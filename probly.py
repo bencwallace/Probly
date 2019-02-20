@@ -1,11 +1,26 @@
 """probly.py: A python module for probability."""
 
-from copy import copy, deepcopy
 import numbers
 import numpy as np
+import operator as op
+
+num_ops_lift = ['add', 'radd', 'sub', 'rsub', 'mul', 'rmul', 'truediv']
+num_ops_other = ['matmul']
+
+programs_lift = [
+    (
+        'def __{:s}__(self, x):\n'
+        '    return Lift(op.{:s})(self, x)'
+    ).format(fcn, fcn) for fcn in num_ops_lift]
+programs_other = [
+    (
+        'def __r{:s}__(self, x):\n'
+        '   X = sampler(x)\n'
+        '   return X.__{:s}__(self)'
+    ).format(fcn, fcn) for fcn in num_ops_other]
 
 
-class sampler():
+class sampler(object):
     """
     A sampler.
 
@@ -26,21 +41,20 @@ class sampler():
         self.argv = [sampler(rv) for rv in argv]
 
         if isinstance(arg, type(self)):
-            print('Init from sampler')
             self.species = arg.species
             self.sample = arg.sample
             self.argv = arg.argv
         elif callable(arg):
-            print('Init from callable')
             self.species = 'composed'
-            self.fcn = deepcopy(arg)
 
             def sample(seed=None):
                 rv_samples = [rv(seed) for rv in self.argv]
-                return self.fcn(*rv_samples)
+                return arg(*rv_samples)
             self.sample = sample
-        elif isinstance(arg, (numbers.Number, np.ndarray)):
+        elif isinstance(arg, (numbers.Number, np.ndarray, list)):
             self.species = 'const'
+            if isinstance(arg, list):
+                arg = np.array(arg)
             self.sample = lambda _=None: arg
         else:   # Assume scipy.stats random variable
             self.species = 'scipy'
@@ -49,21 +63,18 @@ class sampler():
     def __call__(self, seed=None):
         return self.sample(seed)
 
-    def __add__(self, x):
-        return Add(self, x)
+    # Operators for emulating numeric types
+    for p in programs_lift + programs_other:
+        exec(p)
+
+    # Act on right (commutative)
+
 
 
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
 
-    def F(X):
-        return sampler(f, X)
+    def F(*argv):
+        return sampler(f, *argv)
 
     return F
-
-
-def add(x, y):
-    return x + y
-
-
-Add = Lift(add)
