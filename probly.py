@@ -56,12 +56,25 @@ class sampler(object):
     def __init__(self, arg, *argv):
         """Type conversion."""
 
+        self.arg = arg
         self.argv = [sampler(rv) for rv in argv]
 
         if isinstance(arg, type(self)):
             self.species = arg.species
+            self.arg = arg.arg
             self.sample = arg.sample
             self.argv = arg.argv
+        elif isinstance(arg, numbers.Number):
+            self.species = 'scalar'
+            self.sample = lambda _=None: arg
+        elif isinstance(arg, (np.ndarray, list)):
+            self.species = 'array'
+            arg = np.array([sampler(item) for item in arg])
+
+            def sample(seed):
+                rv_samples = [rv(seed) for rv in arg]
+                return np.array(rv_samples)
+            self.sample = sample
         elif callable(arg):
             self.species = 'composed'
 
@@ -69,12 +82,7 @@ class sampler(object):
                 rv_samples = [rv(seed) for rv in self.argv]
                 return arg(*rv_samples)
             self.sample = sample
-        elif isinstance(arg, (numbers.Number, np.ndarray, list)):
-            self.species = 'const'
-            if isinstance(arg, list):
-                arg = np.array(arg)
-            self.sample = lambda _=None: arg
-        else:   # Assume scipy.stats random variable
+        else:   # Must have an rvs method
             self.species = 'scipy'
             self.sample = lambda seed=None: arg.rvs(random_state=seed)
 
@@ -82,6 +90,14 @@ class sampler(object):
         """Draw a random sample."""
 
         return self.sample(seed)
+
+    def __getitem__(self, key):
+        if self.species == 'composed':
+            def component_fcn(*argv):
+                return self.arg(*argv)[key]
+            return sampler(component_fcn, *self.argv)
+        else:
+            return sampler(self.arg[key])
 
     # Operators for emulating numeric types
     for p in programs_lift + programs_other + programs_unary:
