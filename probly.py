@@ -78,20 +78,26 @@ class RV(object):
         sample (function)
     """
 
+    def __new__(cls, obj):
+        if isinstance(obj, cls):
+            # "Copy" constructor. Should not be called by user.
+            return obj
+        else:
+            return super().__new__(cls)
+
     def __init__(self, obj):
         """Type conversion."""
 
-        if callable(obj):
-            # Direct initialization from sample function
+        if isinstance(obj, type(self)):
+            # "Copy" constructor --> No need to init
+            pass
+        elif callable(obj):
+            # Direct initialization from `sample` function
             self.species = 'custom'
             self.sample = lambda seed: obj(random_state=seed)
-        elif isinstance(obj, type(self)):
-            # Copy constructor
-            self.species = obj.species
-            self.sample = obj.sample
         elif isinstance(obj, numbers.Number):
-            # Constant number
-            self.species = 'number'
+            # Constant. Required for arithmetic.
+            self.species = 'const'
             self.sample = lambda _=None: obj
         elif isinstance(obj, (np.ndarray, list, tuple)):
             # Initialize from array-like (of type number, RV, array, etc.)
