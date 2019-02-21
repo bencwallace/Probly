@@ -37,8 +37,12 @@ programs_unary = [
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
 
-    def F(*argv):
-        return RV(f, *argv)
+    def F(*args):
+        def sample(seed):
+            seed = gen_seed(seed)
+            rv_samples = [rv(seed) for rv in args]
+            return f(*rv_samples)
+        return RV(sample)
 
     return F
 
@@ -57,7 +61,7 @@ def gen_seed(seed=None):
     try:
         seed = int.from_bytes(urandom(4), 'big')
     except NotImplementedError:
-        print('Need to implement metho to seed from time')
+        print('Need to implement method to seed from time')
 
     return seed
 
@@ -74,40 +78,35 @@ class RV(object):
         sample (function)
     """
 
-    def __init__(self, arg, *argv):
+    def __init__(self, obj):
         """Type conversion."""
 
-        self.arg = arg
-        self.argv = [RV(rv) for rv in argv]
-
-        if isinstance(arg, type(self)):
-            self.species = arg.species
-            self.arg = arg.arg
-            self.sample = arg.sample
-            self.argv = arg.argv
-        elif isinstance(arg, numbers.Number):
-            self.species = 'scalar'
-            self.sample = lambda _=None: arg
-        elif isinstance(arg, (np.ndarray, list, tuple)):
+        if callable(obj):
+            # Direct initialization from sample function
+            self.species = 'custom'
+            self.sample = obj
+        elif isinstance(obj, type(self)):
+            # Copy constructor
+            self.species = obj.species
+            self.sample = obj.sample
+        elif isinstance(obj, numbers.Number):
+            # Constant number
+            self.species = 'number'
+            self.sample = lambda _=None: obj
+        elif isinstance(obj, (np.ndarray, list, tuple)):
+            # Initialize from array-like (of type number, RV, array, etc.)
             self.species = 'array'
-            arg = np.array([RV(item) for item in arg])
+            array = np.array([RV(item) for item in obj])
 
             def sample(seed):
                 seed = gen_seed(seed)
-                rv_samples = [rv(seed) for rv in arg]
+                rv_samples = [rv(seed) for rv in array]
                 return np.array(rv_samples)
             self.sample = sample
-        elif callable(arg):
-            self.species = 'composed'
-
-            def sample(seed):
-                seed = gen_seed(seed)
-                rv_samples = [rv(seed) for rv in self.argv]
-                return arg(*rv_samples)
-            self.sample = sample
-        else:   # Must have an rvs method
+        else:
+            # Initialize from scipy.stats random variable (or similar)
             self.species = 'scipy'
-            self.sample = lambda seed=None: arg.rvs(random_state=seed)
+            self.sample = lambda seed=None: obj.rvs(random_state=seed)
 
     def __call__(self, seed=None):
         """Draw a random sample."""
@@ -116,9 +115,9 @@ class RV(object):
 
     def __getitem__(self, key):
         if self.species == 'composed':
-            def component_fcn(*argv):
-                return self.arg(*argv)[key]
-            return RV(component_fcn, *self.argv)
+            def component_fcn(*args):
+                return self.arg(*args)[key]
+            return RV(component_fcn, *self.args)
         else:
             return RV(self.arg[key])
 
