@@ -4,6 +4,9 @@ import numbers
 import numpy as np
 import operator as op
 
+import random
+from scipy.stats._distn_infrastructure import rv_generic
+
 from os import urandom
 import time
 
@@ -97,7 +100,7 @@ class RV(object):
         if isinstance(obj, type(self)):
             # "Copy" constructor --> No need to init
             pass
-        elif hasattr(obj, 'rvs'):
+        elif isinstance(obj, rv_generic):
             # Initialize from scipy.stats random variable or similar
             self.species = 'scipy'
             self._sampler = lambda seed=None: obj.rvs(random_state=seed)
@@ -105,28 +108,20 @@ class RV(object):
             # Direct initialization from `_sampler` function
             self.species = 'custom'
 
-            # Determine whether to use parameter name `seed` or `random_state`
+            # Check for `seed` parameter
             try:
                 obj(seed=0)
             except TypeError:
-                fail = True
+                # This mainly handles the case of `random` samplers
+                def sampler(seed=None):
+                    random.seed(seed)
+                    np.random.seed(seed)
+                    return obj()
+                self._sampler = sampler
             else:
-                fail = False
                 self._sampler = lambda seed=None: obj(seed=seed)
                 return
 
-            try:
-                obj(random_state=0)
-            except TypeError:
-                fail = True
-            else:
-                fail = False
-                self._sampler = lambda seed=None: obj(random_state=seed)
-                return
-
-            if fail:
-                self._sampler = lambda seed=None: obj(seed)
-                warn('Sampler function seeding argument not found')
         elif isinstance(obj, numbers.Number):
             # Constant (simplifies doing arithmetic)
             self.species = 'const'
@@ -146,10 +141,9 @@ class RV(object):
 
     def __call__(self, seed=None):
         """Draw a random sample."""
-        if seed is None:
-            return self._sampler()
-        else:
-            return self._sampler(seed + self.id)
+
+        seed = gen_seed()
+        return self._sampler(seed + self.id)
 
     def __getitem__(self, key):
         try:
