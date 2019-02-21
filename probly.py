@@ -9,7 +9,7 @@ from scipy.stats._distn_infrastructure import rv_generic
 
 from os import urandom
 
-# For automating repetitive operator definitions
+# Exec programs for automating repetitive operator definitions
 num_ops_lift = ['add', 'sub', 'mul', 'matmul',
                 'truediv', 'floordiv', 'mod', 'divmod', 'pow']
 num_ops_right = ['add', 'sub', 'mul', 'matmul', 'truediv', 'floordiv', 'mod',
@@ -52,10 +52,10 @@ def Lift(f):
 
 def gen_seed(seed=None):
     """
-    Generate a random seed.
+    Generate a random seed. If a seed is provided, returns it unchanged.
 
-    Based on Python's implementation. Note: numpy requires seeds between 0 and
-    2 ** 32 - 1.
+    Based on the Python implementation.
+    Note: numpy requires seeds between 0 and 2 ** 32 - 1.
     """
 
     if seed is not None:
@@ -71,14 +71,15 @@ def gen_seed(seed=None):
 
 class RV(object):
     """
-    A generic random RV.
+    A generic random variable.
 
-    Basically a very general kind of random variable. Only capable of producing
-    random quantities, whose explicit distribution is not necessarily known.
+    A very general kind of random variable. Only capable of producing random
+    quantities (on being called), whose explicit distribution is not
+    necessarily known. However, compatible with arithmetical operations, can be
+    acted upon by functions (using Lift), and subscriptable.
 
-    Attributes:
-        species (str)
-        sample (function)
+    Arguments:
+        obj (RV, rv_generic, callable, numerical, or array-like)
     """
     _next_id = 0
 
@@ -90,8 +91,6 @@ class RV(object):
             return super().__new__(cls)
 
     def __init__(self, obj):
-        """Type conversion."""
-
         if isinstance(obj, type(self)):
             # "Copy" constructor --> No need to init
             return
@@ -101,13 +100,10 @@ class RV(object):
 
         if isinstance(obj, rv_generic):
             # Initialize from scipy.stats random variable or similar
-            self.species = 'scipy'
             self._sampler = lambda seed=None: obj.rvs(random_state=seed)
         elif callable(obj):
             # Direct initialization from `_sampler` function
-            self.species = 'custom'
 
-            # Check for `seed` parameter
             try:
                 obj(seed=0)
             except TypeError:
@@ -121,11 +117,9 @@ class RV(object):
                 self._sampler = lambda seed=None: obj(seed=seed)
         elif isinstance(obj, numbers.Number):
             # Constant (simplifies doing arithmetic)
-            self.species = 'const'
             self._sampler = lambda seed=None: obj
         elif hasattr(obj, '__getitem__'):
             # Initialize from array-like (of dtype number, RV, array, etc.)
-            self.species = 'array'
             array = np.array([RV(item) for item in obj])
 
             def sampler(seed):
