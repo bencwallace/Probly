@@ -3,8 +3,11 @@
 import numbers
 import numpy as np
 import operator as op
+
 from os import urandom
 import time
+
+from warnings import warn
 
 # For automating repetitive operator definitions
 num_ops_lift = ['add', 'sub', 'mul', 'matmul',
@@ -38,11 +41,11 @@ def Lift(f):
     """Lifts a function to the composition map between random variables."""
 
     def F(*args):
-        def sample(seed):
+        def sampler(seed):
             seed = gen_seed(seed)
             rv_samples = [rv(seed) for rv in args]
             return f(*rv_samples)
-        return RV(sample)
+        return RV(sampler)
 
     return F
 
@@ -91,39 +94,69 @@ class RV(object):
         if isinstance(obj, type(self)):
             # "Copy" constructor --> No need to init
             pass
+        elif hasattr(obj, 'rvs'):
+            # Initialize from scipy.stats random variable or similar
+            self.species = 'scipy'
+            self._sampler = lambda seed=None: obj.rvs(random_state=seed)
         elif callable(obj):
-            # Direct initialization from `sample` function
+            # Direct initialization from `_sampler` function
             self.species = 'custom'
-            self.sample = lambda seed: obj(random_state=seed)
+
+            # Determine whether to use parameter name `seed` or `random_state`
+            try:
+                obj(seed=0)
+            except TypeError:
+                fail = True
+            else:
+                fail = False
+                self._sampler = lambda seed: obj(seed=seed)
+                return
+
+            try:
+                obj(random_state=0)
+            except TypeError:
+                fail = True
+            else:
+                fail = False
+                self._sampler = lambda seed: obj(random_state=seed)
+                return
+
+            if fail:
+                self._sampler = lambda seed: obj(seed)
+                warn('Sampler function seeding argument not found')
         elif isinstance(obj, numbers.Number):
-            # Constant. Required for arithmetic.
+            # Constant (simplifies doing arithmetic)
             self.species = 'const'
-            self.sample = lambda _=None: obj
-        elif isinstance(obj, (np.ndarray, list, tuple)):
-            # Initialize from array-like (of type number, RV, array, etc.)
+            self._sampler = lambda seed=None: obj
+        elif hasattr(obj, '__getitem__'):
+            # Initialize from array-like (of dtype number, RV, array, etc.)
             self.species = 'array'
             array = np.array([RV(item) for item in obj])
 
-            def sample(seed):
+            def sampler(seed):
                 seed = gen_seed(seed)
-                rv_samples = [rv(seed) for rv in array]
-                return np.array(rv_samples)
-            self.sample = sample
+                samples = [rv(seed) for rv in array]
+                return np.array(samples)
+            self._sampler = sampler
         else:
-            # Initialize from scipy.stats random variable (or similar)
-            self.species = 'scipy'
-            self.sample = lambda seed=None: obj.rvs(random_state=seed)
+            print('Error')
 
     def __call__(self, seed=None):
         """Draw a random sample."""
 
-        return self.sample(seed)
+        return self._sampler(seed)
 
     def __getitem__(self, key):
-        if self.species == 'composed':
-            def component_fcn(*args):
-                return self.arg(*args)[key]
-            return RV(component_fcn, *self.args)
+        try:
+            self()[0]
+        except TypeError:
+            raise TypeError('Scalar random variable is not subscriptable')
+
+        if True:
+            def sampler(seed=None):
+                sample = self(seed)
+                return sample[key]
+            return RV(sampler)
         else:
             return RV(self.arg[key])
 
