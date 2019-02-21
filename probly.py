@@ -3,6 +3,8 @@
 import numbers
 import numpy as np
 import operator as op
+from os import urandom
+import time
 
 # For automating repetitive operator definitions
 num_ops_lift = ['add', 'sub', 'mul', 'matmul',
@@ -41,6 +43,25 @@ def Lift(f):
     return F
 
 
+def gen_seed(seed=None):
+    """
+    Generate a random seed.
+
+    Based on Python's implementation. Note: numpy requires seeds between 0 and
+    2 ** 32 - 1.
+    """
+
+    if seed is not None:
+        return seed
+
+    try:
+        seed = int.from_bytes(urandom(4), 'big')
+    except NotImplementedError:
+        print('Need to implement metho to seed from time')
+
+    return seed
+
+
 class RV(object):
     """
     A generic random RV.
@@ -67,18 +88,20 @@ class RV(object):
         elif isinstance(arg, numbers.Number):
             self.species = 'scalar'
             self.sample = lambda _=None: arg
-        elif isinstance(arg, (np.ndarray, list)):
+        elif isinstance(arg, (np.ndarray, list, tuple)):
             self.species = 'array'
             arg = np.array([RV(item) for item in arg])
 
             def sample(seed):
+                seed = gen_seed(seed)
                 rv_samples = [rv(seed) for rv in arg]
                 return np.array(rv_samples)
             self.sample = sample
         elif callable(arg):
             self.species = 'composed'
 
-            def sample(seed=None):
+            def sample(seed):
+                seed = gen_seed(seed)
                 rv_samples = [rv(seed) for rv in self.argv]
                 return arg(*rv_samples)
             self.sample = sample
