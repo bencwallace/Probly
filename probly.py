@@ -8,9 +8,6 @@ import random
 from scipy.stats._distn_infrastructure import rv_generic
 
 from os import urandom
-import time
-
-from warnings import warn
 
 # For automating repetitive operator definitions
 num_ops_lift = ['add', 'sub', 'mul', 'matmul',
@@ -46,7 +43,7 @@ def Lift(f):
     def F(*args):
         def sampler(seed):
             seed = gen_seed(seed)
-            rv_samples = [rv(seed) for rv in args]
+            rv_samples = [RV(var)(seed) for var in args]
             return f(*rv_samples)
         return RV(sampler)
 
@@ -94,13 +91,15 @@ class RV(object):
 
     def __init__(self, obj):
         """Type conversion."""
-        self.id = RV._next_id
-        RV._next_id += 1
 
         if isinstance(obj, type(self)):
             # "Copy" constructor --> No need to init
-            pass
-        elif isinstance(obj, rv_generic):
+            return
+
+        self._id = RV._next_id
+        RV._next_id += 1
+
+        if isinstance(obj, rv_generic):
             # Initialize from scipy.stats random variable or similar
             self.species = 'scipy'
             self._sampler = lambda seed=None: obj.rvs(random_state=seed)
@@ -120,8 +119,6 @@ class RV(object):
                 self._sampler = sampler
             else:
                 self._sampler = lambda seed=None: obj(seed=seed)
-                return
-
         elif isinstance(obj, numbers.Number):
             # Constant (simplifies doing arithmetic)
             self.species = 'const'
@@ -142,8 +139,8 @@ class RV(object):
     def __call__(self, seed=None):
         """Draw a random sample."""
 
-        seed = gen_seed()
-        return self._sampler(seed + self.id)
+        seed = gen_seed(seed)
+        return self._sampler(seed + self._id)
 
     def __getitem__(self, key):
         try:
