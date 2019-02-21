@@ -21,7 +21,7 @@ programs_lift = [
 programs_other = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = sampler(x)\n'
+        '   X = RV(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in num_ops_right]
 
@@ -36,14 +36,14 @@ def Lift(f):
     """Lifts a function to the composition map between random variables."""
 
     def F(*argv):
-        return sampler(f, *argv)
+        return RV(f, *argv)
 
     return F
 
 
-class sampler(object):
+class RV(object):
     """
-    A generic random sampler.
+    A generic random RV.
 
     Basically a very general kind of random variable. Only capable of producing
     random quantities, whose explicit distribution is not necessarily known.
@@ -57,7 +57,7 @@ class sampler(object):
         """Type conversion."""
 
         self.arg = arg
-        self.argv = [sampler(rv) for rv in argv]
+        self.argv = [RV(rv) for rv in argv]
 
         if isinstance(arg, type(self)):
             self.species = arg.species
@@ -69,7 +69,7 @@ class sampler(object):
             self.sample = lambda _=None: arg
         elif isinstance(arg, (np.ndarray, list)):
             self.species = 'array'
-            arg = np.array([sampler(item) for item in arg])
+            arg = np.array([RV(item) for item in arg])
 
             def sample(seed):
                 rv_samples = [rv(seed) for rv in arg]
@@ -95,9 +95,9 @@ class sampler(object):
         if self.species == 'composed':
             def component_fcn(*argv):
                 return self.arg(*argv)[key]
-            return sampler(component_fcn, *self.argv)
+            return RV(component_fcn, *self.argv)
         else:
-            return sampler(self.arg[key])
+            return RV(self.arg[key])
 
     # Operators for emulating numeric types
     for p in programs_lift + programs_other + programs_unary:
