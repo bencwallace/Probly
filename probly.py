@@ -80,6 +80,7 @@ class RV(object):
         species (str)
         sample (function)
     """
+    _next_id = 0
 
     def __new__(cls, obj):
         if isinstance(obj, cls):
@@ -90,6 +91,8 @@ class RV(object):
 
     def __init__(self, obj):
         """Type conversion."""
+        self.id = RV._next_id
+        RV._next_id += 1
 
         if isinstance(obj, type(self)):
             # "Copy" constructor --> No need to init
@@ -109,7 +112,7 @@ class RV(object):
                 fail = True
             else:
                 fail = False
-                self._sampler = lambda seed: obj(seed=seed)
+                self._sampler = lambda seed=None: obj(seed=seed)
                 return
 
             try:
@@ -118,11 +121,11 @@ class RV(object):
                 fail = True
             else:
                 fail = False
-                self._sampler = lambda seed: obj(random_state=seed)
+                self._sampler = lambda seed=None: obj(random_state=seed)
                 return
 
             if fail:
-                self._sampler = lambda seed: obj(seed)
+                self._sampler = lambda seed=None: obj(seed)
                 warn('Sampler function seeding argument not found')
         elif isinstance(obj, numbers.Number):
             # Constant (simplifies doing arithmetic)
@@ -143,8 +146,10 @@ class RV(object):
 
     def __call__(self, seed=None):
         """Draw a random sample."""
-
-        return self._sampler(seed)
+        if seed is None:
+            return self._sampler()
+        else:
+            return self._sampler(seed + self.id)
 
     def __getitem__(self, key):
         try:
