@@ -84,7 +84,7 @@ class RV(object):
         if callable(obj):
             # Direct initialization from sample function
             self.species = 'custom'
-            self.sample = obj
+            self.sample = lambda seed: obj(random_state=seed)
         elif isinstance(obj, type(self)):
             # Copy constructor
             self.species = obj.species
