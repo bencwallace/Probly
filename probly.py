@@ -1,5 +1,6 @@
 """probly.py: A python module for working with random variables."""
 
+import copy
 from functools import wraps
 import math
 import networkx as nx
@@ -155,6 +156,13 @@ class rvar(object):
             return obj
         else:
             return cls(lambda seed=None: obj)
+
+    @classmethod
+    def copy(cls, obj):
+        """Return a random variable with the same distribution as `self`"""
+
+        # Shallow copy is ok as `rvar` isn't mutable
+        return copy.copy(obj)
 
     @classmethod
     def define(cls, sampler):
