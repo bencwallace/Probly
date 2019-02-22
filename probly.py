@@ -29,7 +29,7 @@ _programs_lift = [
 _programs_right = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = rvar.make_rv(x)\n'
+        '   X = rvar.convert(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in _num_ops_right]
 
@@ -63,8 +63,6 @@ def get_seed(seed=None):
 
     Based on the Python implementation. A consistent approach to generating
     re-usable random seeds is needed in order to implement dependency.
-
-    Note: numpy requires seeds between 0 and 2 ** 32 - 1.
     """
 
     if seed is not None:
@@ -96,7 +94,7 @@ class rvar(object):
 
         if f is not None:
             rvar.graph.add_node(self, method=f)
-            edges = [(rvar.make_rv(var), self, {'index': i})
+            edges = [(rvar.convert(var), self, {'index': i})
                      for i, var in enumerate(args)]
             rvar.graph.add_edges_from(edges)
 
@@ -105,7 +103,8 @@ class rvar(object):
         parents = list(self.parents())
 
         if len(parents) == 0:
-            return self.sampler(seed)
+            # Seed as follows for independence of `rvar`s with same `sampler`
+            return self.sampler((seed + id(self)) % _max_seed)
         else:
             # Re-order parents according to edge index
             data = [rvar.graph.get_edge_data(p, self) for p in parents]
@@ -117,23 +116,32 @@ class rvar(object):
             method = rvar.graph.nodes[self]['method']
             return method(*samples)
 
+    def __getitem__(self, key):
+        return rvar.getitem(self, key)
+
     # Define operators for emulating numeric types
     for p in _programs:
         exec(p)
 
     def parents(self):
+        """Returns list of random variables from which `self` is defined"""
         if self in rvar.graph:
             return list(rvar.graph.predecessors(self))
         else:
             return []
 
     @classmethod
-    def make_rv(cls, obj):
-        """Make rvar from constant or rvar"""
+    def convert(cls, obj):
+        """Converts constants to `rvar` objects."""
+
         if isinstance(obj, cls):
             return obj
         else:
             return cls(lambda seed=None: obj)
+
+    @classmethod
+    def define(cls, sampler):
+        return cls(sampler)
 
     @classmethod
     def from_random(cls, random_sampler):
@@ -161,4 +169,10 @@ class rvar(object):
     def array(cls, arr):
         def make_array(*args):
             return np.array(args)
-        return cls(None, make_array, *arr)
+        return cls.compose(make_array, *arr)
+
+    @classmethod
+    def getitem(cls, obj, key):
+        def get(arr):
+            return arr[key]
+        return cls.compose(get, obj)
