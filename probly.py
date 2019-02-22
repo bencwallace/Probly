@@ -57,11 +57,15 @@ def Lift(f):
             seed = gen_seed(seed)
             rv_samples = [RV(var)(seed) for var in args]
             return f(*rv_samples)
-        # The following implicitly adds a node to the graph
+        # The following implicitly adds a node `X` to the graph.
         X = RV(sampler)
 
+        # However, the node's `method` attribute is initially `sampler` and
+        # must be changed to `f`
+        RV.graph.nodes[X]['method'] = f
+
         # Edges must be added before losing information in `args`
-        edges = [(var, X, {'index': i}) for i, var in enumerate(args)]
+        edges = [(RV(var), X, {'index': i}) for i, var in enumerate(args)]
         RV.graph.add_edges_from(edges)
 
         return X
@@ -153,7 +157,8 @@ class RV(object):
             self._sampler = sampler
 
             RV.graph.add_node(self, method=np.array)
-            edges = [(var, self, {'index': i}) for i, var in enumerate(obj)]
+            edges = [(RV(var), self, {'index': i})
+                     for i, var in enumerate(obj)]
             RV.graph.add_edges_from(edges)
         else:
             print('Error')
@@ -167,7 +172,25 @@ class RV(object):
 
         # Seed as follows to ensure independence of RVs with same sampler
         seed = gen_seed(seed)
-        return self._sampler((seed + id(self)) % _max_seed)
+
+        parents = list(self.parents())
+
+        if len(list(parents)) == 0:
+            return self._sampler((seed + id(self)) % _max_seed)
+        else:
+            samples = [p(seed) for p in parents]
+
+            # Re-order parents according to edge index
+            data = [RV.graph.get_edge_data(p, self) for p in parents]
+            indices = [d['index'] for d in data]
+            parents = [parents[i] for i in indices]
+
+            # Sample from parents and evaluate method on samples
+            method = RV.graph.nodes[self]['method']
+            try:
+                return method(samples)
+            except TypeError:
+                return method(*samples)
 
     def __getitem__(self, key):
         """Subscript a random matrix."""
@@ -176,14 +199,21 @@ class RV(object):
         except TypeError:
             raise TypeError('Scalar random variable is not subscriptable')
 
-        if True:
-            def sampler(seed=None):
-                sample = self(seed)
-                return sample[key]
-            return RV(sampler)
-        else:
-            return RV(self.arg[key])
+        def sampler(seed=None):
+            sample = self(seed)
+            return sample[key]
+        X = RV(sampler)
+
+        # Change implicit label
+        select = lambda obj: op.__getitem__(obj, key)
+        RV.graph.nodes[X]['method'] = select
+        RV.graph.add_edge(self, X, index=0)
+
+        return X
 
     # Define operators for emulating numeric types
     for p in _programs_lift + _programs_other + _programs_unary:
         exec(p)
+
+    def parents(self):
+        return list(RV.graph.predecessors(self))
