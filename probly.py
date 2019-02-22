@@ -1,5 +1,6 @@
 """probly.py: A python module for working with random variables."""
 
+import math
 import networkx as nx
 import numbers
 import numpy as np
@@ -10,7 +11,7 @@ from scipy.stats._distn_infrastructure import rv_generic
 
 from os import urandom
 
-# For seeding
+# Numpy max seed
 _max_seed = 2 ** 32 - 1
 
 # Exec programs for automating repetitive operator definitions
@@ -60,7 +61,7 @@ def Lift(f):
         X = RV(sampler)
 
         # Edges must be added before losing information in `args`
-        edges = [(var, X) for var in args]
+        edges = [(var, X, {'index': i}) for i, var in enumerate(args)]
         RV.graph.add_edges_from(edges)
 
         return X
@@ -72,7 +73,9 @@ def gen_seed(seed=None):
     """
     Generate a random seed. If a seed is provided, returns it unchanged.
 
-    Based on the Python implementation.
+    Based on the Python implementation. A consistent approach to generating
+    re-usable random seeds is needed in order to implement dependency.
+
     Note: numpy requires seeds between 0 and 2 ** 32 - 1.
     """
 
@@ -80,7 +83,8 @@ def gen_seed(seed=None):
         return seed
 
     try:
-        seed = int.from_bytes(urandom(4), 'big')
+        max_bytes = math.ceil(np.log2(_max_seed) / 8)
+        seed = int.from_bytes(urandom(max_bytes), 'big')
     except NotImplementedError:
         print('Need to implement method to seed from time')
 
@@ -111,7 +115,7 @@ class RV(object):
 
     def __init__(self, obj):
         if isinstance(obj, type(self)):
-            # "Copy" constructor --> No need to init
+            # "Copy" constructor used (no need to init)
             return
 
         if isinstance(obj, rv_generic):
@@ -149,7 +153,7 @@ class RV(object):
             self._sampler = sampler
 
             RV.graph.add_node(self, method=np.array)
-            edges = [(var, self) for var in obj]
+            edges = [(var, self, {'index': i}) for i, var in enumerate(obj)]
             RV.graph.add_edges_from(edges)
         else:
             print('Error')
@@ -166,6 +170,7 @@ class RV(object):
         return self._sampler((seed + id(self)) % _max_seed)
 
     def __getitem__(self, key):
+        """Subscript a random matrix."""
         try:
             self()[0]
         except TypeError:
@@ -179,6 +184,6 @@ class RV(object):
         else:
             return RV(self.arg[key])
 
-    # Operators for emulating numeric types
+    # Define operators for emulating numeric types
     for p in _programs_lift + _programs_other + _programs_unary:
         exec(p)
