@@ -29,7 +29,7 @@ _programs_lift = [
 _programs_right = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = RV.make_rv(x)\n'
+        '   X = rvar.make_rv(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in _num_ops_right]
 
@@ -49,15 +49,15 @@ def Lift(f):
         The lifted function
 
         Args:
-            `RV`s and constants (though works with anything that casts to `RV`)
+            `rvar`s and constants
         """
 
-        return RV.compose(f, *args)
+        return rvar.compose(f, *args)
 
     return F
 
 
-def gen_seed(seed=None):
+def get_seed(seed=None):
     """
     Generate a random seed. If a seed is provided, returns it unchanged.
 
@@ -79,7 +79,7 @@ def gen_seed(seed=None):
     return seed
 
 
-class RV(object):
+class rvar(object):
     """
     A random variable placeholder.
 
@@ -95,26 +95,26 @@ class RV(object):
             assert callable(sampler), '`sampler` is not callable'
 
         if f is not None:
-            RV.graph.add_node(self, method=f)
-            edges = [(RV.make_rv(var), self, {'index': i})
+            rvar.graph.add_node(self, method=f)
+            edges = [(rvar.make_rv(var), self, {'index': i})
                      for i, var in enumerate(args)]
-            RV.graph.add_edges_from(edges)
+            rvar.graph.add_edges_from(edges)
 
     def __call__(self, seed=None):
-        seed = gen_seed(seed)
+        seed = get_seed(seed)
         parents = list(self.parents())
 
         if len(parents) == 0:
             return self.sampler(seed)
         else:
             # Re-order parents according to edge index
-            data = [RV.graph.get_edge_data(p, self) for p in parents]
+            data = [rvar.graph.get_edge_data(p, self) for p in parents]
             indices = [d['index'] for d in data]
             parents = [parents[i] for i in indices]
 
             # Sample from parents and evaluate method on samples
             samples = [p(seed) for p in parents]
-            method = RV.graph.nodes[self]['method']
+            method = rvar.graph.nodes[self]['method']
             return method(*samples)
 
     # Define operators for emulating numeric types
@@ -122,14 +122,14 @@ class RV(object):
         exec(p)
 
     def parents(self):
-        if self in RV.graph:
-            return list(RV.graph.predecessors(self))
+        if self in rvar.graph:
+            return list(rvar.graph.predecessors(self))
         else:
             return []
 
     @classmethod
     def make_rv(cls, obj):
-        """Make RV from constant or RV"""
+        """Make rvar from constant or rvar"""
         if isinstance(obj, cls):
             return obj
         else:
