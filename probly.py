@@ -32,7 +32,7 @@ _programs_lift = [
 _programs_right = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = rvar.convert(x)\n'
+        '   X = rvar.const(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in _num_ops_right]
 
@@ -90,7 +90,7 @@ class rvar(object):
     `Lift`.
     """
 
-    graph = nx.DiGraph()
+    graph = nx.MultiDiGraph()
 
     def __init__(self, sampler=None, f=None, *args):
         self.sampler = sampler
@@ -99,7 +99,7 @@ class rvar(object):
 
         if f is not None:
             rvar.graph.add_node(self, method=f)
-            edges = [(rvar.convert(var), self, {'index': i})
+            edges = [(rvar.const(var), self, {'index': i})
                      for i, var in enumerate(args)]
             rvar.graph.add_edges_from(edges)
 
@@ -111,13 +111,18 @@ class rvar(object):
             # Seed as follows for independence of `rvar`s with same `sampler`
             return self.sampler((seed + id(self)) % _max_seed)
         else:
-            # Re-order parents according to edge index
+            # Create {index: parent} dictionary `arguments`
+            # This could probably be made more clear
             data = [rvar.graph.get_edge_data(p, self) for p in parents]
-            indices = [d['index'] for d in data]
-            parents = [parents[i] for i in indices]
+            arguments = {}
+            for i in range(len(parents)):
+                indices = [d.values() for d in data[i].values()]
+                for j in range(len(indices)):
+                    arguments[data[i][j]['index']] = parents[i]
 
-            # Sample from parents and evaluate method on samples
-            samples = [p(seed) for p in parents]
+            # Sample elements of `parents` in order specified by `arguments`
+            # and apply `method` to result
+            samples = [arguments[i](seed) for i in range(len(arguments))]
             method = rvar.graph.nodes[self]['method']
             return method(*samples)
 
@@ -149,7 +154,7 @@ class rvar(object):
         return cls._compose(get, obj)
 
     @classmethod
-    def convert(cls, obj):
+    def const(cls, obj):
         """Converts constants to `rvar` objects."""
 
         if isinstance(obj, cls):
