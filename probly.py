@@ -1,5 +1,6 @@
 """probly.py: A python module for working with random variables."""
 
+from functools import wraps
 import math
 import networkx as nx
 import numpy as np
@@ -44,6 +45,7 @@ _programs = _programs_lift + _programs_right + _programs_unary
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
 
+    @wraps(f)
     def F(*args):
         """
         The lifted function
@@ -90,7 +92,7 @@ class rvar(object):
     def __init__(self, sampler=None, f=None, *args):
         self.sampler = sampler
         if self.sampler is not None:
-            assert callable(sampler), '`sampler` is not callable'
+            assert callable(sampler), '{} is not callable'.format(sampler)
 
         if f is not None:
             rvar.graph.add_node(self, method=f)
@@ -117,6 +119,8 @@ class rvar(object):
             return method(*samples)
 
     def __getitem__(self, key):
+        assert hasattr(self(0), '__getitem__'),\
+            'Scalar {} object not subscriptable'.format(self.__class__)
         return rvar.getitem(self, key)
 
     # Define operators for emulating numeric types
