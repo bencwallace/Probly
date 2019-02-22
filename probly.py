@@ -88,7 +88,7 @@ class RV(object):
     A random variable placeholder.
 
     Can be acted upon by arithmetical operations and functions compatible with
-    Lift.
+    `Lift`.
     """
 
     graph = nx.DiGraph()
@@ -99,6 +99,7 @@ class RV(object):
 
 
 class Const(RV):
+    """A constant random variable."""
     def __init__(self, value):
         self.value = value
 
@@ -107,6 +108,8 @@ class Const(RV):
 
 
 class rvIndep(RV):
+    """A random variable whose sampling algorithm is known."""
+
     def __init__(self, sampler):
         if isinstance(sampler, rv_generic):
             # Initialize from scipy.stats random variable or similar
@@ -133,11 +136,22 @@ class rvIndep(RV):
         return self._sampler((seed + id(self)) % _max_seed)
 
 
+def make_rv(var):
+    """Make random variable from constant or random sampler"""
+
+    if isinstance(var, RV):
+        return var
+    elif callable(var):
+        return rvIndep(var)
+    else:
+        return Const(var)
+
+
 class rvCompound(RV):
     def __init__(self, f, *args):
         RV.graph.add_node(self, method=f)
 
-        edges = [(rv_cast(var), self, {'index': i})
+        edges = [(make_rv(var), self, {'index': i})
                  for i, var in enumerate(args)]
         RV.graph.add_edges_from(edges)
 
@@ -187,16 +201,8 @@ class rvArray(rvCompound):
 def rvarray(array):
     # X = RV()
     # RV.graph.add_node(X, method=lambda *args: np.array(args))
-    # edges = [(rv_cast(var), X, {'index': i})
+    # edges = [(make_rv(var), X, {'index': i})
     #          for i, var in enumerate(array)]
     # RV.graph.add_edges_from(edges)
     # return X
     return Lift(np.array)(array)
-
-
-def rv_cast(var):
-    """Cast constants to RVs"""
-    if isinstance(var, RV):
-        return var
-    else:
-        return Const(var)
