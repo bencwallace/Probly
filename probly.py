@@ -78,7 +78,7 @@ def gen_seed(seed=None):
         max_bytes = math.ceil(np.log2(_max_seed) / 8)
         seed = int.from_bytes(urandom(max_bytes), 'big')
     except NotImplementedError:
-        print('Need to implement method to seed from time')
+        raise
 
     return seed
 
