@@ -154,7 +154,7 @@ class rvar(object):
         return cls._compose(get, obj)
 
     @classmethod
-    def const(cls, obj):
+    def _const(cls, obj):
         """Converts constants to `rvar` objects."""
 
         if isinstance(obj, cls):
