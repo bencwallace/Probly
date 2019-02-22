@@ -1,5 +1,6 @@
 """probly.py: A python module for working with random variables."""
 
+import networkx as nx
 import numbers
 import numpy as np
 import operator as op
@@ -9,43 +10,60 @@ from scipy.stats._distn_infrastructure import rv_generic
 
 from os import urandom
 
-# Exec programs for automating repetitive operator definitions
-num_ops_lift = ['add', 'sub', 'mul', 'matmul',
-                'truediv', 'floordiv', 'mod', 'divmod', 'pow']
-num_ops_right = ['add', 'sub', 'mul', 'matmul', 'truediv', 'floordiv', 'mod',
-                 'divmod', 'pow']
-num_ops_unary = ['neg', 'pos', 'abs', 'complex', 'int', 'float', 'round',
-                 'trunc', 'floor', 'ceil']
+# For seeding
+_max_seed = 2 ** 32 - 1
 
-programs_lift = [
+# Exec programs for automating repetitive operator definitions
+_num_ops_lift = ['add', 'sub', 'mul', 'matmul',
+                 'truediv', 'floordiv', 'mod', 'divmod', 'pow']
+_num_ops_right = ['add', 'sub', 'mul', 'matmul', 'truediv', 'floordiv', 'mod',
+                  'divmod', 'pow']
+_num_ops_unary = ['neg', 'pos', 'abs', 'complex', 'int', 'float', 'round',
+                  'trunc', 'floor', 'ceil']
+
+_programs_lift = [
     (
         'def __{:s}__(self, x):\n'
         '    return Lift(op.{:s})(self, x)'
-    ).format(fcn, fcn) for fcn in num_ops_lift]
+    ).format(fcn, fcn) for fcn in _num_ops_lift]
 
-programs_other = [
+_programs_other = [
     (
         'def __r{:s}__(self, x):\n'
         '   X = RV(x)\n'
         '   return X.__{:s}__(self)'
-    ).format(fcn, fcn) for fcn in num_ops_right]
+    ).format(fcn, fcn) for fcn in _num_ops_right]
 
-programs_unary = [
+_programs_unary = [
     (
         'def __{:s}__(self):\n'
         '   return Lift(op.{:s})(self)'
-    ).format(fcn, fcn) for fcn in num_ops_unary]
+    ).format(fcn, fcn) for fcn in _num_ops_unary]
 
 
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
 
     def F(*args):
+        """
+        The lifted function
+
+        Args:
+            `RV`s and constants (though works with anything that casts to `RV`)
+        """
+
         def sampler(seed):
             seed = gen_seed(seed)
             rv_samples = [RV(var)(seed) for var in args]
             return f(*rv_samples)
-        return RV(sampler)
+        # The following implicitly adds a node to the graph
+        X = RV(sampler)
+
+        # Edges must be added before losing information in `args`
+        edges = [(var, X) for var in args]
+        RV.graph.add_edges_from(edges)
+
+        return X
 
     return F
 
@@ -81,7 +99,8 @@ class RV(object):
     Arguments:
         obj (RV, rv_generic, callable, numerical, or array-like)
     """
-    _next_id = 0
+
+    graph = nx.DiGraph()
 
     def __new__(cls, obj):
         if isinstance(obj, cls):
@@ -95,46 +114,56 @@ class RV(object):
             # "Copy" constructor --> No need to init
             return
 
-        self._id = RV._next_id
-        RV._next_id += 1
-
         if isinstance(obj, rv_generic):
             # Initialize from scipy.stats random variable or similar
             self._sampler = lambda seed=None: obj.rvs(random_state=seed)
+
+            RV.graph.add_node(self, method=self._sampler)
         elif callable(obj):
-            # Direct initialization from `_sampler` function
+            # Initialization from sampler function (includes composition)
 
             try:
                 obj(seed=0)
             except TypeError:
-                # This mainly handles the case of `random` samplers
+                # Case 1. Function composition
+                # Case 2. Other sampler (for example from `random` or numpy)
                 def sampler(seed=None):
                     random.seed(seed)
                     np.random.seed(seed)
                     return obj()
                 self._sampler = sampler
             else:
+                # Other/custom sampler
                 self._sampler = lambda seed=None: obj(seed=seed)
         elif isinstance(obj, numbers.Number):
             # Constant (simplifies doing arithmetic)
             self._sampler = lambda seed=None: obj
         elif hasattr(obj, '__getitem__'):
             # Initialize from array-like (of dtype number, RV, array, etc.)
-            array = np.array([RV(item) for item in obj])
+            array = np.array([RV(var) for var in obj])
 
             def sampler(seed):
                 seed = gen_seed(seed)
                 samples = [rv(seed) for rv in array]
                 return np.array(samples)
             self._sampler = sampler
+
+            RV.graph.add_node(self, method=np.array)
+            edges = [(var, self) for var in obj]
+            RV.graph.add_edges_from(edges)
         else:
             print('Error')
+
+        if self not in RV.graph.nodes:
+            # Only possible situation is "Case 2" above
+            RV.graph.add_node(self, method=self._sampler)
 
     def __call__(self, seed=None):
         """Draw a random sample."""
 
+        # Seed as follows to ensure independence of RVs with same sampler
         seed = gen_seed(seed)
-        return self._sampler(seed + self._id)
+        return self._sampler((seed + id(self)) % _max_seed)
 
     def __getitem__(self, key):
         try:
@@ -151,5 +180,5 @@ class RV(object):
             return RV(self.arg[key])
 
     # Operators for emulating numeric types
-    for p in programs_lift + programs_other + programs_unary:
+    for p in _programs_lift + _programs_other + _programs_unary:
         exec(p)
