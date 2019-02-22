@@ -56,7 +56,7 @@ def Lift(f):
             `rvar`s and constants
         """
 
-        return rvar.compose(f, *args)
+        return rvar._compose(f, *args)
 
     return F
 
@@ -123,7 +123,7 @@ class rvar(object):
     def __getitem__(self, key):
         assert hasattr(self(0), '__getitem__'),\
             'Scalar {} object not subscriptable'.format(self.__class__)
-        return rvar.getitem(self, key)
+        return rvar._getitem(self, key)
 
     # Define operators for emulating numeric types
     for p in _programs:
@@ -135,6 +135,17 @@ class rvar(object):
             return list(rvar.graph.predecessors(self))
         else:
             return []
+
+    # Constructors
+    @classmethod
+    def _compose(cls, f, *args):
+        return cls(None, f, *args)
+
+    @classmethod
+    def _getitem(cls, obj, key):
+        def get(arr):
+            return arr[key]
+        return cls._compose(get, obj)
 
     @classmethod
     def convert(cls, obj):
@@ -168,17 +179,7 @@ class rvar(object):
         return cls(lambda seed=None: scipy_rv.rvs(random_state=seed))
 
     @classmethod
-    def compose(cls, f, *args):
-        return cls(None, f, *args)
-
-    @classmethod
     def array(cls, arr):
         def make_array(*args):
             return np.array(args)
-        return cls.compose(make_array, *arr)
-
-    @classmethod
-    def getitem(cls, obj, key):
-        def get(arr):
-            return arr[key]
-        return cls.compose(get, obj)
+        return cls._compose(make_array, *arr)
