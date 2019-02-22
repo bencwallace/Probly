@@ -2,12 +2,10 @@
 
 import math
 import networkx as nx
-import numbers
 import numpy as np
 import operator as op
 
 import random
-from scipy.stats._distn_infrastructure import rv_generic
 
 from os import urandom
 
@@ -28,10 +26,10 @@ _programs_lift = [
         '    return Lift(op.{:s})(self, x)'
     ).format(fcn, fcn) for fcn in _num_ops_lift]
 
-_programs_other = [
+_programs_right = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = RV(x)\n'
+        '   X = RV.make_rv(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in _num_ops_right]
 
@@ -40,7 +38,8 @@ _programs_unary = [
         'def __{:s}__(self):\n'
         '   return Lift(op.{:s})(self)'
     ).format(fcn, fcn) for fcn in _num_ops_unary]
-_programs = _programs_lift + _programs_other + _programs_unary
+_programs = _programs_lift + _programs_right + _programs_unary
+
 
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
@@ -53,10 +52,7 @@ def Lift(f):
             `RV`s and constants (though works with anything that casts to `RV`)
         """
 
-        # The following implicitly adds a node `X` to the graph.
-        X = rvCompound(f, *args)
-
-        return X
+        return RV.compose(f, *args)
 
     return F
 
@@ -93,116 +89,76 @@ class RV(object):
 
     graph = nx.DiGraph()
 
+    def __init__(self, sampler=None, f=None, *args):
+        self.sampler = sampler
+        if self.sampler is not None:
+            assert callable(sampler), '`sampler` is not callable'
+
+        if f is not None:
+            RV.graph.add_node(self, method=f)
+            edges = [(RV.make_rv(var), self, {'index': i})
+                     for i, var in enumerate(args)]
+            RV.graph.add_edges_from(edges)
+
+    def __call__(self, seed=None):
+        seed = gen_seed(seed)
+        parents = list(self.parents())
+
+        if len(parents) == 0:
+            return self.sampler(seed)
+        else:
+            # Re-order parents according to edge index
+            data = [RV.graph.get_edge_data(p, self) for p in parents]
+            indices = [d['index'] for d in data]
+            parents = [parents[i] for i in indices]
+
+            # Sample from parents and evaluate method on samples
+            samples = [p(seed) for p in parents]
+            method = RV.graph.nodes[self]['method']
+            return method(*samples)
+
     # Define operators for emulating numeric types
     for p in _programs:
         exec(p)
 
-
-class Const(RV):
-    """A constant random variable."""
-    def __init__(self, value):
-        self.value = value
-
-    def __call__(self, seed=None):
-        return self.value
-
-
-class rvIndep(RV):
-    """A random variable whose sampling algorithm is known."""
-
-    def __init__(self, sampler):
-        if isinstance(sampler, rv_generic):
-            # Initialize from scipy.stats random variable or similar
-            self._sampler = lambda seed=None: sampler.rvs(random_state=seed)
-        elif callable(sampler):
-            # Initialization from sampler function
-
-            try:
-                # Check if `sampler` takes `seed` as an argument
-                sampler(seed=0)
-            except TypeError:
-                # Case 1. No `seed` argument (assume `random` or `numpy`)
-                def seeded_sampler(seed=None):
-                    random.seed(seed)
-                    np.random.seed(seed)
-                    return sampler()
-                self._sampler = seeded_sampler
-            else:
-                # Case 2. Sampler with `seed` argument
-                self._sampler = lambda seed=None: sampler(seed=seed)
-
-    def __call__(self, seed=None):
-        seed = gen_seed(seed)
-        return self._sampler((seed + id(self)) % _max_seed)
-
-
-def make_rv(var):
-    """Make random variable from constant or random sampler"""
-
-    if isinstance(var, RV):
-        return var
-    elif callable(var):
-        return rvIndep(var)
-    else:
-        return Const(var)
-
-
-class rvCompound(RV):
-    def __init__(self, f, *args):
-        RV.graph.add_node(self, method=f)
-
-        edges = [(make_rv(var), self, {'index': i})
-                 for i, var in enumerate(args)]
-        RV.graph.add_edges_from(edges)
-
-    def __call__(self, seed=None):
-        """Draw a random sample."""
-
-        # Seed as follows to ensure independence of RVs with same sampler
-        seed = gen_seed(seed)
-
-        parents = list(self.parents())
-        samples = [p(seed) for p in parents]
-
-        # Re-order parents according to edge index
-        data = [RV.graph.get_edge_data(p, self) for p in parents]
-        indices = [d['index'] for d in data]
-        parents = [parents[i] for i in indices]
-
-        # Sample from parents and evaluate method on samples
-        method = RV.graph.nodes[self]['method']
-        return method(*samples)
-
     def parents(self):
-        return list(RV.graph.predecessors(self))
+        if self in RV.graph:
+            return list(RV.graph.predecessors(self))
+        else:
+            return []
 
+    @classmethod
+    def make_rv(cls, obj):
+        """Make RV from constant or RV"""
+        if isinstance(obj, cls):
+            return obj
+        else:
+            return cls(lambda seed=None: obj)
 
-class rvArray(rvCompound):
-    def __init__(self, array):
-        super().__init__(self, np.array, *array)
+    @classmethod
+    def from_random(cls, random_sampler):
+        def seeded_sampler(seed=None):
+            random.seed(seed)
+            return random_sampler()
+        return cls(seeded_sampler)
 
-    def __getitem__(self, key):
-        """Subscript a random matrix."""
+    @classmethod
+    def from_numpy(cls, numpy_sampler):
+        def seeded_sampler(seed=None):
+            np.random.seed(seed)
+            return numpy_sampler()
+        return cls(seeded_sampler)
 
-        # assert hasattr(self(), '__getitem__'), 'Scalar random variable is\
-        #                                         not subscriptable'
+    @classmethod
+    def from_scipy(cls, scipy_rv):
+        return cls(lambda seed=None: scipy_rv.rvs(random_state=seed))
 
-        get = lambda *args: op.__getitem__([args], key)
-        X = Lift(get)(self)
+    @classmethod
+    def compose(cls, f, *args):
+        return cls(None, f, *args)
 
-        # Change implicit label (shouldn't be needed anymore)
-        # select = lambda *args: op.__getitem__([args], key)
-        # RV.graph.nodes[X]['method'] = select
-        RV.graph.add_edge(self, X, index=0)
-
-        return X
-
-
-def rvarray(array):
-    # X = RV()
-    # RV.graph.add_node(X, method=lambda *args: np.array(args))
-    # edges = [(make_rv(var), X, {'index': i})
-    #          for i, var in enumerate(array)]
-    # RV.graph.add_edges_from(edges)
-    # return X
-    return Lift(np.array)(array)
+    @classmethod
+    def array(cls, arr):
+        def make_array(*args):
+            return np.array(args)
+        return cls(None, make_array, *arr)
