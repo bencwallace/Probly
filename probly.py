@@ -170,26 +170,25 @@ class rvar(object):
         return copy.copy(obj)
 
     @classmethod
-    def define(cls, sampler):
-        return cls(sampler)
+    def define(cls, obj, origin=None):
+        """Define a random variable from a pre-defined sampler"""
 
-    @classmethod
-    def from_random(cls, random_sampler):
-        def seeded_sampler(seed=None):
-            random.seed(seed)
-            return random_sampler()
-        return cls(seeded_sampler)
-
-    @classmethod
-    def from_numpy(cls, numpy_sampler):
-        def seeded_sampler(seed=None):
-            np.random.seed(seed)
-            return numpy_sampler()
-        return cls(seeded_sampler)
-
-    @classmethod
-    def from_scipy(cls, scipy_rv):
-        return cls(lambda seed=None: scipy_rv.rvs(random_state=seed))
+        if origin is None:
+            return cls(obj)
+        elif origin == 'scipy':
+            return cls(lambda seed=None: obj.rvs(random_state=seed))
+        elif origin == 'numpy':
+            def seeded_sampler(seed=None):
+                np.random.seed(seed)
+                return obj()
+            return cls(seeded_sampler)
+        elif origin == 'random':
+            def seeded_sampler(seed=None):
+                random.seed(seed)
+                return obj()
+            return cls(seeded_sampler)
+        else:
+            raise TypeError('Unknown origin `{}`'.format(origin))
 
     @classmethod
     def array(cls, arr):
