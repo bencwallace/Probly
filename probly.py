@@ -40,7 +40,7 @@ _programs_unary = [
         'def __{:s}__(self):\n'
         '   return Lift(op.{:s})(self)'
     ).format(fcn, fcn) for fcn in _num_ops_unary]
-
+_programs = _programs_lift + _programs_other + _programs_unary
 
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
@@ -53,16 +53,12 @@ def Lift(f):
             `RV`s and constants (though works with anything that casts to `RV`)
         """
 
-        def sampler(seed):
-            seed = gen_seed(seed)
-            rv_samples = [RV(var)(seed) for var in args]
-            return f(*rv_samples)
         # The following implicitly adds a node `X` to the graph.
-        X = RV(sampler)
+        X = RV()
 
         # However, the node's `method` attribute is initially `sampler` and
         # must be changed to `f`
-        RV.graph.nodes[X]['method'] = f
+        RV.graph.add_node(X, method=f)
 
         # Edges must be added before losing information in `args`
         edges = [(RV(var), X, {'index': i}) for i, var in enumerate(args)]
@@ -110,62 +106,50 @@ class RV(object):
 
     graph = nx.DiGraph()
 
-    def __new__(cls, obj):
+    def __new__(cls, obj=None):
         if isinstance(obj, cls):
             # "Copy" constructor. Should not be called by user.
             return obj
         else:
             return super().__new__(cls)
 
-    def __init__(self, obj):
+    def __init__(self, obj=None):
         if isinstance(obj, type(self)):
-            # "Copy" constructor used (no need to init)
+            # "Copy" constructor used. Removing this condition would trigger
+            # `callable` case below and create an actual copy.
             return
-
-        if isinstance(obj, rv_generic):
+        elif isinstance(obj, rv_generic):
             # Initialize from scipy.stats random variable or similar
             self._sampler = lambda seed=None: obj.rvs(random_state=seed)
-
-            RV.graph.add_node(self, method=self._sampler)
         elif callable(obj):
-            # Initialization from sampler function (includes composition)
+            # Initialization from sampler function
 
             try:
+                # Check if `obj` takes `seed` as an argument
                 obj(seed=0)
             except TypeError:
-                # Case 1. Function composition
-                # Case 2. Other sampler (for example from `random` or numpy)
+                # Case 1. No `seed` argument (assume `random` or `numpy`)
                 def sampler(seed=None):
                     random.seed(seed)
                     np.random.seed(seed)
                     return obj()
                 self._sampler = sampler
             else:
-                # Other/custom sampler
+                # Case 2. Sampler with `seed` argument
                 self._sampler = lambda seed=None: obj(seed=seed)
         elif isinstance(obj, numbers.Number):
             # Constant (simplifies doing arithmetic)
             self._sampler = lambda seed=None: obj
         elif hasattr(obj, '__getitem__'):
             # Initialize from array-like (of dtype number, RV, array, etc.)
-            array = np.array([RV(var) for var in obj])
-
-            def sampler(seed):
-                seed = gen_seed(seed)
-                samples = [rv(seed) for rv in array]
-                return np.array(samples)
-            self._sampler = sampler
-
             RV.graph.add_node(self, method=lambda *args: np.array(args))
             edges = [(RV(var), self, {'index': i})
                      for i, var in enumerate(obj)]
             RV.graph.add_edges_from(edges)
-        else:
-            print('Error')
 
         if self not in RV.graph.nodes:
-            # Only possible situation is "Case 2" above
-            RV.graph.add_node(self, method=self._sampler)
+            # Only possible situation is "Case 1" above
+            RV.graph.add_node(self)
 
     def __call__(self, seed=None):
         """Draw a random sample."""
@@ -175,7 +159,7 @@ class RV(object):
 
         parents = list(self.parents())
 
-        if len(list(parents)) == 0:
+        if len(parents) == 0:
             return self._sampler((seed + id(self)) % _max_seed)
         else:
             samples = [p(seed) for p in parents]
@@ -191,25 +175,22 @@ class RV(object):
 
     def __getitem__(self, key):
         """Subscript a random matrix."""
-        try:
-            self()[0]
-        except TypeError:
-            raise TypeError('Scalar random variable is not subscriptable')
 
-        def sampler(seed=None):
-            sample = self(seed)
-            return sample[key]
-        X = RV(sampler)
+        assert hasattr(self(), '__getitem__'), 'Scalar random variable is not\
+                                                subscriptable'
 
-        # Change implicit label
-        select = lambda *args: op.__getitem__([args], key)
-        RV.graph.nodes[X]['method'] = select
+        get = lambda *args: op.__getitem__([args], key)
+        X = Lift(get)(self)
+
+        # Change implicit label (shouldn't be needed anymore)
+        # select = lambda *args: op.__getitem__([args], key)
+        # RV.graph.nodes[X]['method'] = select
         RV.graph.add_edge(self, X, index=0)
 
         return X
 
     # Define operators for emulating numeric types
-    for p in _programs_lift + _programs_other + _programs_unary:
+    for p in _programs:
         exec(p)
 
     def parents(self):
