@@ -32,7 +32,7 @@ _programs_lift = [
 _programs_right = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = rvar.const(x)\n'
+        '   X = rvar._cast(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in _num_ops_right]
 
@@ -94,12 +94,12 @@ class rvar(object):
 
     def __init__(self, sampler=None, f=None, *args):
         self.sampler = sampler
+
         if self.sampler is not None:
             assert callable(sampler), '{} is not callable'.format(sampler)
-
-        if f is not None:
+        elif f is not None:
             rvar.graph.add_node(self, method=f)
-            edges = [(rvar.const(var), self, {'index': i})
+            edges = [(rvar._cast(var), self, {'index': i})
                      for i, var in enumerate(args)]
             rvar.graph.add_edges_from(edges)
 
@@ -154,11 +154,13 @@ class rvar(object):
         return cls._compose(get, obj)
 
     @classmethod
-    def _const(cls, obj):
-        """Converts constants to `rvar` objects."""
+    def _cast(cls, obj):
+        """Cast constants to `rvar` objects."""
 
         if isinstance(obj, cls):
             return obj
+        elif hasattr(obj, '__getitem__'):
+            return rvar.array(obj)
         else:
             return cls(lambda seed=None: obj)
 
@@ -192,6 +194,8 @@ class rvar(object):
 
     @classmethod
     def array(cls, arr):
+        arr = np.array([rvar._cast(var) for var in arr])
+
         def make_array(*args):
             return np.array(args)
         return cls._compose(make_array, *arr)
