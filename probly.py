@@ -156,7 +156,7 @@ class RV(object):
                 return np.array(samples)
             self._sampler = sampler
 
-            RV.graph.add_node(self, method=np.array)
+            RV.graph.add_node(self, method=lambda *args: np.array(args))
             edges = [(RV(var), self, {'index': i})
                      for i, var in enumerate(obj)]
             RV.graph.add_edges_from(edges)
@@ -187,10 +187,7 @@ class RV(object):
 
             # Sample from parents and evaluate method on samples
             method = RV.graph.nodes[self]['method']
-            try:
-                return method(samples)
-            except TypeError:
-                return method(*samples)
+            return method(*samples)
 
     def __getitem__(self, key):
         """Subscript a random matrix."""
@@ -205,7 +202,7 @@ class RV(object):
         X = RV(sampler)
 
         # Change implicit label
-        select = lambda obj: op.__getitem__(obj, key)
+        select = lambda *args: op.__getitem__([args], key)
         RV.graph.nodes[X]['method'] = select
         RV.graph.add_edge(self, X, index=0)
 
