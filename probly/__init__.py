@@ -84,9 +84,7 @@ class rvAbstract(object):
                 `rvar`s and constants
             """
 
-            # composed_rvar = cls.__new__(cls)
-            # composed_rvar.__init__()
-            F_of_args = cls()
+            F_of_args = cls.__new__(cls)
 
             cls.graph.add_node(F_of_args, method=f)
             edges = [(cls._cast(var), F_of_args, {'index': i})
@@ -125,9 +123,10 @@ class rvGen(rvAbstract):
             raise TypeError('Unknown origin `{}`'.format(origin))
 
     def __call__(self, seed=None):
-        # Seed as follows for independence of `rvGen`s with same `sampler`
-        seed = get_seed(seed)
-        return self.sampler((seed + id(self)) % _max_seed)
+        if self.sampler is not None:
+            seed = get_seed(seed)
+            # Seed as follows for independence of `rvGen`s with same `sampler`
+            return self.sampler((seed + id(self)) % _max_seed)
 
     # Instance methods
     def copy(self, obj):
@@ -147,7 +146,7 @@ class rvGen(rvAbstract):
             return cls(lambda seed=None: obj)
 
 
-class rvarNumeric(rvGen):
+class rvNumeric(rvGen):
     """
     A random variable of numeric type. Not for direct use.
 
@@ -280,48 +279,52 @@ class rvarNumeric(rvGen):
         return op.ceil(self)
 
 
-class rvar(rvarNumeric):
+class rvar(rvNumeric):
     """A random scalar."""
 
     pass
 
 
-# class rarray(rvarNumeric):
-#     """
-#     A random array.
+class rarray(rvNumeric):
+    """
+    A random array.
 
-#     Supports subscripting and matrix operations.
-#     """
+    Supports subscripting and matrix operations.
+    """
 
-#     # circular:
-#     def __new__(cls, arr):
-#         arr = np.array([rvGen._cast(var) for var in arr])
+    # circular:
+    def __new__(cls, arr=None):
+        if hasattr(arr, '__getitem__'):
+            @cls.Lift
+            def make_array(*args):
+                return np.array(args)
 
-#         @cls.Lift
-#         def make_array(*args):
-#             return np.array(args)
+            arr = np.array([cls._cast(var) for var in arr])
+            return make_array(*arr)
+        else:
+            return super().__new__(cls)
 
-#         return rarray._compose(make_array, *arr)
-#         # return make_array(*arr)
+    def __init__(self, arr):
+        pass
 
-#     def __getitem__(self, key):
-#         assert hasattr(self(0), '__getitem__'),\
-#             'Scalar {} object not subscriptable'.format(self.__class__)
-#         return rvGen._getitem(self, key)
+    # def __getitem__(self, key):
+    #     assert hasattr(self(0), '__getitem__'),\
+    #         'Scalar {} object not subscriptable'.format(self.__class__)
+    #     return rvGen._getitem(self, key)
 
-#     # To do: add matrix operations
+    # To do: add matrix operations
 
-#     @classmethod
-#     def _cast(cls, obj):
-#         """Cast a constant array to a random array."""
+    # @classmethod
+    # def _cast(cls, obj):
+    #     """Cast a constant array to a random array."""
 
-#         if isinstance(obj, cls):
-#             return obj
-#         else:
-#             return rvGen.array(obj)
+    #     if isinstance(obj, cls):
+    #         return obj
+    #     else:
+    #         return rvGen.array(obj)
 
-#     @classmethod
-#     def _getitem(cls, obj, key):
-#         def get(arr):
-#             return arr[key]
-#         return cls._compose(get, obj)
+    # @classmethod
+    # def _getitem(cls, obj, key):
+    #     def get(arr):
+    #         return arr[key]
+    #     return cls._compose(get, obj)
