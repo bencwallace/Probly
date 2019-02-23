@@ -22,8 +22,14 @@ def Lift(f):
         Args:
             `rvar`s and constants
         """
+        composed_rvar = rvar.__new__(rvar)
 
-        return rvar._compose(f, *args)
+        rvar.graph.add_node(composed_rvar, method=f)
+        edges = [(rvar._cast(var), composed_rvar, {'index': i})
+                 for i, var in enumerate(args)]
+        rvar.graph.add_edges_from(edges)
+
+        return composed_rvar
 
     return F
 
@@ -97,21 +103,10 @@ class rvar(object):
 
     # Constructors
     @classmethod
-    def _compose(cls, f, *args):
-        composed_rvar = cls.__new__(cls)
-
-        rvar.graph.add_node(composed_rvar, method=f)
-        edges = [(rvar._cast(var), composed_rvar, {'index': i})
-                 for i, var in enumerate(args)]
-        rvar.graph.add_edges_from(edges)
-
-        return composed_rvar
-
-    @classmethod
     def _getitem(cls, obj, key):
         def get(arr):
             return arr[key]
-        return cls._compose(get, obj)
+        return Lift(get)(obj)
 
     @classmethod
     def _cast(cls, obj):
@@ -136,5 +131,5 @@ class rvar(object):
         arr = np.array([rvar._cast(var) for var in arr])
 
         def make_array(*args):
-            return np.array(args)
-        return cls._compose(make_array, *arr)
+            return np.array(args)y
+        return Lift(make_array)(*arr)
