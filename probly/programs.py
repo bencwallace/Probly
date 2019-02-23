@@ -1,24 +1,25 @@
-# Exec programs for automating repetitive operator definitions
-_num_ops_lift = ['add', 'sub', 'mul', 'matmul',
+# Exec programs for automating repetitive operator definitions (scalar)
+_num_ops_lift = ['add', 'sub', 'mul',
                  'truediv', 'floordiv', 'mod', 'divmod', 'pow']
-_num_ops_right = ['add', 'sub', 'mul', 'matmul', 'truediv', 'floordiv', 'mod',
+_num_ops_right = ['add', 'sub', 'mul', 'truediv', 'floordiv', 'mod',
                   'divmod', 'pow']
 _num_ops_unary = ['neg', 'pos', 'abs', 'complex', 'int', 'float', 'round',
                   'trunc', 'floor', 'ceil']
+_num_ops_mat = ['matmul']
 
 _programs_lift = [
     (
         '@Lift\n'
         'def __{:s}__(self, x):\n'
         '   return op.{:s}(self, x)'
-    ).format(fcn, fcn) for fcn in _num_ops_lift]
+    ).format(fcn, fcn) for fcn in _num_ops_lift + _num_ops_mat]
 
 _programs_right = [
     (
         'def __r{:s}__(self, x):\n'
         '   X = rvar._cast(x)\n'
         '   return X.__{:s}__(self)'
-    ).format(fcn, fcn) for fcn in _num_ops_right]
+    ).format(fcn, fcn) for fcn in _num_ops_right + _num_ops_mat]
 
 _programs_unary = [
     (
