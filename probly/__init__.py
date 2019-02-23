@@ -260,10 +260,10 @@ class rvarNumeric(rvarGen):
         return op.ceil(self)
 
 
-# class rvar(rvarNumeric):
-#     """A random scalar."""
+class rvar(rvarNumeric):
+    """A random scalar."""
 
-#     pass
+    pass
 
 
 # class rarray(rvarNumeric):
@@ -273,21 +273,21 @@ class rvarNumeric(rvarGen):
 #     Supports subscripting and matrix operations.
 #     """
 
+#     # circular:
 #     def __new__(cls, arr):
-#         arr = np.array([rvar._cast(var) for var in arr])
+#         arr = np.array([rvarGen._cast(var) for var in arr])
 
+#         @cls.Lift
 #         def make_array(*args):
 #             return np.array(args)
 
-#         return cls._compose(make_array, *arr)
-
-#     def __init__(self, arr):
-#         pass
+#         return rarray._compose(make_array, *arr)
+#         # return make_array(*arr)
 
 #     def __getitem__(self, key):
 #         assert hasattr(self(0), '__getitem__'),\
 #             'Scalar {} object not subscriptable'.format(self.__class__)
-#         return rvar._getitem(self, key)
+#         return rvarGen._getitem(self, key)
 
 #     # To do: add matrix operations
 
@@ -298,7 +298,7 @@ class rvarNumeric(rvarGen):
 #         if isinstance(obj, cls):
 #             return obj
 #         else:
-#             return rvar.array(obj)
+#             return rvarGen.array(obj)
 
 #     @classmethod
 #     def _getitem(cls, obj, key):
