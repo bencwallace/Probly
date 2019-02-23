@@ -127,16 +127,137 @@ class rvarGen(object):
         return F
 
 
-# class rvarNumeric(rvarGen):
-#     """
-#     A random variable of numeric type. Not for direct use.
+class rvarNumeric(rvarGen):
+    """
+    A random variable of numeric type. Not for direct use.
 
-#     Compatible with numerical operations.
-#     """
+    Compatible with numerical operations.
+    """
 
-#     # Define operators for emulating numeric types
-#     for p in _programs:
-#         exec(p)
+    # Is there a more natural way to inherit the Lift decorator?
+
+    # Left commuting binary operators
+    @rvarGen.Lift
+    def __add__(self, x):
+        return op.add(self, x)
+
+    @rvarGen.Lift
+    def __sub__(self, x):
+        return op.sub(self, x)
+
+    @rvarGen.Lift
+    def __mul__(self, x):
+        return op.mul(self, x)
+
+    # Right commuting binary operators
+    @rvarGen.Lift
+    def __radd__(self, x):
+        return x.__add__(self)
+
+    @rvarGen.Lift
+    def __rsub__(self, x):
+        return x.__sub__(self)
+
+    @rvarGen.Lift
+    def __rmul__(self, x):
+        return x.__mul__(self)
+
+    # Left non-commuting binary operators
+    @rvarGen.Lift
+    def __matmul__(self, x):
+        return op.matmul(self, x)
+
+    @rvarGen.Lift
+    def __truediv__(self, x):
+        return op.truediv(self, x)
+
+    @rvarGen.Lift
+    def __floordiv__(self, x):
+        return op.floordiv(self, x)
+
+    @rvarGen.Lift
+    def __mod__(self, x):
+        return op.mod(self, x)
+
+    @rvarGen.Lift
+    def __divmod__(self, x):
+        return op.divmod(self, x)
+
+    @rvarGen.Lift
+    def __pow__(self, x):
+        return op.pow(self, x)
+
+    # Right non-commuting binary operators
+    @rvarGen.Lift
+    def __rmatmul__(self, x):
+        x = rvarGen._cast(x)
+        return x.__matmul__(self)
+
+    @rvarGen.Lift
+    def __rtruediv__(self, x):
+        x = rvarGen._cast(x)
+        return x.__truediv__(self)
+
+    @rvarGen.Lift
+    def __rfloordiv__(self, x):
+        x = rvarGen._cast(x)
+        return x.__floordiv__(self)
+
+    @rvarGen.Lift
+    def __rmod__(self, x):
+        x = rvarGen._cast(x)
+        return x.__mod__(self)
+
+    @rvarGen.Lift
+    def __rdivmod__(self, x):
+        x = rvarGen._cast(x)
+        return x.__divmod__(self)
+
+    @rvarGen.Lift
+    def __rpow__(self, x):
+        x = rvarGen._cast(x)
+        return x.__pow__(self)
+
+    # Unary operators
+    @rvarGen.Lift
+    def __neg__(self):
+        return op.neg(self)
+
+    @rvarGen.Lift
+    def __pos__(self):
+        return op.pos(self)
+
+    @rvarGen.Lift
+    def __abs__(self):
+        return op.abs(self)
+
+    @rvarGen.Lift
+    def __complex__(self):
+        return op.complex(self)
+
+    @rvarGen.Lift
+    def __int__(self):
+        return op.int(self)
+
+    @rvarGen.Lift
+    def __float__(self):
+        return op.float(self)
+
+    @rvarGen.Lift
+    def __round__(self):
+        return op.round(self)
+
+    @rvarGen.Lift
+    def __trunc__(self):
+        return op.trunc(self)
+
+    @rvarGen.Lift
+    def __floor__(self):
+        return op.floor(self)
+
+    @rvarGen.Lift
+    def __ceil__(self):
+        return op.ceil(self)
 
 
 # class rvar(rvarNumeric):
