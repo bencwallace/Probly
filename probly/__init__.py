@@ -4,15 +4,28 @@ import copy
 import networkx as nx
 import numpy as np
 import operator as op
-
+from functools import wraps
 import random
 
 from .programs import _programs
-from .helpers import Lift, get_seed
+from .helpers import get_seed, _max_seed
 
 
-# Numpy max seed
-_max_seed = 2 ** 32 - 1
+def Lift(f):
+    """Lifts a function to the composition map between random variables."""
+
+    @wraps(f)
+    def F(*args):
+        """
+        The lifted function
+
+        Args:
+            `rvar`s and constants
+        """
+
+        return rvar._compose(f, *args)
+
+    return F
 
 
 class rvar(object):
@@ -26,9 +39,6 @@ class rvar(object):
     graph = nx.MultiDiGraph()
 
     def __init__(self, sampler=None, origin='random'):
-        if sampler is None:
-            return
-
         assert callable(sampler), '{} is not callable'.format(sampler)
 
         if origin == 'numpy':
@@ -44,7 +54,7 @@ class rvar(object):
                 return sampler()
             self.sampler = seeded_sampler
         else:
-            raise TypeError('Unknown origin `{}`'.format(origin))
+            self.sampler = sampler
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
@@ -88,7 +98,7 @@ class rvar(object):
     # Constructors
     @classmethod
     def _compose(cls, f, *args):
-        composed_rvar = cls.__new__()
+        composed_rvar = cls.__new__(cls)
 
         rvar.graph.add_node(composed_rvar, method=f)
         edges = [(rvar._cast(var), composed_rvar, {'index': i})
