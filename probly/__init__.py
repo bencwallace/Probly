@@ -126,7 +126,6 @@ class rvarGen(object):
     # Constructors
     @classmethod
     def _compose(cls, f, *args):
-        # return cls(None, f, *args)
         newRV = cls.__new__(cls)
 
         rvarGen.graph.add_node(newRV, method=f)
@@ -145,12 +144,11 @@ class rvarGen(object):
         else:
             return cls(lambda seed=None: obj)
 
-    @classmethod
-    def copy(cls, obj):
+    def copy(self, obj):
         """Return a random variable with the same distribution as `self`"""
 
         # Shallow copy is ok as `rvarGen` isn't mutable
-        return copy.copy(obj)
+        return copy.copy(self)
 
     # @classmethod
     # def define(cls, sampler, origin='random'):
@@ -194,47 +192,42 @@ class rvar(rvarNumeric):
     pass
 
 
-# class rarray(rvarNumeric):
-#     """
-#     A random array.
+class rarray(rvarNumeric):
+    """
+    A random array.
 
-#     Supports subscripting and matrix operations.
-#     """
+    Supports subscripting and matrix operations.
+    """
 
-#     def __init__(self, arr):
-#         arr = np.array([rvar._cast(var) for var in arr])
+    def __new__(cls, arr):
+        arr = np.array([rvar._cast(var) for var in arr])
 
-#         def make_array(*args):
-#             return np.array(args)
-#         return _compose(make_array, *arr)
+        def make_array(*args):
+            return np.array(args)
 
-#     def __getitem__(self, key):
-#         assert hasattr(self(0), '__getitem__'),\
-#             'Scalar {} object not subscriptable'.format(self.__class__)
-#         return rvar._getitem(self, key)
+        return cls._compose(make_array, *arr)
 
-#     # To do: add matrix operations
+    def __init__(self, arr):
+        pass
 
-#     @classmethod
-#     def _cast(cls, obj):
-#         """Cast a constant array to a random array."""
+    def __getitem__(self, key):
+        assert hasattr(self(0), '__getitem__'),\
+            'Scalar {} object not subscriptable'.format(self.__class__)
+        return rvar._getitem(self, key)
 
-#         if isinstance(obj, cls):
-#             return obj
-#         else:
-#             return rvar.array(obj)
+    # To do: add matrix operations
 
-#     @classmethod
-#     def _getitem(cls, obj, key):
-#         def get(arr):
-#             return arr[key]
-#         return cls._compose(get, obj)
+    @classmethod
+    def _cast(cls, obj):
+        """Cast a constant array to a random array."""
 
-#     @classmethod
-#     def array(cls, arr):
-#         # arr = np.array([rvarGen._cast(var) for var in arr])
+        if isinstance(obj, cls):
+            return obj
+        else:
+            return rvar.array(obj)
 
-#         # def make_array(*args):
-#         #     return np.array(args)
-#         # return cls._compose(make_array, *arr)
-#         return cls(arr)
+    @classmethod
+    def _getitem(cls, obj, key):
+        def get(arr):
+            return arr[key]
+        return cls._compose(get, obj)
