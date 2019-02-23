@@ -17,9 +17,9 @@ _max_seed = 2 ** 32 - 1
 
 class rvar(object):
     """
-    A random variable placeholder.
+    A general random variable.
 
-    Can be acted upon by arithmetical operations and functions compatible with
+    Can be sampled from and acted upon by appropriate functions decorated with
     `Lift`.
     """
 
@@ -29,7 +29,8 @@ class rvar(object):
         self.sampler = sampler
 
         if self.sampler is not None:
-            assert callable(sampler), '{} is not callable'.format(sampler)
+            assert callable(sampler), 'Sampler {} is not'\
+                                      'callable'.format(sampler)
         elif f is not None:
             rvar.graph.add_node(self, method=f)
             edges = [(rvar._cast(var), self, {'index': i})
@@ -45,7 +46,6 @@ class rvar(object):
             return self.sampler((seed + id(self)) % _max_seed)
         else:
             # Create {index: parent} dictionary `arguments`
-            # This could probably be made more clear
             data = [rvar.graph.get_edge_data(p, self) for p in parents]
             arguments = {}
             for i in range(len(parents)):
@@ -59,17 +59,9 @@ class rvar(object):
             method = rvar.graph.nodes[self]['method']
             return method(*samples)
 
-    def __getitem__(self, key):
-        assert hasattr(self(0), '__getitem__'),\
-            'Scalar {} object not subscriptable'.format(self.__class__)
-        return rvar._getitem(self, key)
-
-    # Define operators for emulating numeric types
-    for p in _programs:
-        exec(p)
-
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
+
         if self in rvar.graph:
             return list(rvar.graph.predecessors(self))
         else:
@@ -81,21 +73,19 @@ class rvar(object):
         return cls(None, f, *args)
 
     @classmethod
-    def _getitem(cls, obj, key):
-        def get(arr):
-            return arr[key]
-        return cls._compose(get, obj)
-
-    @classmethod
     def _cast(cls, obj):
         """Cast constants to `rvar` objects."""
 
         if isinstance(obj, cls):
             return obj
-        elif hasattr(obj, '__getitem__'):
-            return rvar.array(obj)
         else:
             return cls(lambda seed=None: obj)
+
+    @staticmethod
+    def array(cls, obj):
+        """Construct rvarArray object."""
+
+        return rvarArray(cls, obj)
 
     @classmethod
     def copy(cls, obj):
@@ -110,6 +100,7 @@ class rvar(object):
 
         if origin is None:
             return cls(obj)
+        # Following are obsolete for this class
         elif origin == 'scipy':
             return cls(lambda seed=None: obj.rvs(random_state=seed))
         elif origin == 'numpy':
@@ -125,10 +116,66 @@ class rvar(object):
         else:
             raise TypeError('Unknown origin `{}`'.format(origin))
 
-    @classmethod
-    def array(cls, arr):
+
+class rvarNumeric(rvar):
+    """
+    A random variable of numeric type. Not for direct use.
+
+    Compatible with numerical operations.
+    """
+
+    # Define operators for emulating numeric types
+    for p in _programs:
+        exec(p)
+
+
+class rvarScalar(rvarNumeric):
+    """A random scalar."""
+
+    pass
+
+
+class rvarArray(rvarNumeric):
+    """
+    A random array.
+
+    Supports subscripting and matrix operations.
+    """
+
+    def __init__(self, arr):
         arr = np.array([rvar._cast(var) for var in arr])
 
         def make_array(*args):
             return np.array(args)
-        return cls._compose(make_array, *arr)
+        return _compose(make_array, *arr)
+
+    def __getitem__(self, key):
+        assert hasattr(self(0), '__getitem__'),\
+            'Scalar {} object not subscriptable'.format(self.__class__)
+        return rvar._getitem(self, key)
+
+    # To do: add matrix operations
+
+    @classmethod
+    def _cast(cls, obj):
+        """Cast a constant array to a random array."""
+
+        if isinstance(obj, cls):
+            return obj
+        else:
+            return rvar.array(obj)
+
+    @classmethod
+    def _getitem(cls, obj, key):
+        def get(arr):
+            return arr[key]
+        return cls._compose(get, obj)
+
+    @classmethod
+    def array(cls, arr):
+        # arr = np.array([rvar._cast(var) for var in arr])
+
+        # def make_array(*args):
+        #     return np.array(args)
+        # return cls._compose(make_array, *arr)
+        return cls(arr)
