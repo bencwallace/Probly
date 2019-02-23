@@ -25,16 +25,26 @@ class rvar(object):
 
     graph = nx.MultiDiGraph()
 
-    def __init__(self, sampler=None, f=None, *args):
-        self.sampler = sampler
+    def __init__(self, sampler=None, origin='random'):
+        if sampler is None:
+            return
 
-        if self.sampler is not None:
-            assert callable(sampler), '{} is not callable'.format(sampler)
-        elif f is not None:
-            rvar.graph.add_node(self, method=f)
-            edges = [(rvar._cast(var), self, {'index': i})
-                     for i, var in enumerate(args)]
-            rvar.graph.add_edges_from(edges)
+        assert callable(sampler), '{} is not callable'.format(sampler)
+
+        if origin == 'numpy':
+            def seeded_sampler(seed=None):
+                np.random.seed(seed)
+                return sampler()
+            self.sampler = seeded_sampler
+        elif origin == 'scipy':
+            self.sampler = lambda seed=None: sampler.rvs(random_state=seed)
+        elif origin == 'random':
+            def seeded_sampler(seed=None):
+                random.seed(seed)
+                return sampler()
+            self.sampler = seeded_sampler
+        else:
+            raise TypeError('Unknown origin `{}`'.format(origin))
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
@@ -78,7 +88,14 @@ class rvar(object):
     # Constructors
     @classmethod
     def _compose(cls, f, *args):
-        return cls(None, f, *args)
+        composed_rvar = cls.__new__()
+
+        rvar.graph.add_node(composed_rvar, method=f)
+        edges = [(rvar._cast(var), composed_rvar, {'index': i})
+                 for i, var in enumerate(args)]
+        rvar.graph.add_edges_from(edges)
+
+        return composed_rvar
 
     @classmethod
     def _getitem(cls, obj, key):
@@ -103,27 +120,6 @@ class rvar(object):
 
         # Shallow copy is ok as `rvar` isn't mutable
         return copy.copy(obj)
-
-    @classmethod
-    def define(cls, obj, origin=None):
-        """Define a random variable from a pre-defined sampler"""
-
-        if origin is None:
-            return cls(obj)
-        elif origin == 'scipy':
-            return cls(lambda seed=None: obj.rvs(random_state=seed))
-        elif origin == 'numpy':
-            def seeded_sampler(seed=None):
-                np.random.seed(seed)
-                return obj()
-            return cls(seeded_sampler)
-        elif origin == 'random':
-            def seeded_sampler(seed=None):
-                random.seed(seed)
-                return obj()
-            return cls(seeded_sampler)
-        else:
-            raise TypeError('Unknown origin `{}`'.format(origin))
 
     @classmethod
     def array(cls, arr):
