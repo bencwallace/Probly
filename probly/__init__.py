@@ -131,5 +131,5 @@ class rvar(object):
         arr = np.array([rvar._cast(var) for var in arr])
 
         def make_array(*args):
-            return np.array(args)y
+            return np.array(args)
         return Lift(make_array)(*arr)
