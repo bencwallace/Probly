@@ -1,3 +1,13 @@
+import numpy as np
+import math
+from functools import wraps
+from os import urandom
+
+
+# Numpy max seed (redundant: remove)
+_max_seed = 2 ** 32 - 1
+
+
 def Lift(f):
     """Lifts a function to the composition map between random variables."""
 

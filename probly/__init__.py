@@ -1,17 +1,15 @@
 """probly.py: A python module for working with random variables."""
 
 import copy
-from functools import wraps
-import math
 import networkx as nx
 import numpy as np
 import operator as op
 
 import random
 
-from os import urandom
+from .programs import _programs
+from .helpers import Lift, get_seed
 
-from programs import _programs
 
 # Numpy max seed
 _max_seed = 2 ** 32 - 1
