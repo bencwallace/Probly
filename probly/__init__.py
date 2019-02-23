@@ -4,18 +4,61 @@ import copy
 import networkx as nx
 import numpy as np
 import operator as op
-
 import random
 
+# Local
 from .programs import _programs
-from .helpers import Lift, get_seed
+# from .helpers import Lift, get_seed
+
+# For helpers
+import math
+from functools import wraps
+from os import urandom
 
 
 # Numpy max seed
 _max_seed = 2 ** 32 - 1
 
 
-class rvar(object):
+# TO DO: Move to helpers.py
+def Lift(f):
+    """Lifts a function to the composition map between random variables."""
+
+    @wraps(f)
+    def F(*args):
+        """
+        The lifted function
+
+        Args:
+            `rvar`s and constants
+        """
+
+        return rvar._compose(f, *args)
+
+    return F
+
+
+def get_seed(seed=None):
+    """
+    Generate a random seed. If a seed is provided, returns it unchanged.
+
+    Based on the Python implementation. A consistent approach to generating
+    re-usable random seeds is needed in order to implement dependency.
+    """
+
+    if seed is not None:
+        return seed
+
+    try:
+        max_bytes = math.ceil(np.log2(_max_seed) / 8)
+        seed = int.from_bytes(urandom(max_bytes), 'big')
+    except NotImplementedError:
+        raise
+
+    return seed
+
+
+class rvarGen(object):
     """
     A general random variable.
 
@@ -25,28 +68,41 @@ class rvar(object):
 
     graph = nx.MultiDiGraph()
 
-    def __init__(self, sampler=None, f=None, *args):
+    def __init__(self, sampler=None, origin='random'):
+        """Initialize random variable from sampler."""
+
         self.sampler = sampler
+
+        if origin == 'scipy':
+            # Note: scipy uses np.random.seed
+            self.sampler = lambda seed=None: sampler.rvs(random_state=seed)
+        elif origin == 'numpy':
+            def seeded_sampler(seed=None):
+                np.random.seed(seed)
+                return sampler()
+            self.sampler = seeded_sampler
+        elif origin == 'random':
+            def seeded_sampler(seed=None):
+                random.seed(seed)
+                return sampler()
+            self.sampler = seeded_sampler
+        else:
+            raise TypeError('Unknown origin `{}`'.format(origin))
 
         if self.sampler is not None:
             assert callable(sampler), 'Sampler {} is not'\
                                       'callable'.format(sampler)
-        elif f is not None:
-            rvar.graph.add_node(self, method=f)
-            edges = [(rvar._cast(var), self, {'index': i})
-                     for i, var in enumerate(args)]
-            rvar.graph.add_edges_from(edges)
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
         parents = list(self.parents())
 
         if len(parents) == 0:
-            # Seed as follows for independence of `rvar`s with same `sampler`
+            # Seed as follows for independence of `rvarGen`s with same `sampler`
             return self.sampler((seed + id(self)) % _max_seed)
         else:
             # Create {index: parent} dictionary `arguments`
-            data = [rvar.graph.get_edge_data(p, self) for p in parents]
+            data = [rvarGen.graph.get_edge_data(p, self) for p in parents]
             arguments = {}
             for i in range(len(parents)):
                 indices = [d.values() for d in data[i].values()]
@@ -56,68 +112,71 @@ class rvar(object):
             # Sample elements of `parents` in order specified by `arguments`
             # and apply `method` to result
             samples = [arguments[i](seed) for i in range(len(arguments))]
-            method = rvar.graph.nodes[self]['method']
+            method = rvarGen.graph.nodes[self]['method']
             return method(*samples)
 
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
 
-        if self in rvar.graph:
-            return list(rvar.graph.predecessors(self))
+        if self in rvarGen.graph:
+            return list(rvarGen.graph.predecessors(self))
         else:
             return []
 
     # Constructors
     @classmethod
     def _compose(cls, f, *args):
-        return cls(None, f, *args)
+        # return cls(None, f, *args)
+        newRV = cls.__new__(cls)
+
+        rvarGen.graph.add_node(newRV, method=f)
+        edges = [(rvarGen._cast(var), newRV, {'index': i})
+                 for i, var in enumerate(args)]
+        rvarGen.graph.add_edges_from(edges)
+
+        return newRV
 
     @classmethod
     def _cast(cls, obj):
-        """Cast constants to `rvar` objects."""
+        """Cast constants to `rvarGen` objects."""
 
         if isinstance(obj, cls):
             return obj
         else:
             return cls(lambda seed=None: obj)
 
-    @staticmethod
-    def array(cls, obj):
-        """Construct rvarArray object."""
-
-        return rvarArray(cls, obj)
-
     @classmethod
     def copy(cls, obj):
         """Return a random variable with the same distribution as `self`"""
 
-        # Shallow copy is ok as `rvar` isn't mutable
+        # Shallow copy is ok as `rvarGen` isn't mutable
         return copy.copy(obj)
 
-    @classmethod
-    def define(cls, obj, origin=None):
-        """Define a random variable from a pre-defined sampler"""
+    # @classmethod
+    # def define(cls, sampler, origin='random'):
+    #     """Define a random variable from a pre-defined sampler"""
 
-        if origin is None:
-            return cls(obj)
-        # Following are obsolete for this class
-        elif origin == 'scipy':
-            return cls(lambda seed=None: obj.rvs(random_state=seed))
-        elif origin == 'numpy':
-            def seeded_sampler(seed=None):
-                np.random.seed(seed)
-                return obj()
-            return cls(seeded_sampler)
-        elif origin == 'random':
-            def seeded_sampler(seed=None):
-                random.seed(seed)
-                return obj()
-            return cls(seeded_sampler)
-        else:
-            raise TypeError('Unknown origin `{}`'.format(origin))
+    #     if origin is None:
+    #         return cls(sampler)
+    #     # Following are obsolete for this class
+    #     elif origin == 'scipy':
+    #         # Note: scipy uses np.random.seed
+    #         return cls(lambda seed=None: sampler.rvs(random_state=seed))
+    #     elif origin == 'numpy':
+    #         def seeded_sampler(seed=None):
+    #             np.random.seed(seed)
+    #             return sampler()
+    #         return cls(seeded_sampler)
+    #     elif origin == 'random':
+    #         def seeded_sampler(seed=None):
+    #             random.seed(seed)
+    #             return sampler()
+    #         return cls(seeded_sampler)
+    #     else:
+    #         raise TypeError('Unknown origin `{}`'.format(origin))
 
 
-class rvarNumeric(rvar):
+class rvarNumeric(rvarGen):
     """
     A random variable of numeric type. Not for direct use.
 
@@ -129,53 +188,53 @@ class rvarNumeric(rvar):
         exec(p)
 
 
-class rvarScalar(rvarNumeric):
+class rvar(rvarNumeric):
     """A random scalar."""
 
     pass
 
 
-class rvarArray(rvarNumeric):
-    """
-    A random array.
+# class rarray(rvarNumeric):
+#     """
+#     A random array.
 
-    Supports subscripting and matrix operations.
-    """
+#     Supports subscripting and matrix operations.
+#     """
 
-    def __init__(self, arr):
-        arr = np.array([rvar._cast(var) for var in arr])
+#     def __init__(self, arr):
+#         arr = np.array([rvar._cast(var) for var in arr])
 
-        def make_array(*args):
-            return np.array(args)
-        return _compose(make_array, *arr)
+#         def make_array(*args):
+#             return np.array(args)
+#         return _compose(make_array, *arr)
 
-    def __getitem__(self, key):
-        assert hasattr(self(0), '__getitem__'),\
-            'Scalar {} object not subscriptable'.format(self.__class__)
-        return rvar._getitem(self, key)
+#     def __getitem__(self, key):
+#         assert hasattr(self(0), '__getitem__'),\
+#             'Scalar {} object not subscriptable'.format(self.__class__)
+#         return rvar._getitem(self, key)
 
-    # To do: add matrix operations
+#     # To do: add matrix operations
 
-    @classmethod
-    def _cast(cls, obj):
-        """Cast a constant array to a random array."""
+#     @classmethod
+#     def _cast(cls, obj):
+#         """Cast a constant array to a random array."""
 
-        if isinstance(obj, cls):
-            return obj
-        else:
-            return rvar.array(obj)
+#         if isinstance(obj, cls):
+#             return obj
+#         else:
+#             return rvar.array(obj)
 
-    @classmethod
-    def _getitem(cls, obj, key):
-        def get(arr):
-            return arr[key]
-        return cls._compose(get, obj)
+#     @classmethod
+#     def _getitem(cls, obj, key):
+#         def get(arr):
+#             return arr[key]
+#         return cls._compose(get, obj)
 
-    @classmethod
-    def array(cls, arr):
-        # arr = np.array([rvar._cast(var) for var in arr])
+#     @classmethod
+#     def array(cls, arr):
+#         # arr = np.array([rvarGen._cast(var) for var in arr])
 
-        # def make_array(*args):
-        #     return np.array(args)
-        # return cls._compose(make_array, *arr)
-        return cls(arr)
+#         # def make_array(*args):
+#         #     return np.array(args)
+#         # return cls._compose(make_array, *arr)
+#         return cls(arr)

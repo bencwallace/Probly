@@ -2,6 +2,7 @@ import numpy as np
 import math
 from functools import wraps
 from os import urandom
+from . import rvar
 
 
 # Numpy max seed (redundant: remove)
