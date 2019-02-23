@@ -69,18 +69,18 @@ class rvarGen(object):
     graph = nx.MultiDiGraph()
 
     def __init__(self, sampler=None, origin='random'):
-        """Initialize random variable from sampler."""
+        if sampler is None:
+            return
 
-        self.sampler = sampler
+        assert callable(sampler), '{} is not callable'.format(sampler)
 
-        if origin == 'scipy':
-            # Note: scipy uses np.random.seed
-            self.sampler = lambda seed=None: sampler.rvs(random_state=seed)
-        elif origin == 'numpy':
+        if origin == 'numpy':
             def seeded_sampler(seed=None):
                 np.random.seed(seed)
                 return sampler()
             self.sampler = seeded_sampler
+        elif origin == 'scipy':
+            self.sampler = lambda seed=None: sampler.rvs(random_state=seed)
         elif origin == 'random':
             def seeded_sampler(seed=None):
                 random.seed(seed)
@@ -88,10 +88,6 @@ class rvarGen(object):
             self.sampler = seeded_sampler
         else:
             raise TypeError('Unknown origin `{}`'.format(origin))
-
-        if self.sampler is not None:
-            assert callable(sampler), 'Sampler {} is not'\
-                                      'callable'.format(sampler)
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
@@ -126,14 +122,21 @@ class rvarGen(object):
     # Constructors
     @classmethod
     def _compose(cls, f, *args):
-        newRV = cls.__new__(cls)
+        composed_rvar = cls.__new__(cls)
 
-        rvarGen.graph.add_node(newRV, method=f)
-        edges = [(rvarGen._cast(var), newRV, {'index': i})
+        rvar.graph.add_node(composed_rvar, method=f)
+        edges = [(rvar._cast(var), composed_rvar, {'index': i})
+                 for i, var in enumerate(args)]
+        rvar.graph.add_edges_from(edges)
+
+        return composed_rvar
+
+        rvarGen.graph.add_node(composed_rvar, method=f)
+        edges = [(rvarGen._cast(var), composed_rvar, {'index': i})
                  for i, var in enumerate(args)]
         rvarGen.graph.add_edges_from(edges)
 
-        return newRV
+        return composed_rvar
 
     @classmethod
     def _cast(cls, obj):
