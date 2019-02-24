@@ -42,6 +42,12 @@ class rv(object):
 
         if len(args) == 0:
             args = [root]
+        if method is None:
+            # Seeding wrapper for `self.sampler`
+            def sampler(seed=None):
+                np.random.seed(seed)
+                return self.sampler(seed)
+            method = sampler
 
         edges = [(rv._cast(var), self, {'index': i})
                  for i, var in enumerate(args)]
@@ -119,6 +125,8 @@ class rv(object):
 
 
 class Root(rv):
+    """The root of the dependency tree is the random number generator."""
+
     def __init__(self):
         rv.graph.add_node(self)
 
