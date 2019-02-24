@@ -162,10 +162,11 @@ class rv(Numeric):
 
         if len(args) == 0:
             args = [root]
-        # if method is None:
+
             def seeded_sampler(seed=None):
                 np.random.seed(seed)
                 return self.sampler()
+
             method = seeded_sampler
 
         edges = [(rv._cast(var), self, {'index': i})
@@ -205,6 +206,9 @@ class rv(Numeric):
         else:
             return []
 
+    def sampler(self, seed=None):
+        pass
+
     # Constructors
     @classmethod
     def _getitem(cls, obj, key):
@@ -219,12 +223,12 @@ class rv(Numeric):
         if isinstance(obj, cls):
             return obj
         elif hasattr(obj, '__getitem__'):
-            return rv.array(obj)
+            return cls.array(obj)
         else:
-            return cls(lambda seed=None: obj)
+            return Const(obj)
 
-    @classmethod
-    def copy(cls, obj):
+    @staticmethod
+    def copy(obj):
         """Return a random variable with the same distribution as `self`"""
 
         # Shallow copy is ok as `rv` isn't mutable
@@ -232,7 +236,7 @@ class rv(Numeric):
 
     @classmethod
     def array(cls, arr):
-        arr = np.array([rv._cast(var) for var in arr])
+        arr = np.array([cls._cast(var) for var in arr])
 
         def make_array(*args):
             return np.array(args)
@@ -250,3 +254,11 @@ class Root(rv):
 
 
 root = Root()
+
+
+class Const(rv):
+    def __init__(self, value):
+        self.value = value
+
+    def __call__(self, seed=None):
+        return self.value
