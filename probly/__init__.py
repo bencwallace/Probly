@@ -157,12 +157,12 @@ class rv(Numeric):
 
     graph = nx.MultiDiGraph()
 
-    def __init__(self, method=None, *args):
+    def __init__(self, method=None, **args):
         # assert callable(method), '{} is not callable'.format(method)
 
         if len(args) == 0:
             args = [root]
-        if method is None:
+        # if method is None:
             def seeded_sampler(seed=None):
                 np.random.seed(seed)
                 return self.sampler()

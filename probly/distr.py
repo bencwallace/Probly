@@ -21,8 +21,9 @@ class Distr(rv):
         # self.params = rv._cast(args)
 
         def sampler(*args):
-            return self.sampler(self.params)
-        super().__init__()
+            return self.sampler()
+        # super().__init__(sampler, self.params)
+        super().__init__(sampler)
 
     def sampler(self, seed=None):
         # Overload in subclass
