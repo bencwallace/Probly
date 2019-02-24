@@ -5,7 +5,6 @@ import networkx as nx
 import numpy as np
 import operator as op
 from functools import wraps
-import random
 
 from .programs import _programs
 from .helpers import get_seed, _max_seed
@@ -41,15 +40,13 @@ class rv(object):
     def __init__(self, method=None, *args):
         # assert callable(method), '{} is not callable'.format(method)
 
-        if method is None:
-            # When does this occur?
-            rv.graph.add_node(self, method=get_seed)
-            rv.graph.add_edge(root, self, {'index': 0})
-        else:
-            rv.graph.add_node(self, method=method)
-            edges = [(rv._cast(var), self, {'index': i})
-                     for i, var in enumerate(args)]
-            rv.graph.add_edges_from(edges)
+        if len(args) == 0:
+            args = [root]
+
+        edges = [(rv._cast(var), self, {'index': i})
+                 for i, var in enumerate(args)]
+        rv.graph.add_node(self, method=method)
+        rv.graph.add_edges_from(edges)
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
