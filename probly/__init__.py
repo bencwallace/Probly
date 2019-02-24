@@ -163,11 +163,10 @@ class rv(Numeric):
         if len(args) == 0:
             args = [root]
         if method is None:
-            # Seeding wrapper for `self.sampler`
-            def sampler(seed=None):
+            def seeded_sampler(seed=None):
                 np.random.seed(seed)
-                return self.sampler(seed)
-            method = sampler
+                return self.sampler()
+            method = seeded_sampler
 
         edges = [(rv._cast(var), self, {'index': i})
                  for i, var in enumerate(args)]
