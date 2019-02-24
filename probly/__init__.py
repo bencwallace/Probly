@@ -22,14 +22,8 @@ def Lift(f):
         Args:
             `rvar`s and constants
         """
-        composed_rvar = rvar.__new__(rvar)
 
-        rvar.graph.add_node(composed_rvar, method=f)
-        edges = [(rvar._cast(var), composed_rvar, {'index': i})
-                 for i, var in enumerate(args)]
-        rvar.graph.add_edges_from(edges)
-
-        return composed_rvar
+        return rvar(f, *args)
 
     return F
 
@@ -44,46 +38,38 @@ class rvar(object):
 
     graph = nx.MultiDiGraph()
 
-    def __init__(self, sampler=None, origin='random'):
-        assert callable(sampler), '{} is not callable'.format(sampler)
+    def __init__(self, method=None, *args):
+        # assert callable(method), '{} is not callable'.format(method)
 
-        if origin == 'numpy':
-            def seeded_sampler(seed=None):
-                np.random.seed(seed)
-                return sampler()
-            self.sampler = seeded_sampler
-        elif origin == 'scipy':
-            self.sampler = lambda seed=None: sampler.rvs(random_state=seed)
-        elif origin == 'random':
-            def seeded_sampler(seed=None):
-                random.seed(seed)
-                return sampler()
-            self.sampler = seeded_sampler
+        if method is None:
+            # When does this occur?
+            rvar.graph.add_node(self, method=get_seed)
+            rvar.graph.add_edge(root, self, {'index': 0})
         else:
-            self.sampler = sampler
+            rvar.graph.add_node(self, method=method)
+            edges = [(rvar._cast(var), self, {'index': i})
+                     for i, var in enumerate(args)]
+            rvar.graph.add_edges_from(edges)
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
         parents = list(self.parents())
 
-        if len(parents) == 0:
-            # Seed as follows for independence of `rvar`s with same `sampler`
-            return self.sampler((seed + id(self)) % _max_seed)
-        else:
-            # Create {index: parent} dictionary `arguments`
-            # This could probably be made more clear
-            data = [rvar.graph.get_edge_data(p, self) for p in parents]
-            arguments = {}
-            for i in range(len(parents)):
-                indices = [d.values() for d in data[i].values()]
-                for j in range(len(indices)):
-                    arguments[data[i][j]['index']] = parents[i]
+        # Create {index: parent} dictionary `arguments`
+        # This could probably be made more clear
+        data = [rvar.graph.get_edge_data(p, self) for p in parents]
+        arguments = {}
+        for i in range(len(parents)):
+            indices = [d.values() for d in data[i].values()]
+            for j in range(len(indices)):
+                arguments[data[i][j]['index']] = parents[i]
 
-            # Sample elements of `parents` in order specified by `arguments`
-            # and apply `method` to result
-            samples = [arguments[i](seed) for i in range(len(arguments))]
-            method = rvar.graph.nodes[self]['method']
-            return method(*samples)
+        # Sample elements of `parents` in order specified by `arguments`
+        # and apply `method` to result
+        samples = [arguments[i]((seed + id(self)) % _max_seed)
+                   for i in range(len(arguments))]
+        method = rvar.graph.nodes[self]['method']
+        return method(*samples)
 
     def __getitem__(self, key):
         assert hasattr(self(0), '__getitem__'),\
@@ -133,3 +119,14 @@ class rvar(object):
         def make_array(*args):
             return np.array(args)
         return Lift(make_array)(*arr)
+
+
+class Root(rvar):
+    def __init__(self):
+        rvar.graph.add_node(self)
+
+    def __call__(self, seed=None):
+        return get_seed(seed)
+
+
+root = Root()
