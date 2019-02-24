@@ -165,7 +165,7 @@ class rv(Numeric):
 
             def seeded_sampler(seed=None):
                 np.random.seed(seed)
-                return self.sampler()
+                return self.sampler_fixed()
 
             method = seeded_sampler
 
