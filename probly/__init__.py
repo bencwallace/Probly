@@ -20,15 +20,15 @@ def Lift(f):
         The lifted function
 
         Args:
-            `rvar`s and constants
+            `rv`s and constants
         """
 
-        return rvar(f, *args)
+        return rv(f, *args)
 
     return F
 
 
-class rvar(object):
+class rv(object):
     """
     A random variable placeholder.
 
@@ -43,13 +43,13 @@ class rvar(object):
 
         if method is None:
             # When does this occur?
-            rvar.graph.add_node(self, method=get_seed)
-            rvar.graph.add_edge(root, self, {'index': 0})
+            rv.graph.add_node(self, method=get_seed)
+            rv.graph.add_edge(root, self, {'index': 0})
         else:
-            rvar.graph.add_node(self, method=method)
-            edges = [(rvar._cast(var), self, {'index': i})
+            rv.graph.add_node(self, method=method)
+            edges = [(rv._cast(var), self, {'index': i})
                      for i, var in enumerate(args)]
-            rvar.graph.add_edges_from(edges)
+            rv.graph.add_edges_from(edges)
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
@@ -57,7 +57,7 @@ class rvar(object):
 
         # Create {index: parent} dictionary `arguments`
         # This could probably be made more clear
-        data = [rvar.graph.get_edge_data(p, self) for p in parents]
+        data = [rv.graph.get_edge_data(p, self) for p in parents]
         arguments = {}
         for i in range(len(parents)):
             indices = [d.values() for d in data[i].values()]
@@ -68,13 +68,13 @@ class rvar(object):
         # and apply `method` to result
         samples = [arguments[i]((seed + id(self)) % _max_seed)
                    for i in range(len(arguments))]
-        method = rvar.graph.nodes[self]['method']
+        method = rv.graph.nodes[self]['method']
         return method(*samples)
 
     def __getitem__(self, key):
         assert hasattr(self(0), '__getitem__'),\
             'Scalar {} object not subscriptable'.format(self.__class__)
-        return rvar._getitem(self, key)
+        return rv._getitem(self, key)
 
     # Define operators for emulating numeric types
     for p in _programs:
@@ -82,8 +82,8 @@ class rvar(object):
 
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
-        if self in rvar.graph:
-            return list(rvar.graph.predecessors(self))
+        if self in rv.graph:
+            return list(rv.graph.predecessors(self))
         else:
             return []
 
@@ -96,12 +96,12 @@ class rvar(object):
 
     @classmethod
     def _cast(cls, obj):
-        """Cast constants to `rvar` objects."""
+        """Cast constants to `rv` objects."""
 
         if isinstance(obj, cls):
             return obj
         elif hasattr(obj, '__getitem__'):
-            return rvar.array(obj)
+            return rv.array(obj)
         else:
             return cls(lambda seed=None: obj)
 
@@ -109,21 +109,21 @@ class rvar(object):
     def copy(cls, obj):
         """Return a random variable with the same distribution as `self`"""
 
-        # Shallow copy is ok as `rvar` isn't mutable
+        # Shallow copy is ok as `rv` isn't mutable
         return copy.copy(obj)
 
     @classmethod
     def array(cls, arr):
-        arr = np.array([rvar._cast(var) for var in arr])
+        arr = np.array([rv._cast(var) for var in arr])
 
         def make_array(*args):
             return np.array(args)
         return Lift(make_array)(*arr)
 
 
-class Root(rvar):
+class Root(rv):
     def __init__(self):
-        rvar.graph.add_node(self)
+        rv.graph.add_node(self)
 
     def __call__(self, seed=None):
         return get_seed(seed)

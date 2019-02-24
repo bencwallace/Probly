@@ -17,7 +17,7 @@ _programs_lift = [
 _programs_right = [
     (
         'def __r{:s}__(self, x):\n'
-        '   X = rvar._cast(x)\n'
+        '   X = rv._cast(x)\n'
         '   return X.__{:s}__(self)'
     ).format(fcn, fcn) for fcn in _num_ops_right + _num_ops_mat]
 
