@@ -35,6 +35,98 @@ ProblY can be installed with `pip` as follows:
 ```bash
 pip install git+https://github.com/bencwallace/probly#egg=probly
 ```
-<!-- ### Installation -->
+### Simple example
 
-<!-- ### Simple example -->
+**Declaring simple random variables**
+```python
+import probly as pr
+
+# A Bernoulli random variable with p=0.5
+X = pr.Ber(0.5)
+
+# A Bernoulli random variable independent of X
+Y = pr.Ber(0.9)
+
+# A uniform random variable on the interval [-10, 10]
+Z = pr.Unif(-10, 10)
+```
+
+**Sampling from a distribution**
+```python
+# Output a random sample from X
+print(X())
+
+# Output a random sample from Y seeded with seed 0
+print(Y(0))
+```
+
+**Performing arithmetic on random variables:**
+```python
+# Define a new random variable using arithmetic
+W = (1 + X) * Z / (1 + Y)
+
+# Outputs "True"
+print(W(9) == (1 + X(9)) * Z(9) / (1 + Y(9)))
+```
+
+**Defining a random matrix**
+```python
+M = pr.rv.array([[X, Y], [Z, W]])
+```
+
+**Applying a function to a random variable**
+```python
+@pr.Lift
+def f(x):
+	return x[0, 0] - x[1, 1]
+
+f_of_M = f(M)
+print(f_of_M())
+```
+
+**Creating a custom random variable**
+```python
+import numpy as np
+from probly.distr import Distr
+
+class Human(object):
+    def __init__(self, gender, height, weight):
+        self.gender = gender
+        self.height = height
+        self.weight = weight
+
+    def BMI(self):
+        return self.weight / self.height ** 2
+
+
+class randomHuman(Distr):
+    def sampler(self, female_stats, male_stats):
+        female_stats, male_stats = self.params
+
+        gender = {0: 'F', 1: 'M'}[pr.Ber(0.5)()]
+        if gender == 0:
+            height_mean, weight_mean, cov = female_stats
+        else:
+            height_mean, weight_mean, cov = male_stats
+
+        means = [height_mean, weight_mean]
+        height, weight = np.random.multivariate_normal(means, cov)
+
+        return Human(gender, height, weight)
+
+f_cov = np.array([[80, 5], [5, 99]])
+f_stats = [160, 65, f_cov]
+
+m_cov = np.array([[70, 4], [4, 110]])
+m_stats = [180, 75, m_cov]
+
+H = randomHuman(f_stats, m_stats)
+
+seed = 11
+h = H(seed)
+gender = {'F': 'female', 'M': 'male'}[h.gender]
+height = h.height
+weight = h.weight
+print('H({}) is a {} human of height {:.2f}cm'
+      ' and weight {:.2f}kg.'.format(seed, gender, height, weight))
+```
