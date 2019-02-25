@@ -71,7 +71,7 @@ print(W(9) == (1 + X(9)) * Z(9) / (1 + Y(9)))
 
 **Defining a random matrix**
 ```python
-M = pr.rv.array([[X, Y], [Z, W]])
+M = pr.array([[X, Y], [Z, W]])
 ```
 
 **Applying a function to a random variable**
@@ -85,9 +85,20 @@ print(f_of_M())
 ```
 
 **Creating a custom random variable**
+
+The following is an example of a random object of a given class.
+A class `Human` is defined with attributes for gender, height, and weight,
+and then a `RandomHuman` random variable is constructed that samples
+gender by flipping a fair coin and height and weight by sampling a
+correlated 2-dimensional normal distribution whose mean and covariance
+matrix is determined by the gender (this is actually a Gaussian mixture).
+We then define a function `BMI` to compute the body-mass index of a
+`Human` object and decorate `BMI` with `pr.Lift` so that it can be applied
+to `randomHuman` objects.
 ```python
 import numpy as np
-from probly.distr import Distr
+import probly as pr
+
 
 class Human(object):
     def __init__(self, gender, height, weight):
@@ -95,15 +106,12 @@ class Human(object):
         self.height = height
         self.weight = weight
 
-    def BMI(self):
-        return self.weight / self.height ** 2
 
-
-class randomHuman(Distr):
+class randomHuman(pr.Distr):
     def sampler(self, female_stats, male_stats):
         female_stats, male_stats = self.params
 
-        gender = {0: 'F', 1: 'M'}[pr.Ber(0.5)()]
+        gender = pr.Ber(0.5)()
         if gender == 0:
             height_mean, weight_mean, cov = female_stats
         else:
@@ -114,19 +122,31 @@ class randomHuman(Distr):
 
         return Human(gender, height, weight)
 
+# Set desired female and male human statistics
 f_cov = np.array([[80, 5], [5, 99]])
 f_stats = [160, 65, f_cov]
-
 m_cov = np.array([[70, 4], [4, 110]])
 m_stats = [180, 75, m_cov]
 
+# Initialize a `randomHuman` object, sample from it, and print his/her gender
 H = randomHuman(f_stats, m_stats)
 
 seed = 11
+
+# Initialize an actual `Human` object by sampling `H` with the chosen seed
 h = H(seed)
-gender = {'F': 'female', 'M': 'male'}[h.gender]
-height = h.height
-weight = h.weight
-print('H({}) is a {} human of height {:.2f}cm'
-      ' and weight {:.2f}kg.'.format(seed, gender, height, weight))
+
+# Convert outputs of the Bernoulli distribution to strings
+gender = {0: 'female', 1: 'male'}[h.gender]
+
+print('H({}) is {}.'.format(seed, gender))
+
+# Define a decorated BMI function
+@pr.Lift
+def BMI(self):
+    return self.weight / (self.height / 100) ** 2
+
+# Declare and sample frm the BMI of a random human
+B = BMI(H)
+print(B())
 ```
