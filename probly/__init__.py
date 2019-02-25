@@ -1,2 +1,2 @@
-from .core import Lift
+from .core import rv, Lift
 from .distr import Ber, Unif

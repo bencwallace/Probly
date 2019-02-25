@@ -164,7 +164,7 @@ class rv(Numeric):
             args = [root]
 
             def seeded_sampler(seed=None):
-                np.random.seed(seed)
+                np.random.seed((seed + id(self)) % _max_seed)
                 return self.sampler_fixed()
 
             method = seeded_sampler
@@ -189,7 +189,7 @@ class rv(Numeric):
 
         # Sample elements of `parents` in order specified by `arguments`
         # and apply `method` to result
-        samples = [arguments[i]((seed + id(self)) % _max_seed)
+        samples = [arguments[i](seed)
                    for i in range(len(arguments))]
         method = rv.graph.nodes[self]['method']
         return method(*samples)

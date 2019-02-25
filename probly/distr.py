@@ -21,7 +21,7 @@ class Distr(rv):
         def sampler(*args):
             return self.sampler()
         # super().__init__(sampler, self.params)
-        super().__init__(sampler)
+        super().__init__()
 
     def sampler_fixed(self):
         return self.sampler(*self.params)
