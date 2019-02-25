@@ -1,2 +1,2 @@
-from .core import rv, Lift
+from .core import array
 from .distr import Ber, Unif

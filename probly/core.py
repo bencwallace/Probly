@@ -27,7 +27,96 @@ def Lift(f):
     return F
 
 
-class Numeric(object):
+def array(arr):
+    arr = np.array([rv._cast(var) for var in arr])
+
+    def make_array(*args):
+        return np.array(args)
+    return Lift(make_array)(*arr)
+
+
+class rv(object):
+    """
+    A random variable placeholder.
+
+    Can be acted upon by arithmetical operations and functions compatible with
+    `Lift`.
+    """
+
+    graph = nx.MultiDiGraph()
+
+    def __init__(self, method=None, *args):
+        # assert callable(method), '{} is not callable'.format(method)
+
+        if len(args) == 0:
+            args = [root]
+
+            def seeded_sampler(seed=None):
+                np.random.seed((seed + id(self)) % _max_seed)
+                return self.sampler_fixed()
+
+            method = seeded_sampler
+
+        edges = [(rv._cast(var), self, {'index': i})
+                 for i, var in enumerate(args)]
+        rv.graph.add_node(self, method=method)
+        rv.graph.add_edges_from(edges)
+
+    def __call__(self, seed=None):
+        seed = get_seed(seed)
+        parents = list(self.parents())
+
+        # Create {index: parent} dictionary `arguments`
+        # This could probably be made more clear
+        data = [rv.graph.get_edge_data(p, self) for p in parents]
+        arguments = {}
+        for i in range(len(parents)):
+            indices = [d.values() for d in data[i].values()]
+            for j in range(len(indices)):
+                arguments[data[i][j]['index']] = parents[i]
+
+        # Sample elements of `parents` in order specified by `arguments`
+        # and apply `method` to result
+        samples = [arguments[i](seed)
+                   for i in range(len(arguments))]
+        method = rv.graph.nodes[self]['method']
+        return method(*samples)
+
+    def __getitem__(self, key):
+        assert hasattr(self(0), '__getitem__'),\
+            'Scalar {} object not subscriptable'.format(self.__class__)
+
+        def get(arr):
+            return arr[key]
+        return Lift(get)(key)
+
+    def parents(self):
+        """Returns list of random variables from which `self` is defined"""
+        if self in self.graph:
+            return list(self.graph.predecessors(self))
+        else:
+            return []
+
+    def sampler(self, seed=None):
+        pass
+
+    @staticmethod
+    def _cast(obj):
+        """Cast constants to `rv` objects."""
+
+        if isinstance(obj, rv):
+            return obj
+        elif hasattr(obj, '__getitem__'):
+            return array(obj)
+        else:
+            return Const(obj)
+
+    def copy(self):
+        """Return a random variable with the same distribution as `self`"""
+
+        # Shallow copy is ok as `rv` isn't mutable
+        return copy.copy(self)
+
     # Matrix operators
     @Lift
     def __matmul__(self, x):
@@ -145,102 +234,6 @@ class Numeric(object):
     @Lift
     def __ceil__(self):
         return op.ceil(self)
-
-
-class rv(Numeric):
-    """
-    A random variable placeholder.
-
-    Can be acted upon by arithmetical operations and functions compatible with
-    `Lift`.
-    """
-
-    graph = nx.MultiDiGraph()
-
-    def __init__(self, method=None, *args):
-        # assert callable(method), '{} is not callable'.format(method)
-
-        if len(args) == 0:
-            args = [root]
-
-            def seeded_sampler(seed=None):
-                np.random.seed((seed + id(self)) % _max_seed)
-                return self.sampler_fixed()
-
-            method = seeded_sampler
-
-        edges = [(rv._cast(var), self, {'index': i})
-                 for i, var in enumerate(args)]
-        rv.graph.add_node(self, method=method)
-        rv.graph.add_edges_from(edges)
-
-    def __call__(self, seed=None):
-        seed = get_seed(seed)
-        parents = list(self.parents())
-
-        # Create {index: parent} dictionary `arguments`
-        # This could probably be made more clear
-        data = [rv.graph.get_edge_data(p, self) for p in parents]
-        arguments = {}
-        for i in range(len(parents)):
-            indices = [d.values() for d in data[i].values()]
-            for j in range(len(indices)):
-                arguments[data[i][j]['index']] = parents[i]
-
-        # Sample elements of `parents` in order specified by `arguments`
-        # and apply `method` to result
-        samples = [arguments[i](seed)
-                   for i in range(len(arguments))]
-        method = rv.graph.nodes[self]['method']
-        return method(*samples)
-
-    def __getitem__(self, key):
-        assert hasattr(self(0), '__getitem__'),\
-            'Scalar {} object not subscriptable'.format(self.__class__)
-        return rv._getitem(self, key)
-
-    def parents(self):
-        """Returns list of random variables from which `self` is defined"""
-        if self in rv.graph:
-            return list(rv.graph.predecessors(self))
-        else:
-            return []
-
-    def sampler(self, seed=None):
-        pass
-
-    # Constructors
-    @classmethod
-    def _getitem(cls, obj, key):
-        def get(arr):
-            return arr[key]
-        return Lift(get)(obj)
-
-    @classmethod
-    def _cast(cls, obj):
-        """Cast constants to `rv` objects."""
-
-        if isinstance(obj, cls):
-            return obj
-        elif hasattr(obj, '__getitem__'):
-            return cls.array(obj)
-        else:
-            return Const(obj)
-
-    @staticmethod
-    def copy(obj):
-        """Return a random variable with the same distribution as `self`"""
-
-        # Shallow copy is ok as `rv` isn't mutable
-        return copy.copy(obj)
-
-    @classmethod
-    def array(cls, arr):
-        arr = np.array([cls._cast(var) for var in arr])
-
-        def make_array(*args):
-            return np.array(args)
-        return Lift(make_array)(*arr)
 
 
 class Root(rv):
