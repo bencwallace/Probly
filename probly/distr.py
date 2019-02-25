@@ -10,7 +10,7 @@ Subclassing instructions:
 """
 
 import numpy as np
-from . import rv
+from .core import rv
 
 
 class Distr(rv):
