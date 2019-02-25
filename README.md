@@ -29,6 +29,12 @@ ProblY requires the following Python packages:
 * [NumPy](http://www.numpy.org/)
 * [NetworkX](https://networkx.github.io/)
 
+### Installation
+
+ProblY can be installed with `pip` as follows:
+```bash
+pip install git+https://github.com/bencwallace/probly#egg=probly
+```
 <!-- ### Installation -->
 
-### Simple example
+<!-- ### Simple example -->
