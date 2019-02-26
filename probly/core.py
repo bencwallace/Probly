@@ -78,8 +78,7 @@ class rv(object):
         if len(parents) == 0:
             if seed is None:
                 seed = get_seed(seed)
-            np.random.seed((seed + self._id) % _max_seed)
-            return self.sampler_fixed()
+            return self.sampler_fixed((seed + self._id) % _max_seed)
 
         data = [graph.get_edge_data(p, self) for p in parents]
 
