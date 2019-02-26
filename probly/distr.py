@@ -5,9 +5,14 @@ Subclassing instructions:
 
     To define a random variable class with a desired distribution, create a
     subclass of `Distr` with a single method `sampler` whose arguments are
-    `self` and the desired parameters and which samples from the distribution
-    of interest. This sampler has access to the attribute `self.seed` and may
-    seed the random number generator with `np.random.seed(self.seed)`.
+    `self`, the desired parameters, and `seed` with default value `None`.
+    The `sampler` method should output values from the desired distribution.
+    It is import not to forget to include `seed=None` in the list of arguments
+    and, more importantly, to make use of this seed in the definition of
+    `sampler`.
+
+    The new random variable is then initialized with arguments given by the
+    desired parameters (in the order determined by `sampler`).
 """
 
 import numpy as np
@@ -25,8 +30,7 @@ class Distr(rv):
 
     def sampler_fixed(self, seed=None):
         # Assume self.sampler does not accept seed argument
-        self.seed = seed
-        return self.sampler(*self.params)
+        return self.sampler(*self.params, seed=seed)
 
     def sampler(self, *args):
         # Overload in subclass
@@ -34,12 +38,12 @@ class Distr(rv):
 
 
 class Unif(Distr):
-    def sampler(self, a, b):
-        np.random.seed(self.seed)
+    def sampler(self, a, b, seed=None):
+        np.random.seed(seed)
         return np.random.uniform(a, b)
 
 
 class Ber(Distr):
-    def sampler(self, p):
-        np.random.seed(self.seed)
+    def sampler(self, p, seed=None):
+        np.random.seed(seed)
         return np.random.choice(2, p=[1 - p, p])
