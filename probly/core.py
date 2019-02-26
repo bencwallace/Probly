@@ -109,9 +109,14 @@ class rv(object):
         else:
             return []
 
-    def seeded_sampler(self, seed=None):
-        np.random.seed((seed + self._id) % _max_seed)
-        return self.sampler_fixed()
+    def copy(self):
+        """Return a random variable with the same distribution as `self`"""
+
+        # Shallow copy is ok as `rv` isn't mutable
+        c = copy.copy(self)
+        # Need to update id manually when copying
+        c._id = next(c._last_id)
+        return c
 
     def sampler_fixed(self):
         # Overload in .distr.Distr
@@ -127,15 +132,6 @@ class rv(object):
             return array(obj)
         else:
             return Const(obj)
-
-    def copy(self):
-        """Return a random variable with the same distribution as `self`"""
-
-        # Shallow copy is ok as `rv` isn't mutable
-        c = copy.copy(self)
-        # Need to update id manually when copying
-        c._id = next(c._last_id)
-        return c
 
     # Matrix operators
     @Lift
