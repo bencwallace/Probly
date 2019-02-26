@@ -158,6 +158,7 @@ class rv(object):
     # Numpy
     def __array__(self):
         parents = self.parents()
+        return np.array(parents, dtype=object)
 
     # Matrix operators
     @Lift
