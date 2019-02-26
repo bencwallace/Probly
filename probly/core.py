@@ -9,10 +9,19 @@ import itertools
 
 # from .programs import _programs
 from .helpers import get_seed, _max_seed
+import probly.graphtools as graphtools
 
 
 # Initialize global dependency graph
-graph = nx.MultiDiGraph()
+_graph = nx.MultiDiGraph()
+
+
+def nodes():
+    return graphtools.nodes(_graph)
+
+
+def edges():
+    return graphtools.edges(_graph)
 
 
 def Lift(f):
@@ -68,8 +77,8 @@ class rv(object):
         obj = super().__new__(cls)
         edges = [(rv._cast(var), obj, {'index': i})
                  for i, var in enumerate(args)]
-        graph.add_node(obj)
-        graph.add_edges_from(edges)
+        _graph.add_node(obj)
+        _graph.add_edges_from(edges)
 
         return obj
 
@@ -84,7 +93,7 @@ class rv(object):
                 seed = get_seed(seed)
             return self.sampler_fixed((seed + self._id) % _max_seed)
 
-        data = [graph.get_edge_data(p, self) for p in parents]
+        data = [_graph.get_edge_data(p, self) for p in parents]
 
         # Create {index: parent} dictionary
         inputs = {}
@@ -100,28 +109,31 @@ class rv(object):
         return self.function(*samples)
 
     def __getitem__(self, key):
-        # assert hasattr(self(0), '__getitem__'),\
-        #     'Scalar {} object not subscriptable'.format(self.__class__)
-
         @Lift
         def get(arr):
             return arr[key]
         return get(self)
 
+    def __str__(self):
+        return 'RV {}'.format(self._id)
+
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
-        if self in graph:
-            return list(graph.predecessors(self))
+        if self in _graph:
+            return list(_graph.predecessors(self))
         else:
             return []
 
     def copy(self):
         """Return a random variable with the same distribution as `self`"""
 
+        # Alternative is to define __copy__
+
         # Shallow copy is ok as `rv` isn't mutable
         c = copy.copy(self)
         # Need to update id manually when copying
         c._id = next(c._last_id)
+
         return c
 
     def sampler_fixed(self):
@@ -264,3 +276,6 @@ class Const(rv):
 
     def __call__(self, seed=None):
         return self.value
+
+    def __str__(self):
+        return 'const {}'.format(self.value)
