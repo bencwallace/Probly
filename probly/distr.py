@@ -14,13 +14,17 @@ from .core import rv
 
 
 class Distr(rv):
+    def __new__(cls, *args):
+        obj = super().__new__(cls)
+        # def sampler(*args):
+        #     return self.sampler()
+        # super().__init__(sampler, self.params)
+        return obj
+
     def __init__(self, *args):
         self.params = args
         # self.params = rv._cast(args)
 
-        def sampler(*args):
-            return self.sampler()
-        # super().__init__(sampler, self.params)
         super().__init__()
 
     def sampler_fixed(self):

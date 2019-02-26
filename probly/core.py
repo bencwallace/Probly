@@ -5,9 +5,14 @@ import networkx as nx
 import numpy as np
 import operator as op
 from functools import wraps
+import itertools
 
 # from .programs import _programs
 from .helpers import get_seed, _max_seed
+
+
+# Initialize global dependency graph
+graph = nx.MultiDiGraph()
 
 
 def Lift(f):
@@ -15,72 +20,79 @@ def Lift(f):
 
     @wraps(f)
     def F(*args):
-        """
-        The lifted function
-
-        Args:
-            `rv`s and constants
-        """
-
         return rv(f, *args)
 
     return F
 
 
 def array(arr):
+    """Turn an array of `rv` objects and constants into a random variable."""
+
     arr = np.array([rv._cast(var) for var in arr])
 
     def make_array(*args):
         return np.array(args)
+
     return Lift(make_array)(*arr)
 
 
 class rv(object):
     """
-    A random variable placeholder.
+    A random variable.
 
-    Can be acted upon by arithmetical operations and functions compatible with
-    `Lift`.
+    Can be acted upon by functions decorated with `Lift`. Can also be acted
+    upon by numerical operations when its values can.
     """
 
-    graph = nx.MultiDiGraph()
+    # Track random variables for independence
+    _last_id = itertools.count()
 
-    def __init__(self, method=None, *args):
-        # assert callable(method), '{} is not callable'.format(method)
+    def __new__(cls, function=None, *args):
+        """
+        Creates a random variable object.
 
-        if len(args) == 0:
-            args = [root]
+        The new random variable is function(*args) if these are non-emtpy.
 
-            def seeded_sampler(seed=None):
-                np.random.seed((seed + id(self)) % _max_seed)
-                return self.sampler_fixed()
+        Args:
+            function (function): The function being applied.
+            args (list): A list of random variables or constants.
+        """
 
-            method = seeded_sampler
-
-        edges = [(rv._cast(var), self, {'index': i})
+        # Build graph regardless of how rv was created
+        obj = super().__new__(cls)
+        edges = [(rv._cast(var), obj, {'index': i})
                  for i, var in enumerate(args)]
-        rv.graph.add_node(self, method=method)
-        rv.graph.add_edges_from(edges)
+        graph.add_node(obj)
+        graph.add_edges_from(edges)
+
+        return obj
+
+    def __init__(self, function=None, *args):
+        self._id = next(self._last_id)
+        self.function = function
 
     def __call__(self, seed=None):
-        seed = get_seed(seed)
         parents = list(self.parents())
+        if len(parents) == 0:
+            if seed is None:
+                seed = get_seed(seed)
+            np.random.seed((seed + self._id) % _max_seed)
+            return self.sampler_fixed()
 
-        # Create {index: parent} dictionary `arguments`
-        # This could probably be made more clear
-        data = [rv.graph.get_edge_data(p, self) for p in parents]
-        arguments = {}
+        data = [graph.get_edge_data(p, self) for p in parents]
+
+        # Create {index: parent} dictionary
+        inputs = {}
         for i in range(len(parents)):
             indices = [d.values() for d in data[i].values()]
             for j in range(len(indices)):
-                arguments[data[i][j]['index']] = parents[i]
+                inputs[data[i][j]['index']] = parents[i]
 
-        # Sample elements of `parents` in order specified by `arguments`
-        # and apply `method` to result
-        samples = [arguments[i](seed)
-                   for i in range(len(arguments))]
-        method = rv.graph.nodes[self]['method']
-        return method(*samples)
+        # Sample elements of parents in order specified by inputs
+        # and apply function to result
+        samples = [inputs[i](seed)
+                   for i in range(len(inputs))]
+        return self.function(*samples)
 
     def __getitem__(self, key):
         assert hasattr(self(0), '__getitem__'),\
@@ -92,12 +104,17 @@ class rv(object):
 
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
-        if self in self.graph:
-            return list(self.graph.predecessors(self))
+        if self in graph:
+            return list(graph.predecessors(self))
         else:
             return []
 
-    def sampler(self, seed=None):
+    def seeded_sampler(self, seed=None):
+        np.random.seed((seed + self._id) % _max_seed)
+        return self.sampler_fixed()
+
+    def sampler_fixed(self):
+        # Overload in .distr.Distr
         pass
 
     @staticmethod
@@ -115,7 +132,10 @@ class rv(object):
         """Return a random variable with the same distribution as `self`"""
 
         # Shallow copy is ok as `rv` isn't mutable
-        return copy.copy(self)
+        c = copy.copy(self)
+        # Need to update id manually when copying
+        c._id = next(c._last_id)
+        return c
 
     # Matrix operators
     @Lift
@@ -234,19 +254,6 @@ class rv(object):
     @Lift
     def __ceil__(self):
         return op.ceil(self)
-
-
-class Root(rv):
-    """The root of the dependency tree is the random number generator."""
-
-    def __init__(self):
-        rv.graph.add_node(self)
-
-    def __call__(self, seed=None):
-        return get_seed(seed)
-
-
-root = Root()
 
 
 class Const(rv):
