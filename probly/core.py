@@ -90,10 +90,12 @@ class rv(object):
 
     # Sequence magic
     def __getitem__(self, key):
+        key = self._cast(key)
+
         @Lift
-        def get(arr):
-            return arr[key]
-        return get(self)
+        def get(arr, *args):
+            return arr[args]
+        return get(self, *key)
 
     def __iter__(self):
         self.index = 0
