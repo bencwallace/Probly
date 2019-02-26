@@ -20,7 +20,11 @@ def Lift(f):
 
     @wraps(f)
     def F(*args):
-        return rv(f, *args)
+        if any([isinstance(arg, rv) for arg in args]):
+            return rv(f, *args)
+        else:
+            # Could be a problem if F(*args)() called
+            return f(*args)
 
     return F
 
@@ -126,7 +130,7 @@ class rv(object):
 
     @staticmethod
     def _cast(obj):
-        """Cast constants to `rv` objects."""
+        """Cast constants to `Const` objects."""
 
         if isinstance(obj, rv):
             return obj
