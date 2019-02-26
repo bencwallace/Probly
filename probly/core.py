@@ -87,25 +87,15 @@ class rv(object):
         self.function = function
 
     def __call__(self, seed=None):
-        parents = list(self.parents())
+        seed = get_seed(seed)
+        parents = self.parents()
+
         if len(parents) == 0:
-            if seed is None:
-                seed = get_seed(seed)
+            # if seed is None:
+            #     seed = get_seed(seed)
             return self.sampler_fixed((seed + self._id) % _max_seed)
-
-        data = [_graph.get_edge_data(p, self) for p in parents]
-
-        # Create {index: parent} dictionary
-        inputs = {}
-        for i in range(len(parents)):
-            indices = [d.values() for d in data[i].values()]
-            for j in range(len(indices)):
-                inputs[data[i][j]['index']] = parents[i]
-
-        # Sample elements of parents in order specified by inputs
-        # and apply function to result
-        samples = [inputs[i](seed)
-                   for i in range(len(inputs))]
+        samples = [parents[i](seed)
+                   for i in range(len(parents))]
         return self.function(*samples)
 
     def __getitem__(self, key):
@@ -120,7 +110,21 @@ class rv(object):
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
         if self in _graph:
-            return list(_graph.predecessors(self))
+            unordered = list(_graph.predecessors(self))
+            if len(unordered) == 0:
+                return []
+
+            data = [_graph.get_edge_data(p, self) for p in unordered]
+
+            # Create {index: parent} dictionary
+            dictionary = {}
+            for i in range(len(unordered)):
+                indices = [d.values() for d in data[i].values()]
+                for j in range(len(indices)):
+                    dictionary[data[i][j]['index']] = unordered[i]
+
+            ordered = [dictionary[i] for i in range(len(dictionary))]
+            return ordered
         else:
             return []
 
@@ -150,6 +154,10 @@ class rv(object):
             return array(obj)
         else:
             return Const(obj)
+
+    # Numpy
+    def __array__(self):
+        parents = self.parents()
 
     # Matrix operators
     @Lift

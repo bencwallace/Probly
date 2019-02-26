@@ -24,7 +24,8 @@ class TestSimple(TestCase):
         self.assertNotEqual(X(), X(), msg_low_prob)
 
     def test_ber(self):
-        # Fails with low probability
+        # I think this test is failing relatively frequently due to lack of
+        # true independence
         p = 0.5
 
         X = pr.Ber(p)
