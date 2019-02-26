@@ -1,7 +1,6 @@
 """probly.py: A python module for working with random variables."""
 
 import copy
-import networkx as nx
 import numpy as np
 import operator as op
 from functools import wraps
@@ -9,19 +8,9 @@ import itertools
 
 # from .programs import _programs
 from .helpers import get_seed, _max_seed
-import probly.graphtools as graphtools
 
-
-# Initialize global dependency graph
-_graph = nx.MultiDiGraph()
-
-
-def nodes():
-    return graphtools.nodes(_graph)
-
-
-def edges():
-    return graphtools.edges(_graph)
+# Initialize dependency graph
+import probly.graphtools as gt
 
 
 def Lift(f):
@@ -77,8 +66,8 @@ class rv(object):
         obj = super().__new__(cls)
         edges = [(rv._cast(var), obj, {'index': i})
                  for i, var in enumerate(args)]
-        _graph.add_node(obj)
-        _graph.add_edges_from(edges)
+        gt._graph.add_node(obj)
+        gt._graph.add_edges_from(edges)
 
         return obj
 
@@ -109,12 +98,12 @@ class rv(object):
 
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
-        if self in _graph:
-            unordered = list(_graph.predecessors(self))
+        if self in gt._graph:
+            unordered = list(gt._graph.predecessors(self))
             if len(unordered) == 0:
                 return []
 
-            data = [_graph.get_edge_data(p, self) for p in unordered]
+            data = [gt._graph.get_edge_data(p, self) for p in unordered]
 
             # Create {index: parent} dictionary
             dictionary = {}
