@@ -1,3 +1,8 @@
 from .core import array, Lift
-from .distr import Distr, Ber, Unif
 from .graphtools import nodes, edges
+
+from .distr import Distr
+from .distr import Bin, Ber
+from .distr import Gamma, ChiSquared, Exp
+from .distr import NegBin, Geom
+from .distr import Beta, Unif, Pois, Normal
