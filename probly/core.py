@@ -28,12 +28,14 @@ def Lift(f):
 def array(arr):
     """Turn an array of `rv` objects and constants into a random variable."""
 
-    arr = np.array([rv._cast(var) for var in arr])
+    # arr = np.array([rv._cast(var) for var in arr])
+    arr = [rv._cast(var) for var in arr]
 
+    @Lift
     def make_array(*args):
         return np.array(args)
 
-    return Lift(make_array)(*arr)
+    return make_array(*arr)
 
 
 class rv(object):
@@ -95,12 +97,13 @@ class rv(object):
         return self.function(*samples)
 
     def __getitem__(self, key):
-        assert hasattr(self(0), '__getitem__'),\
-            'Scalar {} object not subscriptable'.format(self.__class__)
+        # assert hasattr(self(0), '__getitem__'),\
+        #     'Scalar {} object not subscriptable'.format(self.__class__)
 
+        @Lift
         def get(arr):
             return arr[key]
-        return Lift(get)(key)
+        return get(self)
 
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
