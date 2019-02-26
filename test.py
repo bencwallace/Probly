@@ -5,6 +5,9 @@ import unittest
 from unittest import TestCase
 
 
+msg_low_prob = 'Test fails with low probability. Try running tests again.'
+
+
 class TestSimple(TestCase):
     """Tests for simple distributions."""
 
@@ -18,7 +21,7 @@ class TestSimple(TestCase):
 
         X = pr.Unif(a, b)
 
-        self.assertNotEqual(X(), X())
+        self.assertNotEqual(X(), X(), msg_low_prob)
 
     def test_ber(self):
         # Fails with low probability
@@ -28,7 +31,7 @@ class TestSimple(TestCase):
         total1 = np.sum([X() for _ in range(100)])
         total2 = np.sum([X() for _ in range(100)])
 
-        self.assertNotEqual(total1, total2)
+        self.assertNotEqual(total1, total2, msg_low_prob)
 
 
 class TestSimpleSeeded(TestCase):
@@ -125,7 +128,6 @@ class TestCopy(TestCase):
         self.assertEqual(Z(self.seed)[0], Z(self.seed)[1])
 
 
-# Not working
 class TestArray(TestCase):
     def setUp(self):
         self.seed = 99

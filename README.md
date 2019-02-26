@@ -122,6 +122,7 @@ class randomHuman(pr.Distr):
 
         return Human(gender, height, weight)
 
+
 # Set desired female and male human statistics
 f_cov = np.array([[80, 5], [5, 99]])
 f_stats = [160, 65, f_cov]
@@ -141,10 +142,12 @@ gender = {0: 'female', 1: 'male'}[h.gender]
 
 print('H({}) is {}.'.format(seed, gender))
 
+
 # Define a decorated BMI function
 @pr.Lift
 def BMI(self):
     return self.weight / (self.height / 100) ** 2
+
 
 # Declare and sample frm the BMI of a random human
 B = BMI(H)
