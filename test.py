@@ -112,6 +112,7 @@ class TestCopy(TestCase):
         self.seed = 1
 
     def test_indep_copy(self):
+        # Only tests for apparent independence. Currently, rv's are not indep.
         X = pr.Unif(-1, 1)
         Y = X.copy()
 
@@ -122,6 +123,34 @@ class TestCopy(TestCase):
         Z = pr.array([X, X])
 
         self.assertEqual(Z(self.seed)[0], Z(self.seed)[1])
+
+
+# Not working
+class TestArray(TestCase):
+    def setUp(self):
+        self.seed = 99
+
+    def test_matmul(self):
+        X = pr.Unif(-1, 1)
+        Y = pr.Unif(-1, 1)
+        Z = pr.array(([X, Y], np.array([Y, 1])))
+
+        np.random.seed((self.seed + X._id) % _max_seed)
+        x = np.random.uniform(-1, 1)
+
+        np.random.seed((self.seed + Y._id) % _max_seed)
+        y = np.random.uniform(-1, 1)
+
+        self.assertAlmostEqual(np.linalg.det(Z(self.seed)), x - y ** 2)
+
+    def test_getitem(self):
+        X = pr.Unif(-1, 1)
+        Z = pr.array([[[X, 1], [1, 1]]])
+
+        np.random.seed((self.seed + X._id) % _max_seed)
+        x = np.random.uniform(-1, 1)
+
+        self.assertEqual(Z[0, 0, 0](self.seed), x)
 
 
 if __name__ == '__main__':
