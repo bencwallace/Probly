@@ -51,6 +51,7 @@ class rv(object):
     # Track random variables for independence
     _last_id = itertools.count()
 
+    # Simple magic methods
     def __new__(cls, function=None, *args):
         """
         Creates a random variable object.
@@ -87,18 +88,37 @@ class rv(object):
                    for i in range(len(parents))]
         return self.function(*samples)
 
+    # Sequence magic
     def __getitem__(self, key):
         @Lift
         def get(arr):
             return arr[key]
         return get(self)
 
+    def __iter__(self):
+        self.index = 0
+        self.ordered_parents = self.parents()
+        return self
+
+    def __next__(self):
+        if self.index < len(self.ordered_parents):
+            p = self.ordered_parents[self.index]
+            self.index += 1
+            return p
+        else:
+            raise StopIteration
+
+    # Representation magic
     def __str__(self):
         return 'RV {}'.format(self._id)
 
+    # Helper methods
     def parents(self):
         """Returns list of random variables from which `self` is defined"""
-        if self in gt._graph:
+        if self not in gt._graph:
+            return []
+        else:
+            # Convert to list for re-use
             unordered = list(gt._graph.predecessors(self))
             if len(unordered) == 0:
                 return []
@@ -114,8 +134,6 @@ class rv(object):
 
             ordered = [dictionary[i] for i in range(len(dictionary))]
             return ordered
-        else:
-            return []
 
     def copy(self):
         """Return a random variable with the same distribution as `self`"""
@@ -129,10 +147,6 @@ class rv(object):
 
         return c
 
-    def sampler_fixed(self):
-        # Overload in .distr.Distr
-        pass
-
     @staticmethod
     def _cast(obj):
         """Cast constants to `Const` objects."""
@@ -144,7 +158,12 @@ class rv(object):
         else:
             return Const(obj)
 
-    # Numpy
+    # Sampling methods
+    def sampler_fixed(self):
+        # Overload in .distr.Distr
+        pass
+
+    # Numpy compatibility
     def __array__(self):
         parents = self.parents()
         return np.array(parents, dtype=object)
