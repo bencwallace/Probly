@@ -134,10 +134,12 @@ class TestArray(TestCase):
     def setUp(self):
         self.seed = 99
 
+    # Isn't actually doing any multiplication...
     def test_matmul(self):
         X = pr.Unif(-1, 1)
         Y = pr.Unif(-1, 1)
         Z = pr.array(([X, Y], np.array([Y, 1])))
+        # W = np.dot(Z, Z)
 
         np.random.seed((self.seed + X._id) % _max_seed)
         x = np.random.uniform(-1, 1)
@@ -145,6 +147,7 @@ class TestArray(TestCase):
         np.random.seed((self.seed + Y._id) % _max_seed)
         y = np.random.uniform(-1, 1)
 
+        # self.assertAlmostEqual(np.linalg.det(W(self.seed)), (y**2-x)**2)
         self.assertAlmostEqual(np.linalg.det(Z(self.seed)), x - y ** 2)
 
     def test_getitem(self):

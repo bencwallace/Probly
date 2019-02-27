@@ -3,6 +3,7 @@
 import copy
 import numpy as np
 import operator as op
+import math
 from functools import wraps
 import itertools
 
@@ -165,6 +166,7 @@ class rv(object):
             return Const(obj)
 
     # Matrix operators
+    # To do: check how these are really used
     @Lift
     def __matmul__(self, x):
         return op.matmul(self, x)
@@ -176,111 +178,111 @@ class rv(object):
     # Left commuting binary operators
     @Lift
     def __add__(self, x):
-        return op.add(self, x)
+        return self + x
 
     @Lift
     def __sub__(self, x):
-        return op.sub(self, x)
+        return self - x
 
     @Lift
     def __mul__(self, x):
-        return op.mul(self, x)
+        return self * x
 
     # Right commuting binary operators
     def __radd__(self, x):
         X = self._cast(x)
-        return X.__add__(self)
+        return X + self
 
     def __rsub__(self, x):
         X = self._cast(x)
-        return X.__sub__(self)
+        return X - self
 
     def __rmul__(self, x):
         X = self._cast(x)
-        return X.__mul__(self)
+        return X * self
 
     # Left non-commuting binary operators
     @Lift
     def __truediv__(self, x):
-        return op.truediv(self, x)
+        return self / x
 
     @Lift
     def __floordiv__(self, x):
-        return op.floordiv(self, x)
+        return self // x
 
     @Lift
     def __mod__(self, x):
-        return op.mod(self, x)
+        return self % x
 
     @Lift
     def __divmod__(self, x):
-        return op.divmod(self, x)
+        return divmod(self, x)
 
     @Lift
     def __pow__(self, x):
-        return op.pow(self, x)
+        return self ** x
 
     # Right non-commuting binary operators
     def __rtruediv__(self, x):
         X = self._cast(x)
-        return X.__truediv__(self)
+        return X / self
 
     def __rfloordiv__(self, x):
         X = self._cast(x)
-        return X.__floordiv__(self)
+        return X // self
 
     def __rmod__(self, x):
         X = self._cast(x)
-        return X.__mod__(self)
+        return X % self
 
     def __rdivmod__(self, x):
         X = self._cast(x)
-        return X.__divmod__(self)
+        return divmod(X, self)
 
     def __rpow__(self, x):
         X = self._cast(x)
-        return X.__pow__(self)
+        return X ** self
 
     # Unary operators
     @Lift
     def __neg__(self):
-        return op.neg(self)
+        return -self
 
     @Lift
     def __pos__(self):
-        return op.pos(self)
+        return +self
 
     @Lift
     def __abs__(self):
-        return op.abs(self)
+        return abs(self)
 
     @Lift
     def __complex__(self):
-        return op.complex(self)
+        return complex(self)
 
     @Lift
     def __int__(self):
-        return op.int(self)
+        return int(self)
 
     @Lift
     def __float__(self):
-        return op.float(self)
+        return float(self)
 
     @Lift
     def __round__(self):
-        return op.round(self)
+        return round(self)
 
     @Lift
     def __trunc__(self):
-        return op.trunc(self)
+        return math.trunc(self)
 
     @Lift
     def __floor__(self):
-        return op.floor(self)
+        return math.floor(self)
 
     @Lift
     def __ceil__(self):
-        return op.ceil(self)
+        return math.ceil(self)
 
 
 class Const(rv):
