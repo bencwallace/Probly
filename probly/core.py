@@ -83,7 +83,7 @@ class rv(object):
         if len(parents) == 0:
             # if seed is None:
             #     seed = get_seed(seed)
-            return self.sampler_fixed((seed + self._id) % _max_seed)
+            return self.sampler((seed + self._id) % _max_seed)
         samples = [parents[i](seed)
                    for i in range(len(parents))]
         return self.function(*samples)
@@ -161,7 +161,7 @@ class rv(object):
             return Const(obj)
 
     # Sampling methods
-    def sampler_fixed(self):
+    def sampler(self):
         # Overload in .distr.Distr
         pass
 

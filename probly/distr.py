@@ -4,9 +4,10 @@ Random variables for common distributions.
 Subclassing instructions:
 
     To define a random variable class with a desired distribution, create a
-    subclass of `Distr` with a single method `sampler` whose arguments are
-    `self`, the desired parameters, and `seed` with default value `None`.
+    subclass of `Distr` with at least a single method `sampler` whose arguments
+    are `self` and `seed` with default value `None`.
     The `sampler` method should output values from the desired distribution.
+
     It is import not to forget to include `seed=None` in the list of arguments
     and, more importantly, to make use of this seed in the definition of
     `sampler`.
@@ -20,120 +21,127 @@ from .core import rv
 
 
 class Distr(rv):
+    # Protection from the perils of sub-classing rv directly
     def __new__(cls, *args):
-        return super().__new__(cls)
+        # Create bare rv (add to graph)
+        obj = super().__new__(cls)
 
-    def __init__(self, *args):
-        self.params = args
+        # Initialize id
+        super().__init__(obj)
 
-        super().__init__()
-
-    def sampler_fixed(self, seed=None):
-        # Assume self.sampler does not accept seed argument
-        return self.sampler(*self.params, seed=seed)
-
-    def sampler(self, *args):
-        # Overload in subclass
-        pass
+        return obj
 
 
 class Unif(Distr):
-    def sampler(self, a, b, seed=None):
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
+
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.uniform(a, b)
+        return np.random.uniform(self.a, self.b)
 
 
 class Bin(Distr):
-    def sampler(self, n, p, seed=None):
+    def __init__(self, n, p):
+        self.n = n
+        self.p = p
+
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.binomial(n, p)
+        return np.random.binomial(self.n, self.p)
 
 
 class Ber(Bin):
-    def __new__(cls, p):
-        return super().__new__(cls, 1, p)
-
-    # Overload sampler for efficiency (to do: test if there's a difference)
-    def sampler(self, p, seed=None):
-        np.random.seed(seed)
-        return np.random.choice([0, 1], p=[1 - p, p])
-
-
-# # Alternate definition
-# class Ber(Bin):
-#     def __new__(cls, p):
-#         X = super().__new__(cls, 1, p)
-#         return X
-
-#     def __init__(self, p):
-#         super().__init__(1, p)
+    # Uses np.random.binomial with n = 1 (much faster than np.random.choice)
+    def __init__(self, p):
+        super().__init__(1, p)
 
 
 class Beta(Distr):
-    def sampler(self, alpha, beta, seed=None):
+    def __init__(self, alpha, beta):
+        self.alpha = alpha
+        self.beta = beta
+
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.beta(alpha, beta)
+        return np.random.beta(self.alpha, self.beta)
 
 
 class Gamma(Distr):
-    def sampler(self, shape, rate=None, scale=None, seed=None):
-        assert rate is not None or scale is not None,\
-            'Specify rate or scale'
+    def __init__(self, shape, rate=None, scale=None):
+        self.shape = shape
+        self.rate = rate
+        self.scale = scale
 
-        if scale is None and rate is not None:
-            scale = 1 / float(rate)
-
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.gamma(shape, scale)
+        return np.random.gamma(self.shape, self.scale)
 
 
 class ChiSquared(Gamma):
-    def __new__(cls, k):
+    def __init__(self, k):
+        self.k = k
+
         shape = float(k) / 2
         scale = 2
         rate = 1 / scale
 
-        return super().__new__(cls, shape, rate, scale)
+        super().__init__(shape, rate, scale)
 
-    def sampler(self, k, seed=None):
+    # Much faster than using np.random.gamma
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.chisquare(k)
+        return np.random.chisquare(self.k)
 
 
 class Exp(Gamma):
-    def __new__(cls, rate):
+    def __init__(self, rate):
         shape = 1
         scale = 1 / float(rate)
 
-        return super().__new__(cls, shape, rate, scale)
+        super().__init__(shape, rate, scale)
 
-    def sampler(self, rate, seed=None):
+    # A bit faster than using np.random.gamma
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.exponential(rate)
+        return np.random.exponential(self.rate)
 
 
 class NegBin(Distr):
-    def sampler(self, n, p, seed=None):
+    def __init__(self, n, p):
+        self.n = n
+        self.p = p
+
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.negative_binomial(n, p)
+        return np.random.negative_binomial(self.n, self.p)
 
 
 class Geom(NegBin):
-    def __new__(cls, p):
-        return super().__new__(cls, 1, p)
+    def __init__(self, p):
+        super().__init__(1, p)
 
-    def sampler(self, p, seed=None):
+    # Faster than using np.random.negative_binomial
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.geometric(p)
+        return np.random.geometric(self.p)
 
 
 class Pois(Distr):
-    def sampler(self, rate, seed=None):
+    def __init__(self, rate):
+        self.rate = rate
+
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.poisson(rate)
+        return np.random.poisson(self.rate)
 
 
 class Normal(Distr):
-    def sampler(self, mean, std, seed=None):
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.normal(mean, std)
+        return np.random.normal(self.mean, self.std)
