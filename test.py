@@ -56,8 +56,8 @@ class TestSimpleSeeded(TestCase):
 
         X = pr.Ber(p)
         np.random.seed((self.seed + X._id) % _max_seed)
-        x = np.random.choice(2, p=[1 - p, p])
-        # x = np.random.binomial(1, p)
+        # x = np.random.choice(2, p=[1 - p, p])
+        x = np.random.binomial(1, p)
 
         self.assertEqual(X(self.seed), x)
 

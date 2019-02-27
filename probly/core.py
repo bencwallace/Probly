@@ -51,7 +51,7 @@ class rv(object):
     # Track random variables for independence
     _last_id = itertools.count()
 
-    # Simple magic methods
+    # Core magic methods
     def __new__(cls, function=None, *args):
         """
         Creates a random variable object.
@@ -88,7 +88,11 @@ class rv(object):
                    for i in range(len(parents))]
         return self.function(*samples)
 
-    # Sequence magic
+    # Sequence and array magic
+    def __array__(self):
+        parents = self.parents()
+        return np.array(parents, dtype=object)
+
     def __getitem__(self, key):
         key = self._cast(key)
 
@@ -143,11 +147,11 @@ class rv(object):
         # Alternative is to define __copy__
 
         # Shallow copy is ok as `rv` isn't mutable
-        c = copy.copy(self)
+        Copy = copy.copy(self)
         # Need to update id manually when copying
-        c._id = next(c._last_id)
+        Copy._id = next(Copy._last_id)
 
-        return c
+        return Copy
 
     @staticmethod
     def _cast(obj):
@@ -159,16 +163,6 @@ class rv(object):
             return array(obj)
         else:
             return Const(obj)
-
-    # Sampling methods
-    def sampler(self):
-        # Overload in .distr.Distr
-        pass
-
-    # Numpy compatibility
-    def __array__(self):
-        parents = self.parents()
-        return np.array(parents, dtype=object)
 
     # Matrix operators
     @Lift
