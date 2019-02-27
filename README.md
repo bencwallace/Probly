@@ -35,9 +35,9 @@ ProblY can be installed with `pip` as follows:
 ```bash
 pip install git+https://github.com/bencwallace/probly#egg=probly
 ```
-### Simple example
+### Quick start
 
-**Declaring simple random variables**
+**Initialize simple random variables**
 ```python
 import probly as pr
 
@@ -51,7 +51,7 @@ Y = pr.Ber(0.9)
 Z = pr.Unif(-10, 10)
 ```
 
-**Sampling from a distribution**
+**Sample a random variable**
 ```python
 # Output a random sample from X
 print(X())
@@ -60,7 +60,7 @@ print(X())
 print(Y(0))
 ```
 
-**Performing arithmetic on random variables:**
+**Perform arithmetic**
 ```python
 # Define a new random variable using arithmetic
 W = (1 + X) * Z / (1 + Y)
@@ -69,12 +69,12 @@ W = (1 + X) * Z / (1 + Y)
 print(W(9) == (1 + X(9)) * Z(9) / (1 + Y(9)))
 ```
 
-**Defining a random matrix**
+**Initialize a random matrix**
 ```python
 M = pr.array([[X, Y], [Z, W]])
 ```
 
-**Applying a function to a random variable**
+**Compose a random variable with an arithmetical function**
 ```python
 def f(x):
 	return x[0, 0] - x[1, 1]
@@ -82,8 +82,9 @@ def f(x):
 f_of_M = f(M)
 print(f_of_M())
 ```
+The next example involves composition with a non-arithmetical function.
 
-**Creating a custom random variable**
+**Define a new random object**
 
 The following is an example of a random object of a given class.
 A class `Human` is defined with attributes for gender, height, and weight,
