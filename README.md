@@ -7,7 +7,7 @@ ProblY is a Python package for the symbolic computation of random variables.
 
 In its most general sense, this means treating random variables as objects that can be composed with functions. Specifically, this makes random variables whose realizations are numerical types (scalars and arrays) subject to arithmetical manipulations. However, ProblY random variables can have more general types, e.g. random variables whose realizations are objects of a given class.
 
-An immediate requirement and hence consequence of this approach of this treatment of random objects is the implementation of a *dependence structure* that tracks the relationships between different instances of a random variable. This will be discussed in more detail but a simple example is that if `X` is a random variable and we set `Y = X + 1` and `Z = Y - X` (thereby instantiating two new random variable objects), we expect that `Z` is the constant random variable `1`.
+An immediate requirement and hence consequence of this treatment of random objects is the implementation of a *dependence structure* that tracks the relationships between different instances of a random variable. This will be discussed in more detail but a simple example is that if `X` is a random variable and we set `Y = X + 1` and `Z = Y - X` (thereby instantiating two new random variable objects), we expect that `Z` is the constant random variable `1`.
 
 ### Comparison with other approaches
 
