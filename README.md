@@ -76,7 +76,6 @@ M = pr.array([[X, Y], [Z, W]])
 
 **Applying a function to a random variable**
 ```python
-@pr.Lift
 def f(x):
 	return x[0, 0] - x[1, 1]
 
