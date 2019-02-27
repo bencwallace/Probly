@@ -108,16 +108,20 @@ class Human(object):
 
 
 class randomHuman(pr.Distr):
-    def sampler(self, female_stats, male_stats):
-        female_stats, male_stats = self.params
+    def __init__(self, female_stats, male_stats):
+        self.female_stats = female_stats
+        self.male_stats = male_stats
 
-        gender = pr.Ber(0.5)()
+    def sampler(self, seed=None):
+        np.random.seed(seed)
+        gender = np.random.choice(2, p=[0.5, 0.5])
         if gender == 0:
-            height_mean, weight_mean, cov = female_stats
+            height_mean, weight_mean, cov = self.female_stats
         else:
-            height_mean, weight_mean, cov = male_stats
+            height_mean, weight_mean, cov = self.male_stats
 
         means = [height_mean, weight_mean]
+        np.random.seed(seed)
         height, weight = np.random.multivariate_normal(means, cov)
 
         return Human(gender, height, weight)
