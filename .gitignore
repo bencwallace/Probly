@@ -6,3 +6,5 @@ examples.py
 examples_new.py
 probly/programs.py
 tour.ipynb
+random_human.py
+*.egg-info
