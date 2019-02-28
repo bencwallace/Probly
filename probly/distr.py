@@ -27,7 +27,7 @@ class Distr(rv):
         obj = super().__new__(cls)
 
         # Initialize id
-        super().__init__(obj)
+        # super().__init__(obj)
 
         return obj
 

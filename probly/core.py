@@ -53,41 +53,30 @@ class rv(object):
     _last_id = itertools.count()
 
     # Core magic methods
-    def __new__(cls, function=None, *args):
-        """
-        Creates a random variable object.
-
-        The new random variable is function(*args) if these are non-emtpy.
-
-        Args:
-            function (function): The function being applied.
-            args (list): A list of random variables or constants.
-        """
-
-        # Build graph regardless of how rv was created
+    def __new__(cls, label=None, *parents):
         obj = super().__new__(cls)
+        obj._id = next(cls._last_id)
+
         edges = [(rv._cast(var), obj, {'index': i})
-                 for i, var in enumerate(args)]
-        gt._graph.add_node(obj)
+                 for i, var in enumerate(parents)]
+        gt._graph.add_node(obj, call_method=label)
         gt._graph.add_edges_from(edges)
 
         return obj
 
-    def __init__(self, function=None, *args):
-        self._id = next(self._last_id)
-        self.function = function
+    # def __init__(self, function=None, *args):
+    #     self.function = gt._graph.nodes[self]['call_method']
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
         parents = self.parents()
 
         if len(parents) == 0:
-            # if seed is None:
-            #     seed = get_seed(seed)
             return self.sampler((seed + self._id) % _max_seed)
         samples = [parents[i](seed)
                    for i in range(len(parents))]
-        return self.function(*samples)
+        # return self.function(*samples)
+        return gt._graph.nodes[self]['call_method'](*samples)
 
     # Sequence and array magic
     def __array__(self):
@@ -143,14 +132,19 @@ class rv(object):
             return ordered
 
     def copy(self):
-        """Return a random variable with the same distribution as `self`"""
+        """Returns an independent copy of `self`"""
 
-        # Alternative is to define __copy__
+        return copy.copy(self)
 
-        # Shallow copy is ok as `rv` isn't mutable
-        Copy = copy.copy(self)
-        # Need to update id manually when copying
-        Copy._id = next(Copy._last_id)
+    def __copy__(self):
+        Copy = self.__new__(type(self))
+        _id = Copy._id
+
+        for key, val in self.__dict__.items():
+            setattr(Copy, key, val)
+
+        # Do not copy id
+        Copy._id = _id
 
         return Copy
 
