@@ -25,12 +25,11 @@ class Distr(rv):
 
     Example
     -------
-    The following defines a uniform random variable on the interval
-    `[a + 1, b + 2]`:
+    Define a uniform random variable on the interval `[a + 1, b + 2]`:
 
     >>> import numpy as np
     >>> import probly as pr
-    >>> class UnifPlus(Distr):
+    >>> class UnifPlus(pr.Distr):
     ...     def __init__(self, a, b):
     ...         self.a = a + 1
     ...         self.b = b + 1
@@ -40,7 +39,7 @@ class Distr(rv):
     """
 
     # Protection from the perils of sub-classing rv directly
-    def __new__(cls, *args):
+    def __new__(cls, *args, **kwargs):
         # Create bare rv (add to graph)
         obj = super().__new__(cls)
 
@@ -57,10 +56,6 @@ class Unif(Distr):
         Left endpoint of the support interval.
     b : float
         Right endpoint of the support interval.
-
-    Note
-    ----
-    Attributes are the same as parameters.
     """
 
     def __init__(self, a, b):
@@ -103,22 +98,23 @@ class Ber(Bin):
 
     Takes the value `1` with probability `p` and `0` with probability `1 - p`.
 
-    Parameters
-    ----------
-    p : float
-        Probability that the outcome is `1`.
-
     Attributes
     ----------
     p : float
         Probability that the outcome is `1`.
     n : int
-        Parameter `n` inherited from the corresponding binomial distribution.
+        Parameter `n` inherited from the binomial distribution.
         Equal to `1`.
     """
 
     # Uses np.random.binomial with n = 1 (much faster than np.random.choice)
     def __init__(self, p):
+        """
+        Parameters
+        ----------
+        p : float
+            Probability that the outcome is `1`.
+        """
         super().__init__(1, p)
 
 
@@ -128,15 +124,11 @@ class Beta(Distr):
 
     Parameters
     ----------
-    alpha : (float)
+    alpha : float
         First shape parameter.
 
-    beta : (float)
+    beta : float
         Second shape parameter.
-
-    Note
-    ----
-    Attributes are the same as parameters.
     """
 
     def __init__(self, alpha, beta):
@@ -157,22 +149,13 @@ class Gamma(Distr):
     parameterization. The `shape` parameter and at least one of the `rate` or
     `scale` parameters must be specified.
 
-    Parameters
+    Attributes
     ----------
     shape : float
         Shape parameter.
     rate : float, optional if `scale` specified
         Rate parameter.
     scale : float, optional if `rate` specified
-        Scale parameter.
-
-    Attributes
-    ----------
-    shape : float
-        Shape parameter.
-    rate : float
-        Rate parameter.
-    scale : float
         Scale parameter.
     """
 
@@ -190,23 +173,18 @@ class ChiSquared(Gamma):
     """
     A chi squared random variable.
 
-    Parameters
-    ----------
-    k : float
-        Number of degrees of freedom.
-
     Attributes
     ----------
     k : float
         Number of degrees of freedom.
     shape : float
-        Shape parameter inherited from the corresponding gamma distribution.
+        Shape parameter inherited from the gamma distribution.
         Equal to `k / 2`.
     rate : float
-        Rate parameter inherited from the corresponding gamma distribution.
+        Rate parameter inherited from the gamma distribution.
         Equal to `2`.
     scale : float
-        Scale parameter inherited from the corresponding gamma distribution.
+        Scale parameter inherited from the gamma distribution.
         Equal to `1 / 2`.
     """
 
@@ -229,20 +207,15 @@ class Exp(Gamma):
     """
     An exponential random variable.
 
-    Parameters
-    ----------
-    rate : float
-        Rate parameter.
-
     Attributes
     ----------
     rate : float
         Rate parameter.
     shape : int
-        Shape parameter inherited from the corresponding gamma distribution.
+        Shape parameter inherited from the gamma distribution.
         Equal to `1`.
     scale : float
-        Scale parameter inherited from the corresponding gamma distribution.
+        Scale parameter inherited from the gamma distribution.
         Equal to `1 / rate`.
     """
 
@@ -271,10 +244,6 @@ class NegBin(Distr):
         Number of failures.
 
     p : Probability of success.
-
-    Note
-    ----
-    Attributes are the same as parameters.
     """
 
     def __init__(self, n, p):
@@ -293,16 +262,11 @@ class Geom(NegBin):
     Represents the number of independent Bernoulli trials needed before a trial
     is successful.
 
-    Parameters
-    ----------
-    p : float
-        Probability of success.
-
     Attributes
     ----------
     p : float
         Probability of success.
-    n : Parameter `n` inherited from the corresponding negative binomial
+    n : Parameter `n` inherited from the negative binomial
         distribution. Equal to `1`.
     """
 
@@ -323,10 +287,6 @@ class Pois(Distr):
     ----------
     rate : float
         The rate parameter.
-
-    Note
-    ----
-    Attributes are the same as parameters.
     """
 
     def __init__(self, rate):
@@ -347,10 +307,6 @@ class Normal(Distr):
         Mean.
     std : float
         Standard deviation.
-
-    Note
-    ----
-    Attributes are the same as parameters.
     """
 
     def __init__(self, mean, std):
