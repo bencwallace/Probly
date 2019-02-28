@@ -1,4 +1,6 @@
-"""probly.py: A python module for working with random variables."""
+"""
+Core objects.
+"""
 
 import copy
 import numpy as np
@@ -7,7 +9,6 @@ import math
 from functools import wraps
 import itertools
 
-# from .programs import _programs
 from .helpers import get_seed, _max_seed
 
 # Initialize dependency graph
@@ -15,7 +16,68 @@ import probly.graphtools as gt
 
 
 def Lift(f):
-    """Lifts a function to the composition map between random variables."""
+    """
+    "Lifts" and returns a function to the composition map between random
+    variables.
+
+    Can be used as a decorator.
+
+    Note
+    ----
+    Functions that manipulate their arguments using already lifted functions
+    (such as arithmetical operations) do not need to be lifted themselves.
+    For instance, the following example, which does not make use of `Lift`,
+    works without issue:
+
+    >>> import probly as pr
+    >>> X = pr.Unif(0, 1)
+    >>> M = pr.array([[X, X + 10], [X + 100, X + 1000]])
+    >>> def f(x):
+    ...     return x[0, 0] - x[1, 1]
+    >>> Y = f(M)
+    >>> print(Y())
+    -1000
+
+    Example
+    -------
+    Consider the following custom-built random class:
+
+    >>> import numpy as np
+    >>> import string
+    >>> import probly as pr
+    >>> charset = list(string.ascii_letters)
+    >>> class RandomString(pr.Distr):
+    ... def __init__(self, rate):
+    ...     self.rate = rate
+    ...     def _sampler(self, seed=None):
+    ...         sample = ''
+    ...         Length = pr.Pois(self.rate)(seed=seed)
+    ...         for i in range(Length):
+    ...             if pr.Ber(0.2)(seed + i) == 1:
+    ...                 sample += ' '
+    ...             else:
+    ...                 np.random.seed(seed + i)
+    ...                 char = np.random.choice(charset)
+    ...                 sample += char
+    ...         return sample
+    >>> S = RandomString(20)
+    >>> print(S())
+
+    The following example lifts the `str.title` method:
+
+    >>> Title = pr.Lift(str.title)
+    >>> T = Title(S)
+    >>> print(T())
+
+    In the next example, we decorate a custom function to get a lifted
+    function:
+
+    >>> @pr.Lift
+    >>> def title_first_char(s):
+    ...     return s.title()[0]
+    >>> U = title_first_char(S)
+    >>> print(T())
+    """
 
     @wraps(f)
     def F(*args):
@@ -29,9 +91,22 @@ def Lift(f):
 
 
 def array(arr):
-    """Turn an array of `rv` objects and constants into a random variable."""
+    """
+    Turns a collection of random variables and constants into a random array.
 
-    # arr = np.array([rv._cast(var) for var in arr])
+    Parameters
+    ----------
+    arr (array_like)
+        An `array_like` object of `rv` objects, constants, and other
+        `array_like` objects.
+
+    Returns
+    -------
+    rv
+        A random variable whose samples are arrays of samples of the objects in
+        `arr`.
+    """
+
     arr = [rv._cast(var) for var in arr]
 
     @Lift
@@ -45,8 +120,11 @@ class rv(object):
     """
     A random variable.
 
-    Can be acted upon by functions decorated with `Lift`. Can also be acted
-    upon by numerical operations when its values can.
+    Can be acted upon by in the following ways (when its samples can):
+    -By functions decorated with `Lift`;
+    -By arithmetical operations (when its values can);
+    -By subscripting; and
+    -As an iterator.
     """
 
     # Track random variables for independence
@@ -63,9 +141,6 @@ class rv(object):
         gt._graph.add_edges_from(edges)
 
         return obj
-
-    # def __init__(self, function=None, *args):
-    #     self.function = gt._graph.nodes[self]['call_method']
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
@@ -110,7 +185,8 @@ class rv(object):
 
     # Helper methods
     def parents(self):
-        """Returns list of random variables from which `self` is defined"""
+        """Returns the list of parents in the dependency graph."""
+
         if self not in gt._graph:
             return []
         else:
@@ -132,7 +208,7 @@ class rv(object):
             return ordered
 
     def copy(self):
-        """Returns an independent copy of `self`"""
+        """Returns an independent random variable of the same distribution."""
 
         return copy.copy(self)
 

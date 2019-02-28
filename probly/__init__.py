@@ -1,3 +1,9 @@
+"""
+ProbLy
+
+A python package for the symbolic computation of random variables.
+"""
+
 from .core import array, Lift
 from .graphtools import nodes, edges
 
