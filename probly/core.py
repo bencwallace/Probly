@@ -91,9 +91,22 @@ def Lift(f):
 
 
 def array(arr):
-    """Turn an array of `rv` objects and constants into a random variable."""
+    """
+    Turns a collection of random variables and constants into a random array.
 
-    # arr = np.array([rv._cast(var) for var in arr])
+    Parameters
+    ----------
+    arr (array_like)
+        An `array_like` object of `rv` objects, constants, and other
+        `array_like` objects.
+
+    Returns
+    -------
+    rv
+        A random variable whose samples are arrays of samples of the objects in
+        `arr`.
+    """
+
     arr = [rv._cast(var) for var in arr]
 
     @Lift
@@ -107,8 +120,11 @@ class rv(object):
     """
     A random variable.
 
-    Can be acted upon by functions decorated with `Lift`. Can also be acted
-    upon by numerical operations when its values can.
+    Can be acted upon by in the following ways (when its samples can):
+    -By functions decorated with `Lift`;
+    -By arithmetical operations (when its values can);
+    -By subscripting; and
+    -As an iterator.
     """
 
     # Track random variables for independence
@@ -125,9 +141,6 @@ class rv(object):
         gt._graph.add_edges_from(edges)
 
         return obj
-
-    # def __init__(self, function=None, *args):
-    #     self.function = gt._graph.nodes[self]['call_method']
 
     def __call__(self, seed=None):
         seed = get_seed(seed)
@@ -172,7 +185,8 @@ class rv(object):
 
     # Helper methods
     def parents(self):
-        """Returns list of random variables from which `self` is defined"""
+        """Returns the list of parents in the dependency graph."""
+
         if self not in gt._graph:
             return []
         else:
@@ -194,7 +208,7 @@ class rv(object):
             return ordered
 
     def copy(self):
-        """Returns an independent copy of `self`"""
+        """Returns an independent random variable of the same distribution."""
 
         return copy.copy(self)
 
