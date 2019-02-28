@@ -53,17 +53,14 @@ class Unif(Distr):
 
     Parameters
     ----------
-        a : float
-            Left endpoint of the support interval.
-        b : float
-            Right endpoint of the support interval.
+    a : float
+        Left endpoint of the support interval.
+    b : float
+        Right endpoint of the support interval.
 
-    Attributes
-    ----------
-        a : float
-            Left endpoint of the support interval.
-        b : float
-            Right endpoint of the support interval.
+    Note
+    ----
+    Attributes are the same as parameters.
     """
 
     def __init__(self, a, b):
@@ -76,6 +73,21 @@ class Unif(Distr):
 
 
 class Bin(Distr):
+    """
+    A binomial random variable.
+
+    Represents the number of successful trials out of `n` independent Bernoulli
+    trials with probability of success `p`.
+
+    Parameters
+    ----------
+    n : int
+        Number of trials.
+
+    p : float
+        probability of success.
+    """
+
     def __init__(self, n, p):
         self.n = n
         self.p = p
@@ -86,12 +98,47 @@ class Bin(Distr):
 
 
 class Ber(Bin):
+    """
+    A Bernoulli random variable.
+
+    Takes the value `1` with probability `p` and `0` with probability `1 - p`.
+
+    Parameters
+    ----------
+    p : float
+        Probability that the outcome is `1`.
+
+    Attributes
+    ----------
+    p : float
+        Probability that the outcome is `1`.
+    n : int
+        Parameter `n` inherited from the corresponding binomial distribution.
+        Equal to `1`.
+    """
+
     # Uses np.random.binomial with n = 1 (much faster than np.random.choice)
     def __init__(self, p):
         super().__init__(1, p)
 
 
 class Beta(Distr):
+    """
+    A beta random variable.
+
+    Parameters
+    ----------
+    alpha : (float)
+        First shape parameter.
+
+    beta : (float)
+        Second shape parameter.
+
+    Note
+    ----
+    Attributes are the same as parameters.
+    """
+
     def __init__(self, alpha, beta):
         self.alpha = alpha
         self.beta = beta
@@ -102,6 +149,33 @@ class Beta(Distr):
 
 
 class Gamma(Distr):
+    """
+    A gamma random variable.
+
+    Supports the two common parameterizations of the gamma distribution:
+    the `(shape, rate)` parameterization and the `(shape, scale)`
+    parameterization. The `shape` parameter and at least one of the `rate` or
+    `scale` parameters must be specified.
+
+    Parameters
+    ----------
+    shape : float
+        Shape parameter.
+    rate : float, optional if `scale` specified
+        Rate parameter.
+    scale : float, optional if `rate` specified
+        Scale parameter.
+
+    Attributes
+    ----------
+    shape : float
+        Shape parameter.
+    rate : float
+        Rate parameter.
+    scale : float
+        Scale parameter.
+    """
+
     def __init__(self, shape, rate=None, scale=None):
         self.shape = shape
         self.rate = rate
@@ -113,6 +187,29 @@ class Gamma(Distr):
 
 
 class ChiSquared(Gamma):
+    """
+    A chi squared random variable.
+
+    Parameters
+    ----------
+    k : float
+        Number of degrees of freedom.
+
+    Attributes
+    ----------
+    k : float
+        Number of degrees of freedom.
+    shape : float
+        Shape parameter inherited from the corresponding gamma distribution.
+        Equal to `k / 2`.
+    rate : float
+        Rate parameter inherited from the corresponding gamma distribution.
+        Equal to `2`.
+    scale : float
+        Scale parameter inherited from the corresponding gamma distribution.
+        Equal to `1 / 2`.
+    """
+
     def __init__(self, k):
         self.k = k
 
@@ -129,6 +226,26 @@ class ChiSquared(Gamma):
 
 
 class Exp(Gamma):
+    """
+    An exponential random variable.
+
+    Parameters
+    ----------
+    rate : float
+        Rate parameter.
+
+    Attributes
+    ----------
+    rate : float
+        Rate parameter.
+    shape : int
+        Shape parameter inherited from the corresponding gamma distribution.
+        Equal to `1`.
+    scale : float
+        Scale parameter inherited from the corresponding gamma distribution.
+        Equal to `1 / rate`.
+    """
+
     def __init__(self, rate):
         shape = 1
         scale = 1 / float(rate)
@@ -142,6 +259,24 @@ class Exp(Gamma):
 
 
 class NegBin(Distr):
+    """
+    A negative binomial random variable.
+
+    Represents the number of successes in a sequence of independent Bernoulli
+    trials with probability of success `p` before `n` failures occur.
+
+    Parameters
+    ----------
+    n : int
+        Number of failures.
+
+    p : Probability of success.
+
+    Note
+    ----
+    Attributes are the same as parameters.
+    """
+
     def __init__(self, n, p):
         self.n = n
         self.p = p
@@ -152,6 +287,25 @@ class NegBin(Distr):
 
 
 class Geom(NegBin):
+    """
+    A geometric random variable.
+
+    Represents the number of independent Bernoulli trials needed before a trial
+    is successful.
+
+    Parameters
+    ----------
+    p : float
+        Probability of success.
+
+    Attributes
+    ----------
+    p : float
+        Probability of success.
+    n : Parameter `n` inherited from the corresponding negative binomial
+        distribution. Equal to `1`.
+    """
+
     def __init__(self, p):
         super().__init__(1, p)
 
@@ -162,6 +316,19 @@ class Geom(NegBin):
 
 
 class Pois(Distr):
+    """
+    A Poisson random variable.
+
+    Parameters
+    ----------
+    rate : float
+        The rate parameter.
+
+    Note
+    ----
+    Attributes are the same as parameters.
+    """
+
     def __init__(self, rate):
         self.rate = rate
 
@@ -171,6 +338,21 @@ class Pois(Distr):
 
 
 class Normal(Distr):
+    """
+    A normal random variable.
+
+    Parameters
+    ----------
+    mean : float
+        Mean.
+    std : float
+        Standard deviation.
+
+    Note
+    ----
+    Attributes are the same as parameters.
+    """
+
     def __init__(self, mean, std):
         self.mean = mean
         self.std = std
