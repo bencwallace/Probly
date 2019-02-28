@@ -1,19 +1,5 @@
 """
 Random variables for common distributions.
-
-Subclassing instructions:
-
-    To define a random variable class with a desired distribution, create a
-    subclass of `Distr` with at least a single method `sampler` whose arguments
-    are `self` and `seed` with default value `None`.
-    The `sampler` method should output values from the desired distribution.
-
-    It is import not to forget to include `seed=None` in the list of arguments
-    and, more importantly, to make use of this seed in the definition of
-    `sampler`.
-
-    The new random variable is then initialized with arguments given by the
-    desired parameters (in the order determined by `sampler`).
 """
 
 import numpy as np
@@ -21,18 +7,65 @@ from .core import rv
 
 
 class Distr(rv):
+    """
+    A random variable specified by its distribution.
+
+    The `Distr` class is intended to be subclassed for defining new random
+    variables.
+
+    Notes
+    -----
+    To define a new random variable class with a desired distribution, create a
+    subclass of `Distr` with at least a single method `sampler` that accepts
+    the single argument `seed` with default value `None`.
+    The `sampler` method should output values from the desired distribution.
+
+    It is advised to properly make use of `seed` in the definition of
+    `sampler`.
+
+    Example
+    -------
+    The following defines a uniform random variable on the interval
+    `[a + 1, b + 2]`:
+
+    >>> import numpy as np
+    >>> import probly as pr
+    >>> class UnifPlus(Distr):
+    ...     def __init__(self, a, b):
+    ...         self.a = a + 1
+    ...         self.b = b + 1
+    ...     def sampler(self, seed=None):
+    ...         np.random.seed(seed)
+    ...         return np.random.uniform(self.a, self.b)
+    """
+
     # Protection from the perils of sub-classing rv directly
     def __new__(cls, *args):
         # Create bare rv (add to graph)
         obj = super().__new__(cls)
 
-        # Initialize id
-        # super().__init__(obj)
-
         return obj
 
 
 class Unif(Distr):
+    """
+    A uniform random variable.
+
+    Parameters
+    ----------
+        a : float
+            Left endpoint of the support interval.
+        b : float
+            Right endpoint of the support interval.
+
+    Attributes
+    ----------
+        a : float
+            Left endpoint of the support interval.
+        b : float
+            Right endpoint of the support interval.
+    """
+
     def __init__(self, a, b):
         self.a = a
         self.b = b
