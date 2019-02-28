@@ -8,3 +8,4 @@ probly/programs.py
 tour.ipynb
 random_human.py
 *.egg-info
+doc/build
