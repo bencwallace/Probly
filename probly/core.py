@@ -72,7 +72,7 @@ class rv(object):
         parents = self.parents()
 
         if len(parents) == 0:
-            return self.sampler((seed + self._id) % _max_seed)
+            return self._sampler((seed + self._id) % _max_seed)
         samples = [parents[i](seed)
                    for i in range(len(parents))]
         # return self.function(*samples)

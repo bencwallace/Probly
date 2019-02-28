@@ -16,12 +16,12 @@ class Distr(rv):
     Notes
     -----
     To define a new random variable class with a desired distribution, create a
-    subclass of `Distr` with at least a single method `sampler` that accepts
+    subclass of `Distr` with at least a single method `_sampler` that accepts
     the single argument `seed` with default value `None`.
-    The `sampler` method should output values from the desired distribution.
+    The `_sampler` method should output values from the desired distribution.
 
     It is advised to properly make use of `seed` in the definition of
-    `sampler`.
+    `_sampler`.
 
     Example
     -------
@@ -34,7 +34,7 @@ class Distr(rv):
     ...     def __init__(self, a, b):
     ...         self.a = a + 1
     ...         self.b = b + 1
-    ...     def sampler(self, seed=None):
+    ...     def _sampler(self, seed=None):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
     """
@@ -70,7 +70,7 @@ class Unif(Distr):
         self.a = a
         self.b = b
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.uniform(self.a, self.b)
 
@@ -80,7 +80,7 @@ class Bin(Distr):
         self.n = n
         self.p = p
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.binomial(self.n, self.p)
 
@@ -96,7 +96,7 @@ class Beta(Distr):
         self.alpha = alpha
         self.beta = beta
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.beta(self.alpha, self.beta)
 
@@ -107,7 +107,7 @@ class Gamma(Distr):
         self.rate = rate
         self.scale = scale
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.gamma(self.shape, self.scale)
 
@@ -123,7 +123,7 @@ class ChiSquared(Gamma):
         super().__init__(shape, rate, scale)
 
     # Much faster than using np.random.gamma
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.chisquare(self.k)
 
@@ -136,7 +136,7 @@ class Exp(Gamma):
         super().__init__(shape, rate, scale)
 
     # A bit faster than using np.random.gamma
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.exponential(self.rate)
 
@@ -146,7 +146,7 @@ class NegBin(Distr):
         self.n = n
         self.p = p
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.negative_binomial(self.n, self.p)
 
@@ -156,7 +156,7 @@ class Geom(NegBin):
         super().__init__(1, p)
 
     # Faster than using np.random.negative_binomial
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.geometric(self.p)
 
@@ -165,7 +165,7 @@ class Pois(Distr):
     def __init__(self, rate):
         self.rate = rate
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.poisson(self.rate)
 
@@ -175,6 +175,6 @@ class Normal(Distr):
         self.mean = mean
         self.std = std
 
-    def sampler(self, seed=None):
+    def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.normal(self.mean, self.std)
