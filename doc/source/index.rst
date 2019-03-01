@@ -12,25 +12,9 @@ ProblY is a Python package for symbolic computation of random variables.
    :maxdepth: 2
    :caption: Contents:
 
-
-
-Tutorial
-========
-
-.. toctree::
-   :maxdepth: 2
-
    tutorial
-
-
-
-API Reference
-=============
-
-.. toctree::
-   :maxdepth: 2
-
    probly
+
 
 
 Indices and tables
