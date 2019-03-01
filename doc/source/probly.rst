@@ -20,22 +20,6 @@ probly.distr module
     :undoc-members:
     :show-inheritance:
 
-probly.graphtools module
-------------------------
-
-.. automodule:: probly.graphtools
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-probly.helpers module
----------------------
-
-.. automodule:: probly.helpers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
