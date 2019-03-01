@@ -14,13 +14,25 @@ from os import urandom
 
 class Node(object):
     """
-    A random variable.
+    A node in the global dependency graph.
 
-    Can be acted upon by in the following ways (when its samples can):
-    - By functions decorated with `Lift`;
-    - By arithmetical operations (when its values can);
-    - By subscripting; and
-    - As an iterator.
+    The dependency graph is a labeled directed multigraph implemented with the
+    NetworkX package. The nodes of the graph are `Node` objects and are labeled
+    by a callable object, which we refer to as its "call method". The primary
+    function of a `Node` object is, when
+    called, to recursively combine the outputs of its parents in the
+    dependency graph by feeding them as arguments to its call method. The order
+    in which the outputs are mapped to arguments is determined by the edge
+    labels.
+
+    Parameters
+    ----------
+    call_method : callable
+    parents : list of `Node` objects
+
+    Note
+    ----
+    `Node` objects are not meant to be instantiated directly.
     """
 
     # Track random variables for independence
@@ -35,14 +47,8 @@ class Node(object):
     # Core magic methods
     def __new__(cls, call_method=None, *parents):
         obj = super().__new__(cls)
+
         obj._id = next(cls._last_id)
-
-        if not parents:
-            parents = [root]
-
-        # kluge
-        if not call_method:
-            call_method = 'sampler'
 
         edges = [(var, obj, {'index': i})
                  for i, var in enumerate(parents)]
@@ -55,17 +61,17 @@ class Node(object):
         seed = root(seed)
         parents = self.parents()
 
-        if len(parents) == 0:
-            return self._sampler((seed + self._id) % self._max_seed)
         samples = [parents[i](seed)
                    for i in range(len(parents))]
 
         call_method = self._graph.nodes[self]['call_method']
         if call_method is 'sampler':
-            # kluge
+            # kluge (only happens once but still kluge)
             def seeded_sampler(seed):
                 return self._sampler((seed + self._id) % self._max_seed)
             call_method = seeded_sampler
+            nx.set_node_attributes(self._graph,
+                                   {self: {'call_method': call_method}})
         return call_method(*samples)
 
     # Representation magic

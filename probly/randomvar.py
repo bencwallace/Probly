@@ -108,6 +108,16 @@ def array(arr):
 
 
 class RandomVar(Node):
+    """
+    A random variable.
+
+    Can be acted upon by in the following ways (when its samples can):
+    - By functions decorated with `Lift`;
+    - By arithmetical operations (when its values can);
+    - By subscripting; and
+    - As an iterator.
+    """
+
     # Sequence and array magic
     def __array__(self):
         parents = self.parents()

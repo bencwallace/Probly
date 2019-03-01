@@ -3,47 +3,62 @@ Random variables for common distributions.
 """
 
 import numpy as np
+from .core import root
 from .randomvar import RandomVar
 
 
 class Distr(RandomVar):
     """
-    A random variable specified by its distribution.
+    A random variable or family therefore specified by a distribution.
 
     The `Distr` class is intended to be subclassed for defining new random
-    variables.
+    variables and families of random variables.
 
     Notes
     -----
-    To define a new random variable class with a desired distribution, create a
+    To define a new distribution, create a
     subclass of `Distr` with at least a single method `_sampler` that accepts
     the single argument `seed` with default value `None`.
     The `_sampler` method should output values from the desired distribution.
-
-    It is advised to properly make use of `seed` in the definition of
+    It is important to make consistent use of `seed` in the definition of
     `_sampler`.
+
+    In order to define a parameterized family of random variables, one should
+    additionally define an `__init__` constructor that accepts the desired
+    parameters as arguments and stores their values as object attributes.
+    These values can then be used by the `_sampler` method.
+
+    The `_sampler` method is marked as private and should be treated as such.
+    Rather than calling `_sampler` directly, one should call the random
+    variable instance itself, which is callable by inheritance. Doing so
+    automatically takes care of ensuring independence of different instances
+    of a random variable.
 
     Example
     -------
-    Define a uniform random variable on the interval `[a + 1, b + 2]`:
+    Define a family of "shifted" uniform random variables:
 
     >>> import numpy as np
     >>> import probly as pr
-    >>> class UnifPlus(pr.Distr):
+    >>> class UnifShift(pr.Distr):
     ...     def __init__(self, a, b):
     ...         self.a = a + 1
     ...         self.b = b + 1
     ...     def _sampler(self, seed=None):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
+
+    Instantiate a random variable from this family with support `[1, 2]` and
+    sample from its distribution:
+
+    >>> X = UnifShift(0, 1)
+    >>> X()
     """
 
     # Protection from the perils of sub-classing RandomVar directly
     def __new__(cls, *args, **kwargs):
         # Create bare RandomVar (add to graph)
-        obj = super().__new__(cls)
-
-        return obj
+        return super().__new__(cls, 'sampler', root)
 
 
 class Unif(Distr):
