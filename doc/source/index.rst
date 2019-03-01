@@ -17,7 +17,7 @@ Documentation
    installation
    quick
    tutorial
-   probly
+   ref
 
 
 
