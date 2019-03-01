@@ -126,12 +126,15 @@ class Node(object):
         parents = self.parents()
 
         Copy = self.__new__(type(self), call_method, *parents)
+
+        # Save new id
         _id = Copy._id
 
+        # Copy data that may exist in subclass. Old id also gets copied over
         for key, val in self.__dict__.items():
             setattr(Copy, key, val)
 
-        # Do not copy id
+        # Reset id to new id
         Copy._id = _id
 
         return Copy

@@ -121,4 +121,8 @@ True
 False
 
 Notice that ``UU`` produces the same values as ``W`` for a given seed
-although they are different objects. 
+although they are different objects. This is because, although they
+are distinct from the perspective of the Python interpreter, they are
+the same random variables from the perspective of probability.
+
+.. UU._id == 17
