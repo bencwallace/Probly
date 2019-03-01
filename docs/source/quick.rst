@@ -137,7 +137,7 @@ isn't explicitly known.
 
 >>> C = UU.copy()
 >>> C(seed)
-6.956875051242349
+7.039709854601764
 
 Random matrices
 ---------------
