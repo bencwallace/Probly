@@ -55,7 +55,7 @@ class Node(object):
 
         obj._id = next(cls._last_id)
 
-        edges = [(var, obj, {'index': i})
+        edges = [(cls._cast(var), obj, {'index': i})
                  for i, var in enumerate(parents)]
         cls._graph.add_node(obj, call_method=call_method)
         cls._graph.add_edges_from(edges)
@@ -122,7 +122,10 @@ class Node(object):
         return copy.copy(self)
 
     def __copy__(self):
-        Copy = self.__new__(type(self))
+        call_method = self._graph.nodes[self]['call_method']
+        parents = self.parents()
+
+        Copy = self.__new__(type(self), call_method, *parents)
         _id = Copy._id
 
         for key, val in self.__dict__.items():
