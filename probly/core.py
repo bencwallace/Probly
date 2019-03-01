@@ -6,14 +6,15 @@ This module defines the global dependency graph, its `Node` objects, and its
 `Root` object.
 """
 
-import copy
-import numpy as np
 import math
+import numpy as np
+
+import copy
 import itertools
+
 import networkx as nx
 
-# For seeding
-from os import urandom
+import os
 
 
 class Node(object):
@@ -62,6 +63,15 @@ class Node(object):
         return obj
 
     def __call__(self, seed=None):
+        """
+        Produces a random sample from the desired distribution.
+
+        Parameters
+        ----------
+        seed : int, optional
+            A seed value. If not specified, a random seed will be used.
+        """
+
         seed = root(seed)
         parents = self.parents()
 
@@ -141,7 +151,7 @@ class Root(Node):
 
         try:
             max_bytes = math.ceil(np.log2(self._max_seed) / 8)
-            seed = int.from_bytes(urandom(max_bytes), 'big')
+            seed = int.from_bytes(os.urandom(max_bytes), 'big')
         except NotImplementedError:
             raise NotImplementedError('Seed from time not implemented.')
 

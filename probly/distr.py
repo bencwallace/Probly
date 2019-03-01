@@ -3,6 +3,7 @@ Random variables for common distributions.
 """
 
 import numpy as np
+
 from .core import root
 from .randomvar import RandomVar
 

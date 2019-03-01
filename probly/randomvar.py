@@ -9,6 +9,7 @@ operated on in whatever way is compatible with their realizations.
 
 import math
 import numpy as np
+
 from functools import wraps
 import operator as op
 
@@ -84,7 +85,6 @@ def Lift(f):
         if any([isinstance(arg, RandomVar) for arg in args]):
             return RandomVar(f, *args)
         else:
-            # Could be a problem if F(*args)() called
             return f(*args)
 
     return F
@@ -153,11 +153,11 @@ class RandomVar(Node):
         else:
             raise StopIteration
 
-    @classmethod
-    def _cast(cls, obj):
+    @staticmethod
+    def _cast(obj):
         """Cast constants to `Const` objects."""
 
-        if isinstance(obj, cls):
+        if isinstance(obj, Node):
             return obj
         elif hasattr(obj, '__getitem__'):
             return array(obj)

@@ -1,5 +1,5 @@
-API Reference
-=============
+probly package
+==============
 
 Submodules
 ----------
@@ -16,6 +16,14 @@ probly.distr module
 -------------------
 
 .. automodule:: probly.distr
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+probly.randomvar module
+-----------------------
+
+.. automodule:: probly.randomvar
     :members:
     :undoc-members:
     :show-inheritance:
