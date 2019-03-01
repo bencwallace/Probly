@@ -1,3 +1,12 @@
+"""
+Random variables
+================
+
+This modules defines `RandomVar` objects as nodes in the dependency graph
+(`Node` objects) with extra structure allowing them to be transformed and
+operated on in whatever way is compatible with their realizations.
+"""
+
 import math
 import numpy as np
 from functools import wraps

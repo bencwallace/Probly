@@ -1,5 +1,9 @@
 """
-Core objects.
+Core objects and methods
+========================
+
+This module defines the global dependency graph, its `Node` objects, and its
+`Root` object.
 """
 
 import copy
