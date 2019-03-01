@@ -1,11 +1,3 @@
-"""
-======
-ProbLy
-======
-
-A python package for the symbolic computation of random variables.
-"""
-
 from .randomvar import array, Lift
 
 # Binomial-type distributions
