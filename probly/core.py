@@ -115,7 +115,7 @@ def array(arr):
     return make_array(*arr)
 
 
-class rv(object):
+class rvAbstract(object):
     """
     A random variable.
 
@@ -147,7 +147,7 @@ class rv(object):
         if not call_method:
             call_method = 'sampler'
 
-        edges = [(rv._cast(var), obj, {'index': i})
+        edges = [(cls._cast(var), obj, {'index': i})
                  for i, var in enumerate(parents)]
         cls._graph.add_node(obj, call_method=call_method)
         cls._graph.add_edges_from(edges)
@@ -246,7 +246,7 @@ class rv(object):
     def _cast(obj):
         """Cast constants to `Const` objects."""
 
-        if isinstance(obj, rv):
+        if isinstance(obj, rvAbstract):
             return obj
         elif hasattr(obj, '__getitem__'):
             return array(obj)
@@ -373,9 +373,13 @@ class rv(object):
         return math.ceil(self)
 
 
-class Root(rv):
+class rv(rvAbstract):
+    pass
+
+
+class Root(rvAbstract):
     def __new__(cls, *args, **kwargs):
-        return super(rv, cls).__new__(cls, *args, **kwargs)
+        return super(rvAbstract, cls).__new__(cls, *args, **kwargs)
 
     def __call__(self, seed=None):
         """
