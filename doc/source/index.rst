@@ -3,13 +3,34 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ProblY's documentation!
-==================================
+ProblY
+======
+
+ProblY is a Python package for symbolic computation of random variables.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+
+
+Tutorial
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorial
+
+
+
+API Reference
+=============
+
+.. toctree::
+   :maxdepth: 2
+
+   probly
 
 
 Indices and tables
@@ -18,3 +39,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
