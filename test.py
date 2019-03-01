@@ -1,10 +1,11 @@
 import numpy as np
 import probly as pr
-from probly.helpers import _max_seed
 import unittest
 from unittest import TestCase
+from probly.core import Node
 
 
+_max_seed = Node._max_seed
 msg_low_prob = 'Test fails with low probability. Try running tests again.'
 
 
