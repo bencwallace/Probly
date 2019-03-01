@@ -74,13 +74,6 @@ class Node(object):
 
         call_method = self._graph.nodes[self]['call_method']
 
-        if call_method is 'copy':
-            # Copies have as parent the element they were copied from.
-            # Makes copies independent by calling parent with modified seed.
-
-            seed += self._id
-            call_method = lambda x: x
-
         seed = root(seed)
         parents = self.parents()
         samples = [parents[i](seed)
@@ -122,15 +115,15 @@ class Node(object):
         return copy.copy(self)
 
     def __copy__(self):
-        # call_method = self._graph.nodes[self]['call_method']
-        # parents = self.parents()
-        call_method = 'copy'
-        parents = [self]
+        # Returns a seed-shifted (independent) version of `self`
 
-        Copy = self.__new__(type(self), call_method, *parents)
+        # Save next id
+        _id = next(self._last_id)
 
-        # Save new id
-        _id = Copy._id
+        # Construct shifted copy
+        def shifted_call_method(seed=None):
+            return self((root(seed) + _id) % self._max_seed)
+        Copy = self.__new__(type(self), shifted_call_method, root)
 
         # Copy data that may exist in subclass. Old id also gets copied over
         for key, val in self.__dict__.items():
