@@ -10,10 +10,8 @@ from functools import wraps
 import itertools
 import networkx as nx
 
-from .helpers import get_seed, _max_seed
-
-# Initialize dependency graph
-# import probly.graphtools as gt
+# For seeding
+from os import urandom
 
 
 def Lift(f):
@@ -134,28 +132,44 @@ class rv(object):
     # Initialize dependency graph
     _graph = nx.MultiDiGraph()
 
+    # NumPy max seed
+    _max_seed = 2 ** 32 - 1
+
     # Core magic methods
-    def __new__(cls, label=None, *parents):
+    def __new__(cls, call_method=None, *parents):
         obj = super().__new__(cls)
         obj._id = next(cls._last_id)
 
+        if not parents:
+            parents = [root]
+
+        # kluge
+        if not call_method:
+            call_method = 'sampler'
+
         edges = [(rv._cast(var), obj, {'index': i})
                  for i, var in enumerate(parents)]
-        cls._graph.add_node(obj, call_method=label)
+        cls._graph.add_node(obj, call_method=call_method)
         cls._graph.add_edges_from(edges)
 
         return obj
 
     def __call__(self, seed=None):
-        seed = get_seed(seed)
+        seed = root(seed)
         parents = self.parents()
 
         if len(parents) == 0:
-            return self._sampler((seed + self._id) % _max_seed)
+            return self._sampler((seed + self._id) % self._max_seed)
         samples = [parents[i](seed)
                    for i in range(len(parents))]
-        # return self.function(*samples)
-        return self._graph.nodes[self]['call_method'](*samples)
+
+        call_method = self._graph.nodes[self]['call_method']
+        if call_method is 'sampler':
+            # kluge
+            def seeded_sampler(seed):
+                return self._sampler((seed + self._id) % self._max_seed)
+            call_method = seeded_sampler
+        return call_method(*samples)
 
     # Sequence and array magic
     def __array__(self):
@@ -357,6 +371,33 @@ class rv(object):
     @Lift
     def __ceil__(self):
         return math.ceil(self)
+
+
+class Root(rv):
+    def __new__(cls, *args, **kwargs):
+        return super(rv, cls).__new__(cls, *args, **kwargs)
+
+    def __call__(self, seed=None):
+        """
+        Generate a random seed. If a seed is provided, returns it unchanged.
+
+        Based on the Python implementation. A consistent approach to generating
+        re-usable random seeds is needed in order to implement dependency.
+        """
+
+        if seed is not None:
+            return seed
+
+        try:
+            max_bytes = math.ceil(np.log2(self._max_seed) / 8)
+            seed = int.from_bytes(urandom(max_bytes), 'big')
+        except NotImplementedError:
+            raise NotImplementedError('Seed from time not implemented.')
+
+        return seed
+
+
+root = Root()
 
 
 class Const(rv):
