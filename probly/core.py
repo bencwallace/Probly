@@ -82,7 +82,9 @@ class Node(object):
             nx.set_node_attributes(self._graph,
                                    {self: {'call_method': call_method}})
         elif call_method is 'copy':
-            # Make copies independent
+            # Copies have as parent the element they were copied from.
+            # Makes copies independent by calling parent with modified seed.
+
             seed += self._id
             call_method = lambda x: x
 

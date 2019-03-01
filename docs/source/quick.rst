@@ -122,9 +122,44 @@ True
 >>> UU is W
 False
 
+.. UU._id == 17
+
 Notice that ``UU`` produces the same values as ``W`` for a given seed
 although they are different objects. This is because, although they
 are distinct from the perspective of the Python interpreter, they are
 the same random variables from the perspective of probability.
 
-.. UU._id == 17
+Independent copies
+------------------
+Independent copies of a random variable can be produced using the ``copy``
+method. This can be useful when the distribution of a random variable
+isn't explicitly known.
+
+>>> C = UU.copy()
+>>> C(seed)
+6.956875051242349
+
+Random matrices
+---------------
+Random NumPy arrays (in particular, random matrices) can be formed from
+other random variables.
+
+>>> M = pr.array([[X, Z], [W, Y]])
+>>> type(M)
+probly.randomvar.RandomVar
+
+Lifting functions
+-----------------
+Functions can be lifted to maps between random variables using the
+``@pr.Lift`` decorator::
+
+	import numpy as np
+	@pr.Lift
+	def Det(m):
+		return np.linalg.det(m)
+
+The function ``Det`` can now be applied to ``M``.
+
+>>> D = Det(M)
+>>> D(seed)
+0.8924340037906262
