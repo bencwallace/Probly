@@ -1,6 +1,8 @@
 Quick start
 ===========
 
+First, make sure that ProblY is `installed <https://bencwallace.github.io/installation.html>`_.
+
 A note on reproducible results
 ------------------------------
 

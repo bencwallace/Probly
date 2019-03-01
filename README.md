@@ -1,6 +1,8 @@
 # ProblY
 by Benjamin Wallace
 
+Website: https://bencwallace.github.io/
+
 ## Description
 
 ProblY is a Python package for the symbolic computation of random variables.
@@ -20,3 +22,7 @@ Other Python packages, such as NumPy and SciPy include methods for sampling from
 
 A second import feature of ProblY not found in NumPy or SciPy is the automatic tracking of dependence structure so that one can expect results consistent with this structure when sampling from a collection of random variables or a random variable defined as a function of such a collection.
 For instance, when sampling `Z = [X, X + log(X)]` (regardless of the distribution of `X`) one expects a sample with `Z[0] = 1` to also have `Z[1] = 1 + log(1) = 1`. A user using NumPy would require a certain level of caution not to get inconsistent results, whereas ProblY takes care of this in the background.
+
+### Quick start
+
+Click [here](https://bencwallace.github.io/quick.html)
