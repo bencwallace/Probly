@@ -61,6 +61,12 @@ class Distr(RandomVar):
         # Create bare RandomVar (add to graph)
         return super().__new__(cls, 'sampler', root)
 
+    def __call__(self, seed=None):
+        def seeded_sampler(seed):
+            return self._sampler((seed + self._id) % self._max_seed)
+
+        return seeded_sampler(root(seed))
+
 
 class Unif(Distr):
     """

@@ -74,14 +74,7 @@ class Node(object):
 
         call_method = self._graph.nodes[self]['call_method']
 
-        if call_method is 'sampler':
-            # kluge (only happens once but still kluge)
-            def seeded_sampler(seed):
-                return self._sampler((seed + self._id) % self._max_seed)
-            call_method = seeded_sampler
-            nx.set_node_attributes(self._graph,
-                                   {self: {'call_method': call_method}})
-        elif call_method is 'copy':
+        if call_method is 'copy':
             # Copies have as parent the element they were copied from.
             # Makes copies independent by calling parent with modified seed.
 
