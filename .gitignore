@@ -1,11 +1,9 @@
 .ipynb_checkpoints
 __pycache__
-todo.md
-compiled.py
-examples.py
-examples_new.py
-probly/programs.py
-tour.ipynb
-random_human.py
+
 *.egg-info
 doc/build
+
+todo.md
+
+compiled.py
