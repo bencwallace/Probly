@@ -72,13 +72,8 @@ class Node(object):
             A seed value. If not specified, a random seed will be used.
         """
 
-        seed = root(seed)
-        parents = self.parents()
-
-        samples = [parents[i](seed)
-                   for i in range(len(parents))]
-
         call_method = self._graph.nodes[self]['call_method']
+
         if call_method is 'sampler':
             # kluge (only happens once but still kluge)
             def seeded_sampler(seed):
@@ -86,6 +81,16 @@ class Node(object):
             call_method = seeded_sampler
             nx.set_node_attributes(self._graph,
                                    {self: {'call_method': call_method}})
+        elif call_method is 'copy':
+            # Make copies independent
+            seed += self._id
+            call_method = lambda x: x
+
+        seed = root(seed)
+        parents = self.parents()
+        samples = [parents[i](seed)
+                   for i in range(len(parents))]
+
         return call_method(*samples)
 
     # Representation magic
@@ -122,8 +127,10 @@ class Node(object):
         return copy.copy(self)
 
     def __copy__(self):
-        call_method = self._graph.nodes[self]['call_method']
-        parents = self.parents()
+        # call_method = self._graph.nodes[self]['call_method']
+        # parents = self.parents()
+        call_method = 'copy'
+        parents = [self]
 
         Copy = self.__new__(type(self), call_method, *parents)
 
