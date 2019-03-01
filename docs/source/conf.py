@@ -24,9 +24,9 @@ copyright = '2019, Benjamin Wallace'
 author = 'Benjamin Wallace'
 
 # The short X.Y version
-version = ''
+version = '0.1'
 # The full version, including alpha/beta/rc tags
-release = '2019'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
