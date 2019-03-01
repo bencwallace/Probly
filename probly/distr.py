@@ -71,7 +71,7 @@ class Unif(Distr):
     a : float
         Left endpoint of the support interval.
     b : float
-        Right endpoint of the support inteRandomVaral.
+        Right endpoint of the selfupport inteRandomVaral.
     """
 
     def __init__(self, a, b):
@@ -114,23 +114,14 @@ class Ber(Bin):
 
     Takes the value `1` with probability `p` and `0` with probability `1 - p`.
 
-    Attributes
+    Parameters
     ----------
     p : float
         Probability that the outcome is `1`.
-    n : int
-        Parameter `n` inherited from the binomial distribution.
-        Equal to `1`.
     """
 
     # Uses np.random.binomial with n = 1 (much faster than np.random.choice)
     def __init__(self, p):
-        """
-        Parameters
-        ----------
-        p : float
-            Probability that the outcome is `1`.
-        """
         super().__init__(1, p)
 
 
@@ -165,7 +156,7 @@ class Gamma(Distr):
     parameterization. The `shape` parameter and at least one of the `rate` or
     `scale` parameters must be specified.
 
-    Attributes
+    Parameters
     ----------
     shape : float
         Shape parameter.
@@ -189,19 +180,10 @@ class ChiSquared(Gamma):
     """
     A chi squared random variable.
 
-    Attributes
+    Parameters
     ----------
     k : float
         Number of degrees of freedom.
-    shape : float
-        Shape parameter inherited from the gamma distribution.
-        Equal to `k / 2`.
-    rate : float
-        Rate parameter inherited from the gamma distribution.
-        Equal to `2`.
-    scale : float
-        Scale parameter inherited from the gamma distribution.
-        Equal to `1 / 2`.
     """
 
     def __init__(self, k):
@@ -223,16 +205,10 @@ class Exp(Gamma):
     """
     An exponential random variable.
 
-    Attributes
+    Parameters
     ----------
     rate : float
         Rate parameter.
-    shape : int
-        Shape parameter inherited from the gamma distribution.
-        Equal to `1`.
-    scale : float
-        Scale parameter inherited from the gamma distribution.
-        Equal to `1 / rate`.
     """
 
     def __init__(self, rate):
@@ -278,12 +254,10 @@ class Geom(NegBin):
     Represents the number of independent Bernoulli trials needed before a trial
     is successful.
 
-    Attributes
+    Parameters
     ----------
     p : float
         Probability of success.
-    n : Parameter `n` inherited from the negative binomial
-        distribution. Equal to `1`.
     """
 
     def __init__(self, p):
