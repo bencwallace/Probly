@@ -16,7 +16,6 @@ Documentation
 
    installation
    quick
-   tutorial
    ref
 
 
