@@ -8,11 +8,12 @@ import operator as op
 import math
 from functools import wraps
 import itertools
+import networkx as nx
 
 from .helpers import get_seed, _max_seed
 
 # Initialize dependency graph
-import probly.graphtools as gt
+# import probly.graphtools as gt
 
 
 def Lift(f):
@@ -121,14 +122,17 @@ class rv(object):
     A random variable.
 
     Can be acted upon by in the following ways (when its samples can):
-    -By functions decorated with `Lift`;
-    -By arithmetical operations (when its values can);
-    -By subscripting; and
-    -As an iterator.
+    - By functions decorated with `Lift`;
+    - By arithmetical operations (when its values can);
+    - By subscripting; and
+    - As an iterator.
     """
 
     # Track random variables for independence
     _last_id = itertools.count()
+
+    # Initialize dependency graph
+    _graph = nx.MultiDiGraph()
 
     # Core magic methods
     def __new__(cls, label=None, *parents):
@@ -137,8 +141,8 @@ class rv(object):
 
         edges = [(rv._cast(var), obj, {'index': i})
                  for i, var in enumerate(parents)]
-        gt._graph.add_node(obj, call_method=label)
-        gt._graph.add_edges_from(edges)
+        cls._graph.add_node(obj, call_method=label)
+        cls._graph.add_edges_from(edges)
 
         return obj
 
@@ -151,7 +155,7 @@ class rv(object):
         samples = [parents[i](seed)
                    for i in range(len(parents))]
         # return self.function(*samples)
-        return gt._graph.nodes[self]['call_method'](*samples)
+        return self._graph.nodes[self]['call_method'](*samples)
 
     # Sequence and array magic
     def __array__(self):
@@ -187,15 +191,15 @@ class rv(object):
     def parents(self):
         """Returns the list of parents in the dependency graph."""
 
-        if self not in gt._graph:
+        if self not in self._graph:
             return []
         else:
             # Convert to list for re-use
-            unordered = list(gt._graph.predecessors(self))
+            unordered = list(self._graph.predecessors(self))
             if len(unordered) == 0:
                 return []
 
-            data = [gt._graph.get_edge_data(p, self) for p in unordered]
+            data = [self._graph.get_edge_data(p, self) for p in unordered]
 
             # Create {index: parent} dictionary
             dictionary = {}
