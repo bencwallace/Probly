@@ -3,10 +3,10 @@ Random variables for common distributions.
 """
 
 import numpy as np
-from .core import rv
+from .randomvar import RandomVar
 
 
-class Distr(rv):
+class Distr(RandomVar):
     """
     A random variable specified by its distribution.
 
@@ -38,9 +38,9 @@ class Distr(rv):
     ...         return np.random.uniform(self.a, self.b)
     """
 
-    # Protection from the perils of sub-classing rv directly
+    # Protection from the perils of sub-classing RandomVar directly
     def __new__(cls, *args, **kwargs):
-        # Create bare rv (add to graph)
+        # Create bare RandomVar (add to graph)
         obj = super().__new__(cls)
 
         return obj
@@ -55,7 +55,7 @@ class Unif(Distr):
     a : float
         Left endpoint of the support interval.
     b : float
-        Right endpoint of the support interval.
+        Right endpoint of the support inteRandomVaral.
     """
 
     def __init__(self, a, b):
