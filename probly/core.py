@@ -36,7 +36,8 @@ class Node(object):
     Parameters
     ----------
     call_method : callable
-    parents : list of `Node` objects
+    parents : list
+        List of `Node` objects
 
     Note
     ----

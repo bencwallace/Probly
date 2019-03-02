@@ -12,9 +12,6 @@ msg_low_prob = 'Test fails with low probability. Try running tests again.'
 class TestSimple(TestCase):
     """Tests for simple distributions."""
 
-    def setUp(self):
-        self.seed = 100
-
     def test_unif(self):
         # Almost surely passes
         a = 0
@@ -37,7 +34,7 @@ class TestSimple(TestCase):
 
 
 class TestSimpleSeeded(TestCase):
-    """Tests for simple distributions."""
+    """Tests for simple distributions (seeded)."""
 
     def setUp(self):
         self.seed = 100
@@ -63,6 +60,54 @@ class TestSimpleSeeded(TestCase):
         x = np.random.binomial(1, p)
 
         self.assertEqual(X(self.seed), x)
+
+
+class TestDistr(TestCase):
+    """Tests for a few other distributions."""
+    def setUp(self):
+        # Binomial
+        self.n = 10
+        self.p = 0.2
+
+        # Beta
+        self.alpha = 2.1
+        self.beta = 3
+
+        # Gamma
+        self.shape = 1.5
+        self.rate = 2.6
+        self.scale = 3.1
+
+        # Chi squared
+        self.k = 11.1
+
+    def test_bin(self):
+        val = pr.Bin(self.n, self.p)()
+        self.assertIsNotNone(val)
+
+    def test_beta(self):
+        val = pr.Beta(self.alpha, self.beta)()
+        self.assertIsNotNone(val)
+
+    def test_gamma_rate(self):
+        val = pr.Gamma(self.shape, self.rate)()
+        self.assertIsNotNone(val)
+
+    def test_gamma_scale(self):
+        val = pr.Gamma(self.shape, scale=self.scale)()
+        self.assertIsNotNone(val)
+
+    def test_gamma_both(self):
+        val = pr.Gamma(self.shape, self.rate, self.scale)
+        self.assertIsNotNone(val)
+
+    def test_chisquared(self):
+        val = pr.ChiSquared(self.k)
+        self.assertIsNotNone(val)
+
+    def test_exp(self):
+        val = pr.Exp(self.rate)
+        self.assertIsNotNone(val)
 
 
 class TestScalar(TestCase):

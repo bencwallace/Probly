@@ -171,8 +171,13 @@ class Gamma(Distr):
 
     def __init__(self, shape, rate=None, scale=None):
         self.shape = shape
-        self.rate = rate
-        self.scale = scale
+
+        if scale is not None:
+            self.scale = scale
+            self.rate = 1 / scale
+        else:
+            self.rate = rate
+            self.scale = 1 / rate
 
     def _sampler(self, seed=None):
         np.random.seed(seed)

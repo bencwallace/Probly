@@ -33,7 +33,7 @@ will produce the same result.
 
 >>> seed = 99	# An arbitrary but fixed seed
 >>> Z(seed)
-0.3279725540489231
+4.029209149361858
 >>> # Repeat the last step to obtain the same output
 
 When called with no argument, a seed produced by a random number generator
@@ -41,16 +41,16 @@ is used and the output is not reproducible.
 
 >>> # We obtained the following output. You'll almost surely get something different
 >>> Z()
-4.364698077658325
+-7.722714026707818
 
 Nevertheless, the outputs of ``Z()`` are uniformly distributed on the
 interval ``[-10, 10]``. Similarly, we can check ``X`` is equally likely
-to take on the values ``0`` and ``1``::
+to take on the values ``0`` and ``1`` by computing its empirical mean::
 
 	trials = 1000
 	total = 0
-	for _ in range(trials):
-	    total += X()
+	for i in range(trials):
+	    total += X(i)
 	average = total / trials
 
 The following output is non-reproducible because we didn't fix a seed,
@@ -58,7 +58,7 @@ but it should still be close to ``0.5`` (by the
 `law of large numbers <https://en.wikipedia.org/wiki/Law_of_large_numbers>`_).
 
 >>> average
-0.503
+0.481
 
 Combining random variables
 --------------------------
@@ -74,7 +74,7 @@ probly.randomvar.RandomVar
 We can nevertheless sample from this unknown distribution!
 
 >>> W(seed)
-0.3279725540489231
+4.029209149361858
 
 Dependent random variables
 --------------------------
@@ -106,7 +106,7 @@ This is clearly different from sampling from ``Z`` with two
 different seeds and then subtracting.
 
 >>> Z(seed) - Z(seed + 1)
--1.6256591446723405
+0.025317558092513792
 
 Other arithmetical functions
 ----------------------------
@@ -122,7 +122,8 @@ True
 >>> UU is W
 False
 
-.. UU._id == 17
+.. UU._id == 15
+.. UU._offset == 1416695020
 
 Notice that ``UU`` produces the same values as ``W`` for a given seed
 although they are different objects. This is because, although they
@@ -137,7 +138,7 @@ isn't explicitly known.
 
 >>> C = UU.copy()
 >>> C(seed)
-7.039709854601764
+-2.9138460200219587
 
 Random matrices
 ---------------
@@ -162,4 +163,4 @@ The function ``Det`` can now be applied to ``M``.
 
 >>> D = Det(M)
 >>> D(seed)
-0.8924340037906262
+-15.234526369301307
