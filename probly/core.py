@@ -13,23 +13,11 @@ import itertools
 
 import networkx as nx
 
-from functools import wraps
 
-
-# Initialize random offset generator (for independence)
-Offset = np.random.RandomState()
-
-
-def make_indep(sampler, _id):
-    max_seed = 2 ** 32 - 1
-
-    @wraps(sampler)
-    def indep_sampler(seed=None):
-        offset = Offset.get_state()[1][_id]
-        offset = int(offset)    # prevents overflow
-        return sampler((RNG(seed) + offset) % max_seed)
-
-    return indep_sampler
+def get_offset(_id):
+    np.random.seed(_id)
+    # Convert to int to avoid overflow error
+    return int(np.random.get_state()[1][1])
 
 
 class Node(object):
@@ -75,6 +63,7 @@ class Node(object):
 
         # Can't rely on init constructor, which gets overloaded
         obj._id = next(cls._last_id)
+        obj._offset = get_offset(obj._id)
 
         return obj
 
@@ -135,14 +124,16 @@ class Node(object):
 
         # Save id
         next_id = next(self._last_id)
+        next_offset = get_offset(next_id)
 
-        # [deprected]
         # Construct shifted copy
-        # def shifted_call_method(seed=None):
-        #     return self((RNG(seed) + _id) % self._max_seed)
+        def shifted_call_method(seed=None):
+            diff = self._offset - next_offset
+            return self((RNG(seed) - diff) % self._max_seed)
+        Copy = self.__new__(type(self), shifted_call_method, RNG)
 
-        indep_call_method = make_indep(self, next_id)
-        Copy = self.__new__(type(self), indep_call_method, RNG)
+        # indep_call_method = make_indep(self, next_id)
+        # Copy = self.__new__(type(self), call_method, RNG)
 
         # Copy data that may exist in subclass. Old id also gets copied over
         for key, val in self.__dict__.items():
@@ -150,6 +141,7 @@ class Node(object):
 
         # Reset id to new id
         Copy._id = next_id
+        Copy._offset = next_offset
 
         return Copy
 
