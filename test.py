@@ -47,7 +47,7 @@ class TestSimpleSeeded(TestCase):
         b = 10
 
         X = pr.Unif(a, b)
-        offset = Offset.get_state()[1][X._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[X._id]) % _max_seed)
         x = np.random.uniform(a, b)
 
@@ -57,7 +57,7 @@ class TestSimpleSeeded(TestCase):
         p = 0.8
 
         X = pr.Ber(p)
-        offset = Offset.get_state()[1][X._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[X._id]) % _max_seed)
         # x = np.random.choice(2, p=[1 - p, p])
         x = np.random.binomial(1, p)
@@ -77,12 +77,12 @@ class TestScalar(TestCase):
         b2 = 3.1
 
         X = pr.Unif(a1, b1)
-        offset = Offset.get_state()[1][X._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[X._id]) % _max_seed)
         x = np.random.uniform(a1, b1)
 
         Y = pr.Unif(a2, b2)
-        offset = Offset.get_state()[1][Y._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[Y._id]) % _max_seed)
         y = np.random.uniform(a2, b2)
 
@@ -96,7 +96,7 @@ class TestScalar(TestCase):
         b = -1
 
         Y = pr.Unif(a, b)
-        offset = Offset.get_state()[1][Y._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[Y._id]) % _max_seed)
         y = np.random.uniform(a, b)
 
@@ -110,7 +110,7 @@ class TestScalar(TestCase):
         b = 10
 
         X = pr.Unif(a, b)
-        offset = Offset.get_state()[1][X._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[X._id]) % _max_seed)
         x = np.random.uniform(a, b)
 
@@ -148,11 +148,11 @@ class TestArray(TestCase):
         Z = pr.array(([X, Y], np.array([Y, 1])))
         # W = np.dot(Z, Z)
 
-        offset = Offset.get_state()[1][X._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[X._id]) % _max_seed)
         x = np.random.uniform(-1, 1)
 
-        offset = Offset.get_state()[1][Y._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[Y._id]) % _max_seed)
         y = np.random.uniform(-1, 1)
 
@@ -163,7 +163,7 @@ class TestArray(TestCase):
         X = pr.Unif(-1, 1)
         Z = pr.array([[[X, 1], [1, 1]]])
 
-        offset = Offset.get_state()[1][X._id]
+        offset = Offset.get_state()[1]
         np.random.seed((self.seed + offset[X._id]) % _max_seed)
         x = np.random.uniform(-1, 1)
 
