@@ -63,9 +63,9 @@ class Distr(RandomVar):
 
     def __call__(self, seed=None):
         def seeded_sampler(seed):
-            return self._sampler((seed + self._id) % self._max_seed)
+            return self._sampler((RNG(seed) + self._id) % self._max_seed)
 
-        return seeded_sampler(RNG(seed))
+        return seeded_sampler(seed)
 
 
 class Unif(Distr):
