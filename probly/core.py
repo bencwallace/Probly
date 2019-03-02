@@ -117,13 +117,13 @@ class Node(object):
     def __copy__(self):
         # Returns a seed-shifted (independent) version of `self`
 
-        # Save next id
-        _id = next(self._last_id)
-
         # Construct shifted copy
         def shifted_call_method(seed=None):
             return self((root(seed) + _id) % self._max_seed)
         Copy = self.__new__(type(self), shifted_call_method, root)
+
+        # Save id
+        _id = Copy._id
 
         # Copy data that may exist in subclass. Old id also gets copied over
         for key, val in self.__dict__.items():
