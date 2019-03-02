@@ -74,7 +74,7 @@ class Node(object):
 
         call_method = self._graph.nodes[self]['call_method']
 
-        seed = root(seed)
+        seed = RNG(seed)
         parents = self.parents()
         samples = [parents[i](seed)
                    for i in range(len(parents))]
@@ -119,8 +119,8 @@ class Node(object):
 
         # Construct shifted copy
         def shifted_call_method(seed=None):
-            return self((root(seed) + _id) % self._max_seed)
-        Copy = self.__new__(type(self), shifted_call_method, root)
+            return self((RNG(seed) + _id) % self._max_seed)
+        Copy = self.__new__(type(self), shifted_call_method, RNG)
 
         # Save id
         _id = Copy._id
@@ -159,4 +159,5 @@ class Root(Node):
         return seed
 
 
-root = Root()
+# Make random number generator root
+RNG = Root()

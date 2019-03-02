@@ -4,7 +4,7 @@ Random variables for common distributions.
 
 import numpy as np
 
-from .core import root
+from .core import RNG
 from .randomvar import RandomVar
 
 
@@ -59,13 +59,13 @@ class Distr(RandomVar):
     # Protection from the perils of sub-classing RandomVar directly
     def __new__(cls, *args, **kwargs):
         # Create bare RandomVar (add to graph)
-        return super().__new__(cls, 'sampler', root)
+        return super().__new__(cls, 'sampler', RNG)
 
     def __call__(self, seed=None):
         def seeded_sampler(seed):
             return self._sampler((seed + self._id) % self._max_seed)
 
-        return seeded_sampler(root(seed))
+        return seeded_sampler(RNG(seed))
 
 
 class Unif(Distr):
