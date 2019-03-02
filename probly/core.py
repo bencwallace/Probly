@@ -14,7 +14,18 @@ import itertools
 
 import networkx as nx
 
+from functools import wraps
 import os
+
+
+def make_indep(sampler, id):
+    max_seed = 2 ** 32 - 1
+
+    @wraps(sampler)
+    def indep_sampler(seed=None):
+        return sampler((RNG(seed) + id) % max_seed)
+
+    return indep_sampler
 
 
 class Node(object):
@@ -117,20 +128,21 @@ class Node(object):
     def __copy__(self):
         # Returns a seed-shifted (independent) version of `self`
 
-        # Construct shifted copy
-        def shifted_call_method(seed=None):
-            return self((RNG(seed) + _id) % self._max_seed)
-        Copy = self.__new__(type(self), shifted_call_method, RNG)
-
         # Save id
-        _id = Copy._id
+        next_id = next(self._last_id)
+
+        # Construct shifted copy
+        # def shifted_call_method(seed=None):
+        #     return self((RNG(seed) + _id) % self._max_seed)
+        indep_call_method = make_indep(self, next_id)
+        Copy = self.__new__(type(self), indep_call_method, RNG)
 
         # Copy data that may exist in subclass. Old id also gets copied over
         for key, val in self.__dict__.items():
             setattr(Copy, key, val)
 
         # Reset id to new id
-        Copy._id = _id
+        Copy._id = next_id
 
         return Copy
 
