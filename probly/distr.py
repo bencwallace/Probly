@@ -62,8 +62,10 @@ class Distr(RandomVar):
         return super().__new__(cls, 'sampler', RNG)
 
     def __call__(self, seed=None):
+        # [deprecated]
         # def seeded_sampler(seed):
         #     return self._sampler((RNG(seed) + self._id) % self._max_seed)
+
         indep_sampler = make_indep(self._sampler, self._id)
 
         return indep_sampler(seed)

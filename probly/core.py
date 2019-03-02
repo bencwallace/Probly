@@ -6,7 +6,6 @@ This module defines the global dependency graph, its `Node` objects, and its
 `Root` object.
 """
 
-import math
 import numpy as np
 
 import copy
@@ -15,15 +14,20 @@ import itertools
 import networkx as nx
 
 from functools import wraps
-import os
 
 
-def make_indep(sampler, id):
+# Initialize random offset generator (for independence)
+Offset = np.random.RandomState()
+
+
+def make_indep(sampler, _id):
     max_seed = 2 ** 32 - 1
 
     @wraps(sampler)
     def indep_sampler(seed=None):
-        return sampler((RNG(seed) + id) % max_seed)
+        offset = Offset.get_state()[1][_id]
+        offset = int(offset)    # prevents overflow
+        return sampler((RNG(seed) + offset) % max_seed)
 
     return indep_sampler
 
@@ -64,12 +68,13 @@ class Node(object):
     def __new__(cls, call_method=None, *parents):
         obj = super().__new__(cls)
 
-        obj._id = next(cls._last_id)
-
         edges = [(cls._cast(var), obj, {'index': i})
                  for i, var in enumerate(parents)]
         cls._graph.add_node(obj, call_method=call_method)
         cls._graph.add_edges_from(edges)
+
+        # Can't rely on init constructor, which gets overloaded
+        obj._id = next(cls._last_id)
 
         return obj
 
@@ -131,9 +136,11 @@ class Node(object):
         # Save id
         next_id = next(self._last_id)
 
+        # [deprected]
         # Construct shifted copy
         # def shifted_call_method(seed=None):
         #     return self((RNG(seed) + _id) % self._max_seed)
+
         indep_call_method = make_indep(self, next_id)
         Copy = self.__new__(type(self), indep_call_method, RNG)
 
@@ -148,27 +155,19 @@ class Node(object):
 
 
 class Root(Node):
+    """
+    A root node of the dependency graph. Acts as a random number generator.
+    """
+
     def __new__(cls, *args, **kwargs):
         return super(Node, cls).__new__(cls, *args, **kwargs)
 
     def __call__(self, seed=None):
         """
         Generate a random seed. If a seed is provided, returns it unchanged.
-
-        Based on the Python implementation. A consistent approach to generating
-        re-usable random seeds is needed in order to implement dependency.
         """
-
-        if seed is not None:
-            return seed
-
-        try:
-            max_bytes = math.ceil(np.log2(self._max_seed) / 8)
-            seed = int.from_bytes(os.urandom(max_bytes), 'big')
-        except NotImplementedError:
-            raise NotImplementedError('Seed from time not implemented.')
-
-        return seed
+        np.random.seed(seed)
+        return np.random.get_state()[1][0]
 
 
 # Make random number generator root
