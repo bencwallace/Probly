@@ -157,7 +157,9 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         # Cast to int to avoid overflow
         return int(new_seed)
 
-    # Makes RandomVar objects behave like NumPy arrays
+    # Allows NumPy ufuncs (in particular, addition) and derived methods (for
+    # example, summation, which is the ufunc reduce method of addition) to act
+    # on RandomVar objects
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
         # Cast inputs to RandomVar: If not RandomVar, treat as constant
         inputs = tuple(x if isinstance(x, RandomVar)
@@ -167,6 +169,14 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             return getattr(op, method)(*inputs, **kwargs)
 
         return RandomVar(partial, *inputs)
+
+    # Goal: make np.linalg.det work
+    # def __array__(self):
+    #     if hasattr(self, '_array'):
+    #         items = [p.__array__() for p in self._parents]
+    #         return np.array(items, dtype=object)
+    #     else:
+    #         return self
 
     def __getitem__(self, key):
         def get_item_from_key(array):
