@@ -1,3 +1,5 @@
+from .core import RandomVar
+
 from .helpers import array
 
 # Binomial-type distributions
@@ -13,6 +15,7 @@ from .distr import NegBin, Geom
 from .distr import Beta, Unif, Pois, Normal
 
 __all__ = []
+__all__ += ['RandomVar']
 __all__ += ['array']
 __all__ += ['Bin', 'Ber']
 __all__ += ['Gamma', 'ChiSquared', 'Exp']
