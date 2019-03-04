@@ -1,3 +1,5 @@
+from .helpers import array
+
 # Binomial-type distributions
 from .distr import Bin, Ber
 
@@ -10,7 +12,8 @@ from .distr import NegBin, Geom
 # Other distributions
 from .distr import Beta, Unif, Pois, Normal
 
-__all__ = ['array', 'Lift']
+__all__ = []
+__all__ += ['array']
 __all__ += ['Bin', 'Ber']
 __all__ += ['Gamma', 'ChiSquared', 'Exp']
 __all__ += ['NegBin', 'Geom']

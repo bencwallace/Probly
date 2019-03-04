@@ -13,9 +13,9 @@ class Node(object):
 
     Parameters
     ----------
-    call_method : callable
-    parents : list
-        List of `Node` objects
+    op : callable
+    parents : array_like
+        Collection of `Node` objects
 
     Note
     ----
@@ -102,23 +102,6 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     # NumPy max seed
     _max_seed = 2 ** 32 - 1
 
-    @staticmethod
-    def get_seed(seed=None, offset=False):
-        """
-        Produces a random seed.
-        """
-
-        np.random.seed(seed)
-        new_seed = np.random.get_state()[1][int(offset)]
-
-        # Cast to int to avoid overflow
-        return int(new_seed)
-
-    def _sampler(seed=None):
-        # Defaults to identity map.
-        # Due to _offset, behaves as random number generator
-        return seed
-
     def __new__(cls, *args, **kwargs):
         """
         Defines the subclassing interface.
@@ -131,48 +114,66 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         _offset attributes that are used to ensure independence.
         """
 
+        _id = next(cls._last_id)
+
         # First constructs a bare Node object
         obj = super().__new__(cls)
 
         if cls is RandomVar:
-            # Initialize from arguments
+            # Dependent RandomVar initialized from args
             op = args[0]
             parents = args[1:]
+
+            _offset = 0
         else:
-            # Initialize from _sampler
+            # Independent RandomVar initialized from _sampler
             op = obj._sampler
             parents = ()
+
+            _offset = cls.get_seed(_id, offset=True)
 
         # Then initialize it
         super().__init__(obj, op, *parents)
 
         # Add _id and _offset attributes for independence.
-        obj._id = next(cls._last_id)
-        obj._offset = cls.get_seed(obj._id, offset=True)
+        obj._id = _id
+        obj._offset = _offset
 
         return obj
 
-    # This method allows for compatibility NumPy ufuncs.
-    def __array_ufunc__(self, op, method, *parents, **kwargs):
-        # Cast parents to RandomVar: If not RandomVar, treat as constant
-        parents = tuple(p if isinstance(p, RandomVar)
-                        else RandomVar(p) for p in parents)
-
-        def partial(*parents):
-            return getattr(op, method)(*parents, **kwargs)
-
-        return RandomVar(partial, *parents)
-
     def __call__(self, seed=None):
-        if self._parents:
-            # Random variable depends on parents
-            return super().__call__(seed)
-        else:
-            # Independent random variable
-            new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
-            return super().__call__(new_seed)
+        new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
+        return super().__call__(new_seed)
+
+    @staticmethod
+    def get_seed(seed=None, offset=False):
+        """
+        Produces a random seed.
+        """
+
+        np.random.seed(seed)
+        new_seed = np.random.get_state()[1][int(offset)]
+
+        # Cast to int to avoid overflow
+        return int(new_seed)
+
+    # Makes RandomVar objects behave like NumPy arrays
+    def __array_ufunc__(self, op, method, *inputs, **kwargs):
+        # Cast inputs to RandomVar: If not RandomVar, treat as constant
+        inputs = tuple(x if isinstance(x, RandomVar)
+                       else RandomVar(x) for x in inputs)
+
+        def partial(*inputs):
+            return getattr(op, method)(*inputs, **kwargs)
+
+        return RandomVar(partial, *inputs)
 
     def __getitem__(self, key):
         def get_item_from_key(array):
             return array[key]
         return RandomVar(get_item_from_key, self)
+
+    # Default sampler
+    def _sampler(seed=None):
+        # Behaves as random number generator due to _offset
+        return seed
