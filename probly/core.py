@@ -1,37 +1,15 @@
 """
-Core objects and methods
-========================
-
-This module defines the global dependency graph, its `Node` objects, and its
-`Root` object.
+This module defines a random variable as a node in a computational graph.
 """
 
-import numpy as np
-
-import copy
 import itertools
-
-import networkx as nx
-
-
-def get_offset(_id):
-    np.random.seed(_id)
-    # Convert to int to avoid overflow error
-    return int(np.random.get_state()[1][1])
+import numpy as np
+from numpy.lib.mixins import NDArrayOperatorsMixin
 
 
 class Node(object):
     """
-    A node in the global dependency graph.
-
-    The dependency graph is a labeled directed multigraph implemented with the
-    NetworkX package. The nodes of the graph are `Node` objects and are labeled
-    by a callable object, which we refer to as its "call method". The primary
-    function of a `Node` object is, when
-    called, to recursively combine the outputs of its parents in the
-    dependency graph by feeding them as arguments to its call method. The order
-    in which the outputs are mapped to arguments is determined by the edge
-    labels.
+    A node in a computational graph.
 
     Parameters
     ----------
@@ -44,124 +22,157 @@ class Node(object):
     `Node` objects are not meant to be instantiated directly.
     """
 
-    # Track random variables for independence
-    _last_id = itertools.count()
+    # Core magic methods
+    def __init__(self, op=None, *parents):
+        """
+        Parameters
+        ----------
+        op : optional
+            An operation. Default is the identity map. If not callable,
+            understood as the constant map returning itself. Mandatory if
+            parents not specified.
+        parents : optional
+            A collection of callables (preferably `SimpleNode` objects).
+        """
 
-    # Initialize dependency graph
-    _graph = nx.MultiDiGraph()
+        self._parents = parents
+
+        if not op:
+            # Must be root acting as identity
+            assert not parents
+            self._op = lambda *x: x
+        elif not callable(op):
+            # Treat op as constant
+            self._op = lambda *x: op
+        else:
+            self._op = op
+
+    def __call__(self, *args):
+        """
+        Combines parent outputs on given arguments via an operation.
+        """
+
+        if not self._parents:
+            # Let root act directly on args
+            out = self._op(*args)
+        else:
+            inputs = (p(*args) for p in self._parents)
+            out = self._op(*inputs)
+
+        # For length 1 tuples
+        if hasattr(out, '__len__') and len(out) == 1:
+            out = out[0]
+
+        return out
+
+
+class RandomVar(Node, NDArrayOperatorsMixin):
+    """
+    A random variable.
+
+    Behaves like a `Node` object that can be acted on by any NumPy ufunc in a
+    way compatible with the graph structure. Also acts as an interface for the
+    definition of families of random variables via subclassing. Such families
+    should be defined by subclassing RandomVar rather than Node.
+
+    Example
+    -------
+    Define a family of "shifted" uniform random variables:
+
+    >>> import numpy as np
+    >>> import probly as pr
+    >>> class UnifShift(pr.Distr):
+    ...     def __init__(self, a, b):
+    ...         self.a = a + 1
+    ...         self.b = b + 1
+    ...     def _sampler(self, seed=None):
+    ...         np.random.seed(seed)
+    ...         return np.random.uniform(self.a, self.b)
+
+    Instantiate a random variable from this family with support `[1, 2]` and
+    sample from its distribution:
+
+    >>> X = UnifShift(0, 1)
+    >>> X()
+    """
+
+    # Counter for _id. Set start=1 or else first RandomVar acts as increment
+    _last_id = itertools.count(start=1)
 
     # NumPy max seed
     _max_seed = 2 ** 32 - 1
 
-    # Core magic methods
-    def __new__(cls, call_method=None, *parents):
+    @staticmethod
+    def get_seed(seed=None, offset=False):
+        """
+        Produces a random seed.
+        """
+
+        np.random.seed(seed)
+        new_seed = np.random.get_state()[1][int(offset)]
+
+        # Cast to int to avoid overflow
+        return int(new_seed)
+
+    def _sampler(seed=None):
+        # Defaults to identity map.
+        # Due to _offset, behaves as random number generator
+        return seed
+
+    def __new__(cls, *args, **kwargs):
+        """
+        Defines the subclassing interface.
+
+        A subclass of RandomVar contains: a method _sampler that produces
+        samples from a distribution given some seed; and possibly a method
+        __init__ to specify parameters. The __new__ method initializes an
+        object of such a subclass as a Node object with no parents and with
+        _op given by the _sampler method. In addition, __new__ adds _id and
+        _offset attributes that are used to ensure independence.
+        """
+
+        # First constructs a bare Node object
         obj = super().__new__(cls)
 
-        edges = [(cls._cast(var), obj, {'index': i})
-                 for i, var in enumerate(parents)]
-        cls._graph.add_node(obj, call_method=call_method)
-        cls._graph.add_edges_from(edges)
+        if cls is RandomVar:
+            # Initialize from arguments
+            op = args[0]
+            parents = args[1:]
+        else:
+            # Initialize from _sampler
+            op = obj._sampler
+            parents = ()
 
-        # Can't rely on init constructor, which gets overloaded
+        # Then initialize it
+        super().__init__(obj, op, *parents)
+
+        # Add _id and _offset attributes for independence.
         obj._id = next(cls._last_id)
-        obj._offset = get_offset(obj._id)
+        obj._offset = cls.get_seed(obj._id, offset=True)
 
         return obj
 
+    # This method allows for compatibility NumPy ufuncs.
+    def __array_ufunc__(self, op, method, *parents, **kwargs):
+        # Cast parents to RandomVar: If not RandomVar, treat as constant
+        parents = tuple(p if isinstance(p, RandomVar)
+                        else RandomVar(p) for p in parents)
+
+        def partial(*parents):
+            return getattr(op, method)(*parents, **kwargs)
+
+        return RandomVar(partial, *parents)
+
     def __call__(self, seed=None):
-        """
-        Produces a random sample from the desired distribution.
-
-        Parameters
-        ----------
-        seed : int, optional
-            A seed value. If not specified, a random seed will be used.
-        """
-
-        call_method = self._graph.nodes[self]['call_method']
-
-        seed = RNG(seed)
-        parents = self.parents()
-        samples = [parents[i](seed)
-                   for i in range(len(parents))]
-
-        return call_method(*samples)
-
-    # Representation magic
-    def __str__(self):
-        return 'RV {}'.format(self._id)
-
-    # Helper methods
-    def parents(self):
-        """Returns the list of parents in the dependency graph."""
-
-        if self not in self._graph:
-            return []
+        if self._parents:
+            # Random variable depends on parents
+            return super().__call__(seed)
         else:
-            # Convert to list for re-use
-            unordered = list(self._graph.predecessors(self))
-            if len(unordered) == 0:
-                return []
+            # Independent random variable
+            new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
+            return super().__call__(new_seed)
 
-            data = [self._graph.get_edge_data(p, self) for p in unordered]
-
-            # Create {index: parent} dictionary
-            dictionary = {}
-            for i in range(len(unordered)):
-                indices = [d.values() for d in data[i].values()]
-                for j in range(len(indices)):
-                    dictionary[data[i][j]['index']] = unordered[i]
-
-            ordered = [dictionary[i] for i in range(len(dictionary))]
-            return ordered
-
-    def copy(self):
-        """Returns an independent random variable of the same distribution."""
-
-        return copy.copy(self)
-
-    def __copy__(self):
-        # Returns a seed-shifted (independent) version of `self`
-
-        # Save id
-        next_id = next(self._last_id)
-        next_offset = get_offset(next_id)
-
-        # Construct shifted copy
-        def shifted_call_method(seed=None):
-            diff = self._offset - next_offset
-            return self((RNG(seed) - diff) % self._max_seed)
-        Copy = self.__new__(type(self), shifted_call_method, RNG)
-
-        # indep_call_method = make_indep(self, next_id)
-        # Copy = self.__new__(type(self), call_method, RNG)
-
-        # Copy data that may exist in subclass. Old id also gets copied over
-        for key, val in self.__dict__.items():
-            setattr(Copy, key, val)
-
-        # Reset id to new id
-        Copy._id = next_id
-        Copy._offset = next_offset
-
-        return Copy
-
-
-class Root(Node):
-    """
-    A root node of the dependency graph. Acts as a random number generator.
-    """
-
-    def __new__(cls, *args, **kwargs):
-        return super(Node, cls).__new__(cls, *args, **kwargs)
-
-    def __call__(self, seed=None):
-        """
-        Generate a random seed. If a seed is provided, returns it unchanged.
-        """
-        np.random.seed(seed)
-        return np.random.get_state()[1][0]
-
-
-# Make random number generator root
-RNG = Root()
+    def __getitem__(self, key):
+        def get_item_from_key(array):
+            return array[key]
+        return RandomVar(get_item_from_key, self)

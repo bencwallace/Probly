@@ -1,5 +1,3 @@
-from .randomvar import array, Lift
-
 # Binomial-type distributions
 from .distr import Bin, Ber
 

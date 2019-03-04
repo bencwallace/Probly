@@ -3,69 +3,10 @@ Random variables for common distributions.
 """
 
 import numpy as np
-
-from .core import RNG
-from .randomvar import RandomVar
+from .core import RandomVar
 
 
-class Distr(RandomVar):
-    """
-    A random variable or family therefore specified by a distribution.
-
-    The `Distr` class is intended to be subclassed for defining new random
-    variables and families of random variables.
-
-    Notes
-    -----
-    To define a new distribution, create a
-    subclass of `Distr` with at least a single method `_sampler` that accepts
-    the single argument `seed` with default value `None`.
-    The `_sampler` method should output values from the desired distribution.
-    It is important to make consistent use of `seed` in the definition of
-    `_sampler`.
-
-    In order to define a parameterized family of random variables, one should
-    additionally define an `__init__` constructor that accepts the desired
-    parameters as arguments and stores their values as object attributes.
-    These values can then be used by the `_sampler` method.
-
-    The `_sampler` method is marked as private and should be treated as such.
-    Rather than calling `_sampler` directly, one should call the random
-    variable instance itself, which is callable by inheritance. Doing so
-    automatically takes care of ensuring independence of different instances
-    of a random variable.
-
-    Example
-    -------
-    Define a family of "shifted" uniform random variables:
-
-    >>> import numpy as np
-    >>> import probly as pr
-    >>> class UnifShift(pr.Distr):
-    ...     def __init__(self, a, b):
-    ...         self.a = a + 1
-    ...         self.b = b + 1
-    ...     def _sampler(self, seed=None):
-    ...         np.random.seed(seed)
-    ...         return np.random.uniform(self.a, self.b)
-
-    Instantiate a random variable from this family with support `[1, 2]` and
-    sample from its distribution:
-
-    >>> X = UnifShift(0, 1)
-    >>> X()
-    """
-
-    # Protection from the perils of sub-classing RandomVar directly
-    def __new__(cls, *args, **kwargs):
-        # Create bare RandomVar (add to graph)
-        return super().__new__(cls, 'sampler', RNG)
-
-    def __call__(self, seed=None):
-        return self._sampler((RNG(seed) + self._offset) % self._max_seed)
-
-
-class Unif(Distr):
+class Unif(RandomVar):
     """
     A uniform random variable.
 
@@ -86,7 +27,7 @@ class Unif(Distr):
         return np.random.uniform(self.a, self.b)
 
 
-class Bin(Distr):
+class Bin(RandomVar):
     """
     A binomial random variable.
 
@@ -128,7 +69,7 @@ class Ber(Bin):
         super().__init__(1, p)
 
 
-class Beta(Distr):
+class Beta(RandomVar):
     """
     A beta random variable.
 
@@ -150,7 +91,7 @@ class Beta(Distr):
         return np.random.beta(self.alpha, self.beta)
 
 
-class Gamma(Distr):
+class Gamma(RandomVar):
     """
     A gamma random variable.
 
@@ -231,7 +172,7 @@ class Exp(Gamma):
         return np.random.exponential(self.rate)
 
 
-class NegBin(Distr):
+class NegBin(RandomVar):
     """
     A negative binomial random variable.
 
@@ -277,7 +218,7 @@ class Geom(NegBin):
         return np.random.geometric(self.p)
 
 
-class Pois(Distr):
+class Pois(RandomVar):
     """
     A Poisson random variable.
 
@@ -295,7 +236,7 @@ class Pois(Distr):
         return np.random.poisson(self.rate)
 
 
-class Normal(Distr):
+class Normal(RandomVar):
     """
     A normal random variable.
 
