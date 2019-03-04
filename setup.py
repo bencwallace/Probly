@@ -17,7 +17,6 @@ setup(name='probly',
       author='Benjamin Wallace',
       author_email='bencwallace@gmail.com',
       classifiers=[
-                   'Development Status :: 2 - Pre-Alpha',
                    'Environment :: Console',
                    'Intended Audience :: Science/Research',
                    'Intended Audience :: Developers',
