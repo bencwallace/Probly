@@ -22,7 +22,7 @@ class DUnif(RandomVar):
         Highest possible value.
     """
 
-    def __init__(self, a, b):
+    def __init__(self, a=0, b):
         self.a = a
         self.b = b
 
@@ -40,12 +40,12 @@ class Multinomial(RandomVar):
     Parameters
     ----------
     n : int
-        Number of trials
-    pvals : list or tuple
-        Success probabilities
+        Number of trials.
+    pvals : list or tuple, optional
+        Success probabilities.
     """
 
-    def __init__(self, n, pvals):
+    def __init__(self, n, pvals=[0.5]):
         self.n = n
         self.pvals = pvals
 
@@ -66,11 +66,11 @@ class Bin(Multinomial):
     n : int
         Number of trials.
 
-    p : float
+    p : float, optional
         probability of success.
     """
 
-    def __init__(self, n, p):
+    def __init__(self, n, p=0.5):
         super().__init__(self, n, [1 - p, p])
 
     def _sampler(self, seed=None):
@@ -86,12 +86,12 @@ class Ber(Bin):
 
     Parameters
     ----------
-    p : float
+    p : float, optional
         Probability that the outcome is `1`.
     """
 
     # Uses np.random.binomial with n = 1 (much faster than np.random.choice)
-    def __init__(self, p):
+    def __init__(self, p=0.5):
         super().__init__(1, p)
 
 
@@ -109,10 +109,11 @@ class NegBin(RandomVar):
     n : int
         Number of failures.
 
-    p : Probability of success.
+    p : float, optional
+        Probability of success.
     """
 
-    def __init__(self, n, p):
+    def __init__(self, n, p=0.5):
         self.n = n
         self.p = p
 
@@ -130,11 +131,11 @@ class Geom(NegBin):
 
     Parameters
     ----------
-    p : float
+    p : float, optional
         Probability of success.
     """
 
-    def __init__(self, p):
+    def __init__(self, p=0.5):
         super().__init__(1, p)
 
     # Faster than using np.random.negative_binomial
@@ -172,11 +173,11 @@ class Pois(RandomVar):
 
     Parameters
     ----------
-    rate : float
+    rate : float, optional
         The rate parameter.
     """
 
-    def __init__(self, rate):
+    def __init__(self, rate=1):
         self.rate = rate
 
     def _sampler(self, seed=None):
@@ -184,7 +185,7 @@ class Pois(RandomVar):
         return np.random.poisson(self.rate)
 
 
-# ----------------------- Continuous random variables ----------------------- #
+# ======================= Continuous random variables ======================= #
 
 
 # ------------------------------ Gamma family ------------------------------ #
@@ -200,7 +201,7 @@ class Gamma(RandomVar):
 
     Parameters
     ----------
-    shape : float
+    shape : float, optional
         Shape parameter.
     rate : float, optional if `scale` specified
         Rate parameter.
@@ -208,7 +209,7 @@ class Gamma(RandomVar):
         Scale parameter.
     """
 
-    def __init__(self, shape, rate=None, scale=None):
+    def __init__(self, shape=1, rate=None, scale=None):
         self.shape = shape
 
         if scale is not None:
@@ -254,11 +255,11 @@ class Exp(Gamma):
 
     Parameters
     ----------
-    rate : float
+    rate : float, optional
         Rate parameter.
     """
 
-    def __init__(self, rate):
+    def __init__(self, rate=1):
         shape = 1
         scale = 1 / float(rate)
 
@@ -278,13 +279,13 @@ class Unif(RandomVar):
 
     Parameters
     ----------
-    a : float
+    a : float, optional
         Left endpoint of the support interval.
-    b : float
+    b : float, optional
         Right endpoint of the selfupport inteRandomVaral.
     """
 
-    def __init__(self, a, b):
+    def __init__(self, a=0, b=1):
         self.a = a
         self.b = b
 
@@ -301,13 +302,13 @@ class Normal(RandomVar):
 
     Parameters
     ----------
-    mean : float
+    mean : float, optional
         Mean.
-    sd : float
+    sd : float, optional
         Standard deviation.
     """
 
-    def __init__(self, mean, sd):
+    def __init__(self, mean=0, sd=1):
         self.mean = mean
         self.sd = sd
 
@@ -322,11 +323,11 @@ class LogNormal(RandomVar):
 
     Parameters
     ----------
-    mean : float
-    sd : float
+    mean : float, optional
+    sd : float, optional
     """
 
-    def __init__(self, mean, sd):
+    def __init__(self, mean=0, sd=1):
         self.mean = mean
         self.sd = sd
 
@@ -422,11 +423,11 @@ class Laplace(RandomVar):
 
     Parameters
     ----------
-    loc : float
-    scale : float
+    loc : float, optional
+    scale : float, optional
     """
 
-    def __init__(self, loc, scale):
+    def __init__(self, loc=0, scale=1):
         self.loc = loc
         self.scale = scale
 
@@ -441,11 +442,11 @@ class Logistic(RandomVar):
 
     Parameters
     ----------
-    loc : float
-    scale : float
+    loc : float, optional
+    scale : float, optional
     """
 
-    def __init__(self, loc, scale):
+    def __init__(self, loc=0, scale=1):
         self.loc = loc
         self.scale = scale
 
