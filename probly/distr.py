@@ -1,21 +1,25 @@
 """
-Random variables for common distributions.
+Families of random variables defined from a distribution.
 """
 
 import numpy as np
 from .core import RandomVar
 
+# ======================== Discrete random variables ======================== #
 
-class Unif(RandomVar):
+
+# -------------------- Discrete uniform random variable -------------------- #
+
+class DUnif(RandomVar):
     """
-    A uniform random variable.
+    A discrete uniform random variable.
 
     Parameters
     ----------
-    a : float
-        Left endpoint of the support interval.
-    b : float
-        Right endpoint of the selfupport inteRandomVaral.
+    a : int
+        Lowest possible value.
+    b : int
+        Highest possible value.
     """
 
     def __init__(self, a, b):
@@ -24,10 +28,33 @@ class Unif(RandomVar):
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.uniform(self.a, self.b)
+        return np.random.randint(self.a, self.b + 1)
 
 
-class Bin(RandomVar):
+# --------------------------- Multinomial family --------------------------- #
+
+class Multinomial(RandomVar):
+    """
+    A multinomial random variable.
+
+    Parameters
+    ----------
+    n : int
+        Number of trials
+    pvals : list or tuple
+        Success probabilities
+    """
+
+    def __init__(self, n, pvals):
+        self.n = n
+        self.pvals = pvals
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.multinomial(self.n, self.pvals)
+
+
+class Bin(Multinomial):
     """
     A binomial random variable.
 
@@ -44,8 +71,7 @@ class Bin(RandomVar):
     """
 
     def __init__(self, n, p):
-        self.n = n
-        self.p = p
+        super().__init__(self, n, [1 - p, p])
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -69,27 +95,99 @@ class Ber(Bin):
         super().__init__(1, p)
 
 
-class Beta(RandomVar):
+# ------------------------ Negative binomial family ------------------------ #
+
+class NegBin(RandomVar):
     """
-    A beta random variable.
+    A negative binomial random variable.
+
+    Represents the number of successes in a sequence of independent Bernoulli
+    trials with probability of success `p` before `n` failures occur.
 
     Parameters
     ----------
-    alpha : float
-        First shape parameter.
+    n : int
+        Number of failures.
 
-    beta : float
-        Second shape parameter.
+    p : Probability of success.
     """
 
-    def __init__(self, alpha, beta):
-        self.alpha = alpha
-        self.beta = beta
+    def __init__(self, n, p):
+        self.n = n
+        self.p = p
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.beta(self.alpha, self.beta)
+        return np.random.negative_binomial(self.n, self.p)
 
+
+class Geom(NegBin):
+    """
+    A geometric random variable.
+
+    Represents the number of independent Bernoulli trials needed before a trial
+    is successful.
+
+    Parameters
+    ----------
+    p : float
+        Probability of success.
+    """
+
+    def __init__(self, p):
+        super().__init__(1, p)
+
+    # Faster than using np.random.negative_binomial
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.geometric(self.p)
+
+
+# --------------------- Other discrete random variables --------------------- #
+
+class HyperGeom(RandomVar):
+    """
+    A hypergeometric random variable.
+
+    Parameters
+    ----------
+    ngood : int
+    nbad : int
+    nsample : int
+    """
+
+    def __init__(self, ngood, nbad, nsample):
+        self.ngood = ngood
+        self.nbad = nbad
+        self.nsample = nsample
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.hypergeometric(self.ngood, self.nbad, self.nsample)
+
+
+class Pois(RandomVar):
+    """
+    A Poisson random variable.
+
+    Parameters
+    ----------
+    rate : float
+        The rate parameter.
+    """
+
+    def __init__(self, rate):
+        self.rate = rate
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.poisson(self.rate)
+
+
+# ----------------------- Continuous random variables ----------------------- #
+
+
+# ------------------------------ Gamma family ------------------------------ #
 
 class Gamma(RandomVar):
     """
@@ -172,69 +270,30 @@ class Exp(Gamma):
         return np.random.exponential(self.rate)
 
 
-class NegBin(RandomVar):
-    """
-    A negative binomial random variable.
+# ------------------------ Uniform random variables ------------------------ #
 
-    Represents the number of successes in a sequence of independent Bernoulli
-    trials with probability of success `p` before `n` failures occur.
+class Unif(RandomVar):
+    """
+    A uniform random variable.
 
     Parameters
     ----------
-    n : int
-        Number of failures.
-
-    p : Probability of success.
+    a : float
+        Left endpoint of the support interval.
+    b : float
+        Right endpoint of the selfupport inteRandomVaral.
     """
 
-    def __init__(self, n, p):
-        self.n = n
-        self.p = p
+    def __init__(self, a, b):
+        self.a = a
+        self.b = b
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.negative_binomial(self.n, self.p)
+        return np.random.uniform(self.a, self.b)
 
 
-class Geom(NegBin):
-    """
-    A geometric random variable.
-
-    Represents the number of independent Bernoulli trials needed before a trial
-    is successful.
-
-    Parameters
-    ----------
-    p : float
-        Probability of success.
-    """
-
-    def __init__(self, p):
-        super().__init__(1, p)
-
-    # Faster than using np.random.negative_binomial
-    def _sampler(self, seed=None):
-        np.random.seed(seed)
-        return np.random.geometric(self.p)
-
-
-class Pois(RandomVar):
-    """
-    A Poisson random variable.
-
-    Parameters
-    ----------
-    rate : float
-        The rate parameter.
-    """
-
-    def __init__(self, rate):
-        self.rate = rate
-
-    def _sampler(self, seed=None):
-        np.random.seed(seed)
-        return np.random.poisson(self.rate)
-
+# ------------------- Stable random variables ------------------- #
 
 class Normal(RandomVar):
     """
@@ -244,14 +303,205 @@ class Normal(RandomVar):
     ----------
     mean : float
         Mean.
-    std : float
+    sd : float
         Standard deviation.
     """
 
-    def __init__(self, mean, std):
+    def __init__(self, mean, sd):
         self.mean = mean
-        self.std = std
+        self.sd = sd
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.normal(self.mean, self.std)
+        return np.random.normal(self.mean, self.sd)
+
+
+class LogNormal(RandomVar):
+    """
+    A log-normal random variable.
+
+    Parameters
+    ----------
+    mean : float
+    sd : float
+    """
+
+    def __init__(self, mean, sd):
+        self.mean = mean
+        self.sd = sd
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.lognormal(self.mean, self.sd)
+
+
+# --------------------- Beta distribution and power law --------------------- #
+
+class Beta(RandomVar):
+    """
+    A beta random variable.
+
+    Parameters
+    ----------
+    alpha : float
+        First shape parameter.
+
+    beta : float
+        Second shape parameter.
+    """
+
+    def __init__(self, alpha, beta):
+        self.alpha = alpha
+        self.beta = beta
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.beta(self.alpha, self.beta)
+
+
+class PowerLaw(RandomVar):
+    """
+    A random variable following a power law.
+
+    Parameters
+    ----------
+    power : float
+    """
+
+    def __init__(self, power):
+        self.power = power
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.power(self.power)
+
+
+# ------------------------ F and t random variables ------------------------ #
+
+class F(RandomVar):
+    """
+    An F random variable.
+
+    Parameters
+    ----------
+    d1 : int
+    d2 : int
+    """
+
+    def __init__(self, d1, d2):
+        self.d1 = d1
+        self.d2 = d2
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.f(self.d1, self.d2)
+
+
+class Student_t(RandomVar):
+    """
+    A Student's t random variable.
+
+    Parameters
+    ----------
+    deg : float
+    """
+
+    def __init__(self, deg):
+        self.deg = deg
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.standard_t(self.deg)
+
+
+# -------------------- Other continuous random variables -------------------- #
+
+class Laplace(RandomVar):
+    """
+    A Laplace random variable.
+
+    Parameters
+    ----------
+    loc : float
+    scale : float
+    """
+
+    def __init__(self, loc, scale):
+        self.loc = loc
+        self.scale = scale
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.laplace(self.loc, self.scale)
+
+
+class Logistic(RandomVar):
+    """
+    A logistic random variable.
+
+    Parameters
+    ----------
+    loc : float
+    scale : float
+    """
+
+    def __init__(self, loc, scale):
+        self.loc = loc
+        self.scale = scale
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.logistic(self.loc, self.scale)
+
+
+class Pareto(RandomVar):
+    """
+    A Pareto random variable.
+
+    Parameters
+    ----------
+    shape : float
+    """
+
+    def __init__(self, shape):
+        self.shape = shape
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.pareto(self.shape)
+
+
+class VonMises(RandomVar):
+    """
+    A von Mises random variable.
+
+    Parameters
+    ----------
+    mean : float
+    kappa : float
+    """
+
+    def __init__(self, mean, kappa):
+        self.mean = mean
+        self.kappa = kappa
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.vonmises(self.mean, self.kappa)
+
+
+class Weibull(RandomVar):
+    """
+    A Weibull random variable.
+
+    Parameters
+    ----------
+    shape : float
+    """
+
+    def __init__(self, shape):
+        self.shape = shape
+
+    def _sampler(self, seed=None):
+        np.random.seed(seed)
+        return np.random.weibull(self.shape)
