@@ -20,14 +20,22 @@ For more information, see :ref:`independence`.
 Simple random variables
 ***********************
 
-We begin by importing ``probly`` and creating some pre-packaged random variables.
+We begin by importing ``probly``.
+
+>>> import probly as pr
+
+.. testsetup::
+
+   from probly.core import RandomVar
+   RandomVar.reset()
+
+Next, we initialize some pre-packaged random variables.
 A complete list of available distributions is available at the :ref:`api`. See
 also also the :class:`~ProblY.RandomVar` documentation if you want to create your own
 random variables from scratch.
 
->>> import probly as pr
->>> # A Bernoulli random variable with p=0.5
->>> X = pr.Ber(0.5)
+>>> # A Bernoulli random variable with p=0.5 (the default)
+>>> X = pr.Ber()
 >>> # A Bernoulli random variable independent of X
 >>> Y = pr.Ber(0.9)
 >>> # A uniform random variable on the interval [*10, 10]
@@ -40,32 +48,35 @@ will produce the same result.
 
 >>> seed = 99	# An arbitrary but fixed seed
 >>> Z(seed)
-8.454997886702277
+-4.340731821079555
 >>> # Repeat the last step to obtain the same output
 
 When called with no argument, a seed produced by a random number generator
 is used and the output is not reproducible.
 
 >>> # We obtained the following output. You'll probably get something different.
->>> Z()
+>>> Z() # doctest: +SKIP
 -7.722714026707818
 
 Nevertheless, the outputs of ``Z()`` are uniformly distributed on the
 interval ``[-10, 10]``. Similarly, we can check ``X`` is equally likely
-to take on the values ``0`` and ``1`` by computing its empirical mean::
+to take on the values ``0`` and ``1`` by computing its empirical mean.
 
-	trials = 1000
-	total = 0
-	for i in range(trials):
-	    total += X(i)
-	average = total / trials
+>>> trials = 1000
+>>> total = 0
+>>> for i in range(trials):
+...     total += X(i)
+>>> average = total / trials
 
-The following output is non-reproducible because we didn't fix a seed,
-but it should still be close to ``0.5`` (by the
-`law of large numbers <https://en.wikipedia.org/wiki/Law_of_large_numbers>`_).
+The following output is close to ``0.5`` as expected by the
+`law of large numbers <https://en.wikipedia.org/wiki/Law_of_large_numbers>`_.
 
 >>> average
-0.496
+0.476
+
+The output should be close to ``0.5`` for most seed choices. Try running the
+code above with a few different seeds to see this (this will not affect
+reproducibility).	
 
 **************************
 Random variable arithmetic
@@ -77,12 +88,12 @@ distribution may not be know explicitly.
 >>> W = (1 + X) * Z / (1 + Y)
 >>> # W is a new random object
 >>> type(W)
-probly.core.RandomVar
+<class 'probly.core.RandomVar'>
 
 We can nevertheless sample from this unknown distribution!
 
 >>> W(seed)
-4.227498943351138
+-4.340731821079555
 
 Note that ``W`` is *dependent* on ``X``, ``Y``, and ``Z``.
 This essentially means that the following outputs ``True``.
@@ -134,7 +145,7 @@ other random variables.
 
 >>> M = pr.array([[X, Z], [W, Y]])
 >>> type(M)
-probly.core.RandomVar
+<class 'probly.core.RandomVar'>
 
 Random arrays can be manipulated like ordinary NumPy arrays.
 
@@ -167,4 +178,4 @@ The function ``Det`` can now be applied to ``M``.
 
 >>> D = Det(M)
 >>> D(seed)
--35.743494632069975
+-17.841952742532634

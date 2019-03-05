@@ -13,6 +13,11 @@ each instance of a random variable is initialized in such a way as to behave
 differently from other instances, *even when all instances are seeded the same
 way*. Take the following for example.
 
+.. testsetup::
+
+   from probly.core import RandomVar
+   RandomVar.reset()
+
 >>> import probly as pr
 >>> X = pr.Unif(0, 1)
 >>> Y = pr.Unif(0, 1)
@@ -26,13 +31,11 @@ attribute that increases in steps of 1 every time an independent random variable
 initialized. This makes outputs reproducible as long as they are generated in
 the same order and without interruption by the initialization of new random variables.
 
->>> import probly as pr
->>> X = pr.Unif(0, 1)
 >>> x = X(0)
 >>> x 	# Produces the following value if no other random variables have been initialized
-0.6957197622360134
+0.44334357301565486
 >>> X = pr.Unif(0, 1)	# Initializes a new random variable
->>> X(0) == X 			# True with probability almost 0
+>>> X(0) == X() 		# True with probability almost 0
 False
 
 .. _dependence:
@@ -51,10 +54,10 @@ ensures that a random variable minus itself is alsways ``0``!
 >>> Y() == 0.0		# Outputs True for any seed
 True
 
-This is clearly different from sampling from ``Y`` with two
-different seeds and then subtracting.
+This is clearly different from sampling from the following.
 
->>> Y(seed) - Y(seed + 1) == 0		# Probably False
+>>> seed = 11
+>>> X(seed) - X(seed + 1) == 0		# Typically False
 False
 
 Here's another example where we want dependence structure to be maintained.
@@ -63,5 +66,5 @@ Here's another example where we want dependence structure to be maintained.
 >>> X = pr.Unif(0, 1)
 >>> Y = pr.array([X, X + 1])
 >>> Z = Y[1] - Y[0]
->>> Z() == 1.0
+>>> Z() == 1
 True

@@ -5,6 +5,7 @@ Families of random variables defined from a distribution.
 import numpy as np
 from .core import RandomVar
 
+
 # ======================== Discrete random variables ======================== #
 
 

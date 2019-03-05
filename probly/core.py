@@ -144,6 +144,11 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return super().__call__(new_seed)
 
     @classmethod
+    def reset(cls):
+        # For debugging only
+        cls._last_id = itertools.count(start=1)
+
+    @classmethod
     def get_seed(cls, seed=None, return_if_seeded=True):
         """
         Produces a random seed.
