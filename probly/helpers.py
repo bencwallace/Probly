@@ -102,12 +102,12 @@ def array(arr):
         # Recursively turn elements into RandomVar objects
         parents = (array(p) for p in arr)
 
-        Array = RandomVar(op, *parents)
+        RV = RandomVar(op, *parents)
 
         # Trying to get np.linalg.det to work
-        # Array._array = True
+        RV._array = True
 
-        return Array
+        return RV
     elif isinstance(arr, RandomVar):
         return arr
     else:

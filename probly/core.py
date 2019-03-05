@@ -52,18 +52,25 @@ class Node(object):
         Combines parent outputs on given arguments via an operation.
         """
 
-        if not self._parents:
+        if not self.parents():
             # Let root act directly on args
-            out = self._op(*args)
+            out = self.op()(*args)
         else:
-            inputs = (p(*args) for p in self._parents)
-            out = self._op(*inputs)
+            inputs = (p(*args) for p in self.parents())
+            out = self.op()(*inputs)
 
         # For length 1 tuples
         if hasattr(out, '__len__') and len(out) == 1:
             out = out[0]
 
         return out
+
+    # Getters
+    def op(self):
+        return self._op
+
+    def parents(self):
+        return self._parents
 
 
 class RandomVar(Node, NDArrayOperatorsMixin):
@@ -170,13 +177,13 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         return RandomVar(partial, *inputs)
 
-    # Goal: make np.linalg.det work
-    # def __array__(self):
-    #     if hasattr(self, '_array'):
-    #         items = [p.__array__() for p in self._parents]
-    #         return np.array(items, dtype=object)
-    #     else:
-    #         return self
+    # Determines behaviour of np.array
+    def __array__(self, dtype=object):
+        if hasattr(self, '_array'):
+            items = [p.__array__() for p in self.parents()]
+            return np.array(items, dtype=object)
+        else:
+            return self
 
     def __getitem__(self, key):
         def get_item_from_key(array):
