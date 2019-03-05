@@ -26,46 +26,6 @@ def Lift(f):
     >>> Y = f(M)
     >>> print(Y())
     -1000
-
-    Example
-    -------
-    Consider the following custom-built random class:
-
-    >>> import numpy as np
-    >>> import string
-    >>> import probly as pr
-    >>> charset = list(string.ascii_letters)
-    >>> class RandomString(pr.Distr):
-    ... def __init__(self, rate):
-    ...     self.rate = rate
-    ...     def _sampler(self, seed=None):
-    ...         sample = ''
-    ...         Length = pr.Pois(self.rate)(seed=seed)
-    ...         for i in range(Length):
-    ...             if pr.Ber(0.2)(seed + i) == 1:
-    ...                 sample += ' '
-    ...             else:
-    ...                 np.random.seed(seed + i)
-    ...                 char = np.random.choice(charset)
-    ...                 sample += char
-    ...         return sample
-    >>> S = RandomString(20)
-    >>> print(S())
-
-    The following example lifts the `str.title` method:
-
-    >>> Title = pr.Lift(str.title)
-    >>> T = Title(S)
-    >>> print(T())
-
-    In the next example, we decorate a custom function to get a lifted
-    function:
-
-    >>> @pr.Lift
-    >>> def title_first_char(s):
-    ...     return s.title()[0]
-    >>> U = title_first_char(S)
-    >>> print(T())
     """
 
     @wraps(f)
