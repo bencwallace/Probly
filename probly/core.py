@@ -124,7 +124,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             op = obj._sampler
             parents = ()
 
-            _offset = cls.make_random(_id)
+            _offset = cls.get_random(_id)
 
         # Then initialize it
         super().__init__(obj, op, *parents)
@@ -143,27 +143,27 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
 
-    @staticmethod
-    def get_seed(seed=None, return_if_seeded=False):
+    @classmethod
+    def get_seed(cls, seed=None, return_if_seeded=True):
         """
         Produces a random seed.
 
         If `return_if_seeded` is True, returns `seed` (when provided).
         """
 
-        np.random.seed(seed)
-        new_seed = np.random.get_state()[1][int(return_if_seeded)]
+        if seed and return_if_seeded:
+            return seed
 
-        # Cast to int to avoid overflow
-        return int(new_seed)
+        np.random.seed(seed)
+        return np.random.randint(cls._max_seed)
 
     @classmethod
-    def make_random(cls, seed):
+    def get_random(cls, seed, old=False):
         """
         Produces a pseudo-random number from a given input seed.
         """
 
-        return cls.get_seed(seed, return_if_seeded=True)
+        return cls.get_seed(seed, False)
 
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
         # Allows NumPy ufuncs (in particular, addition) and derived methods
