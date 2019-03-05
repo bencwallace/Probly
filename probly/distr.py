@@ -19,12 +19,15 @@ class DUnif(RandomVar):
     a : int
         Lowest possible value.
     b : int
-        Highest possible value.
+        Highest possible value. Default is `a + 1`.
     """
 
-    def __init__(self, a=0, b):
+    def __init__(self, a=0, b=None):
         self.a = a
-        self.b = b
+        if b is None:
+            self.b = a + 1
+        else:
+            self.b = b
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -42,12 +45,15 @@ class Multinomial(RandomVar):
     n : int
         Number of trials.
     pvals : list or tuple, optional
-        Success probabilities.
+        Success probabilities. Default is equal probabilities for each outcome.
     """
 
-    def __init__(self, n, pvals=[0.5]):
+    def __init__(self, n, pvals=None):
         self.n = n
-        self.pvals = pvals
+        if not pvals:
+            self.pvals = [1 / n] * n
+        else:
+            self.pvals = pvals
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -71,7 +77,8 @@ class Bin(Multinomial):
     """
 
     def __init__(self, n, p=0.5):
-        super().__init__(self, n, [1 - p, p])
+        super().__init__(n, [1 - p, p])
+        self.p = p
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -478,11 +485,11 @@ class VonMises(RandomVar):
 
     Parameters
     ----------
-    mean : float
-    kappa : float
+    mean : float, optional
+    kappa : float, optional
     """
 
-    def __init__(self, mean, kappa):
+    def __init__(self, mean=0, kappa=1):
         self.mean = mean
         self.kappa = kappa
 

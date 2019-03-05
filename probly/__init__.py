@@ -22,19 +22,16 @@ __all__ = []
 __all__ += ['array', 'Lift']
 
 # Discrete random variables
-distributions = []
-distributions += ['DUnif']
-distributions += ['Multinomial', 'Bin', 'Ber']
-distributions += ['NegBin', 'Geom']
-distributions += ['HyperGeom', 'Pois']
+__all__ += ['DUnif']
+__all__ += ['Multinomial', 'Bin', 'Ber']
+__all__ += ['NegBin', 'Geom']
+__all__ += ['HyperGeom', 'Pois']
 
 # Continuous random variables
-distributions += ['Gamma', 'ChiSquared', 'Exp']
-distributions += ['Unif']
-distributions += ['Normal', 'LogNormal']
-distributions += ['Beta', 'PowerLaw']
-distributions += ['F', 'Student_t']
-distributions += ['Laplace', 'Logistic', 'Pareto', 'VonMises']
-distributions += ['Weibull']
-
-__all__ += distributions
+__all__ += ['Gamma', 'ChiSquared', 'Exp']
+__all__ += ['Unif']
+__all__ += ['Normal', 'LogNormal']
+__all__ += ['Beta', 'PowerLaw']
+__all__ += ['F', 'Student_t']
+__all__ += ['Laplace', 'Logistic', 'Pareto', 'VonMises']
+__all__ += ['Weibull']
