@@ -2,39 +2,31 @@
 This module defines a random variable as a node in a computational graph.
 """
 
-import itertools
 import numpy as np
 from numpy.lib.mixins import NDArrayOperatorsMixin
+import itertools
+import functools
 
 
 class Node(object):
     """
     A node in a computational graph.
 
+    Acts as a function by passing the outputs of its `parents` (computed
+    recursively) to an operation `op`.
+
     Parameters
     ----------
-    op : callable
-    parents : array_like
-        Collection of `Node` objects
-
-    Note
-    ----
-    `Node` objects are not meant to be instantiated directly.
+    op : optional
+        An operation accepting `len(parents)` arguments.
+        Defaults to the identity map.
+        If not callable, understood as the constant map returning itself.
+        Mandatory if parents not specified.
+    parents : optional
+        A collection of callable (typically `Node`) objects.
     """
 
-    # Core magic methods
     def __init__(self, op=None, *parents):
-        """
-        Parameters
-        ----------
-        op : optional
-            An operation. Default is the identity map. If not callable,
-            understood as the constant map returning itself. Mandatory if
-            parents not specified.
-        parents : optional
-            A collection of callables (preferably `SimpleNode` objects).
-        """
-
         self._parents = parents
 
         if not op:
@@ -48,10 +40,6 @@ class Node(object):
             self._op = op
 
     def __call__(self, *args):
-        """
-        Combines parent outputs on given arguments via an operation.
-        """
-
         if not self.parents():
             # Let root act directly on args
             out = self.op()(*args)
@@ -87,8 +75,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     Define a family of "shifted" uniform random variables:
 
     >>> import numpy as np
-    >>> import probly as pr
-    >>> class UnifShift(pr.Distr):
+    >>> class UnifShift(RandomVar):
     ...     def __init__(self, a, b):
     ...         self.a = a + 1
     ...         self.b = b + 1
@@ -137,7 +124,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             op = obj._sampler
             parents = ()
 
-            _offset = cls.get_seed(_id, offset=True)
+            _offset = cls.make_random(_id)
 
         # Then initialize it
         super().__init__(obj, op, *parents)
@@ -149,36 +136,51 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return obj
 
     def __call__(self, seed=None):
+        """
+        Produces a random sample.
+        """
+
         new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
 
     @staticmethod
-    def get_seed(seed=None, offset=False):
+    def get_seed(seed=None, return_if_seeded=False):
         """
         Produces a random seed.
+
+        If `return_if_seeded` is True, returns `seed` (when provided).
         """
 
         np.random.seed(seed)
-        new_seed = np.random.get_state()[1][int(offset)]
+        new_seed = np.random.get_state()[1][int(return_if_seeded)]
 
         # Cast to int to avoid overflow
         return int(new_seed)
 
-    # Allows NumPy ufuncs (in particular, addition) and derived methods (for
-    # example, summation, which is the ufunc reduce method of addition) to act
-    # on RandomVar objects
+    @classmethod
+    def make_random(cls, seed):
+        """
+        Produces a pseudo-random number from a given input seed.
+        """
+
+        return cls.get_seed(seed, return_if_seeded=True)
+
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
+        # Allows NumPy ufuncs (in particular, addition) and derived methods
+        # (for example, summation, which is the ufunc reduce method of
+        # addition) to act on RandomVar objects.
+
         # Cast inputs to RandomVar: If not RandomVar, treat as constant
         inputs = tuple(x if isinstance(x, RandomVar)
                        else RandomVar(x) for x in inputs)
 
-        def partial(*inputs):
-            return getattr(op, method)(*inputs, **kwargs)
+        fcn = getattr(op, method)
+        partial = functools.partial(fcn, **kwargs)
 
         return RandomVar(partial, *inputs)
 
-    # Determines behaviour of np.array
     def __array__(self, dtype=object):
+        # Determines behaviour of np.array
         if hasattr(self, '_array'):
             items = [p.__array__() for p in self.parents()]
             return np.array(items, dtype=object)
@@ -190,7 +192,8 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             return array[key]
         return RandomVar(get_item_from_key, self)
 
-    # Default sampler
-    def _sampler(seed=None):
-        # Behaves as random number generator due to _offset
-        return seed
+    def _sampler(self, seed=None):
+        # Default sampler. Behaves as random number since called through
+        # __call__, which adds _offset to seed.
+
+        return self.get_seed(seed)

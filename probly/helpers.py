@@ -80,12 +80,12 @@ def Lift(f):
 
 def array(arr):
     """
-    Turns an array_like collection of random variables into a random array.
+    Casts an array of random variables to a random variable.
 
     Parameters
     ----------
-    arr (array_like)
-        An `array_like` object of `RandomVar` objects, constants, and other
+    arr : array_like
+        An `array_like` collection of `RandomVar` objects, constants, and other
         `array_like` objects.
 
     Returns

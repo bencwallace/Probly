@@ -6,7 +6,7 @@ from unittest import TestCase
 from probly.core import RandomVar
 
 
-get_offset = lambda seed=None: RandomVar.get_seed(seed, offset=True)
+make_random = RandomVar.make_random
 _max_seed = RandomVar._max_seed
 msg_low_prob = 'Test fails with low probability. Try running tests again.'
 
@@ -46,7 +46,7 @@ class TestSimpleSeeded(TestCase):
         b = 10
 
         X = pr.Unif(a, b)
-        offset = get_offset(X._id)
+        offset = make_random(X._id)
         np.random.seed((self.seed + offset) % _max_seed)
         x = np.random.uniform(a, b)
 
@@ -56,7 +56,7 @@ class TestSimpleSeeded(TestCase):
         p = 0.8
 
         X = pr.Ber(p)
-        offset = get_offset(X._id)
+        offset = make_random(X._id)
         np.random.seed((self.seed + offset) % _max_seed)
         # x = np.random.choice(2, p=[1 - p, p])
         x = np.random.binomial(1, p)
@@ -124,12 +124,12 @@ class TestScalar(TestCase):
         b2 = 3.1
 
         X = pr.Unif(a1, b1)
-        offset = get_offset(X._id)
+        offset = make_random(X._id)
         np.random.seed((self.seed + offset) % _max_seed)
         x = np.random.uniform(a1, b1)
 
         Y = pr.Unif(a2, b2)
-        offset = get_offset(Y._id)
+        offset = make_random(Y._id)
         np.random.seed((self.seed + offset) % _max_seed)
         y = np.random.uniform(a2, b2)
 
@@ -143,7 +143,7 @@ class TestScalar(TestCase):
         b = -1
 
         Y = pr.Unif(a, b)
-        offset = get_offset(Y._id)
+        offset = make_random(Y._id)
         np.random.seed((self.seed + offset) % _max_seed)
         y = np.random.uniform(a, b)
 
@@ -157,7 +157,7 @@ class TestScalar(TestCase):
         b = 10
 
         X = pr.Unif(a, b)
-        offset = get_offset(X._id)
+        offset = make_random(X._id)
         np.random.seed((self.seed + offset) % _max_seed)
         x = np.random.uniform(a, b)
 
@@ -194,11 +194,11 @@ class TestArray(TestCase):
         Z = pr.array(([X, Y], np.array([Y, 1])))
         # W = np.dot(Z, Z)
 
-        offset = get_offset(X._id)
+        offset = make_random(X._id)
         np.random.seed((self.seed + offset) % _max_seed)
         x = np.random.uniform(-1, 1)
 
-        offset = get_offset(Y._id)
+        offset = make_random(Y._id)
         np.random.seed((self.seed + offset) % _max_seed)
         y = np.random.uniform(-1, 1)
 
@@ -210,7 +210,7 @@ class TestArray(TestCase):
         X = pr.Unif(-1, 1)
         Z = pr.array([[X, 1], [1, 1]])
 
-        offset = get_offset(X._id)
+        offset = make_random(X._id)
         np.random.seed((self.seed + offset) % _max_seed)
         x = np.random.uniform(-1, 1)
 
