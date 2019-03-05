@@ -65,7 +65,7 @@ def array(arr):
         RV = RandomVar(op, *parents)
 
         # Trying to get np.linalg.det to work
-        RV._array = True
+        RV._isarray = True
 
         return RV
     elif isinstance(arr, RandomVar):

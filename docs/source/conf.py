@@ -50,6 +50,9 @@ extensions = [
     'sphinx.ext.napoleon'
 ]
 
+# Autodoc settings
+# autodoc_member_order = 'bysource'
+
 # Napoleon settings
 napoleon_google_docstring = False
 

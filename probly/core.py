@@ -133,6 +133,9 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         obj._id = _id
         obj._offset = _offset
 
+        # Mark as not an array by default
+        obj._isarray = False
+
         return obj
 
     def __call__(self, seed=None):
@@ -186,7 +189,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
-        if hasattr(self, '_array'):
+        if self._isarray:
             items = [p.__array__() for p in self.parents()]
             return np.array(items, dtype=object)
         else:

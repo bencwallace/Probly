@@ -5,6 +5,6 @@ API Reference
 #############
 
 .. automodule:: probly
-    :members: Lift
+    :members:
     :undoc-members:
     :show-inheritance:
