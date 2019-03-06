@@ -106,7 +106,7 @@ This essentially means that the following outputs ``True``.
 >>> y = Y(seed)
 >>> z = Z(seed)
 >>> w = W(seed)
->>> w == (1 + x) * z / (1 + y)
+>>> w == (1 + x) * z / (5 + y)
 True
 
 For more information, see :ref:`dependence`.
