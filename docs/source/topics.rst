@@ -4,9 +4,9 @@ Assorted topics
 
 .. _independence:
 
-********************************
-Independence and reproducibility
-********************************
+************
+Independence
+************
 
 In order to allow for independent but identically distributed random variables,
 each instance of a random variable is initialized in such a way as to behave

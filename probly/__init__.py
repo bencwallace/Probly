@@ -1,5 +1,5 @@
 # Helpers
-from .helpers import array, Lift
+from .helpers import Lift, array
 
 # Discrete random variables
 from .distr import DUnif
@@ -19,7 +19,7 @@ from .distr import Weibull
 __all__ = []
 
 # Helpers
-__all__ += ['array', 'Lift']
+__all__ += ['Lift', 'array']
 
 # Discrete random variables
 __all__ += ['DUnif']

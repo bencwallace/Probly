@@ -6,29 +6,13 @@ Quick start
 Installation
 ************
 
-Requirements
-============
-Probly makes use of the following package:
-
-* `NumPy <http://www.numpy.org/>`_
-
-Installation
-============
 Probly can be installed using `pip <https://pypi.org/project/pip/>`_ from GitHub as follows::
 
    pip install git+https://github.com/bencwallace/probly#egg=probly
 
-******************************
-A note on reproducible results
-******************************
+.. note::
 
-The following examples consist of code segments (prefaced by >>>) followed by
-expected outputs (no >>>). In order to reproduce the same results, the code
-segments must be executed in the prescribed order. Other code segments may
-be added between successive segments as long as they do not involve the
-instantiation of random variables.
-
-For more information, see :ref:`independence`.
+   Probly makes use of `NumPy <http://www.numpy.org/>`_.
 
 ***********************
 Simple random variables
@@ -44,15 +28,21 @@ We begin by importing ``probly``.
    RandomVar.reset()
 
 Next, we initialize some pre-packaged random variables.
-A complete list of available distributions is available at the :ref:`api`. See
-also also the :class:`~Probly.RandomVar` documentation if you want to create your own
-random variables from scratch.
+A complete list of available distributions is available at the :ref:`api`.
+See also also the :class:`~Probly.RandomVar` documentation if you want to
+create your own random variables from scratch.
+
+.. note::
+
+   The following examples consist of code segments (prefaced by >>>) followed by expected outputs (no >>>). In order to reproduce the same results, the code segments must be executed in the prescribed order. Other code segments may be added between successive segments as long as they do not involve the instantiation of random variables.
+
+   For more information, see :ref:`independence`.
 
 >>> # A Bernoulli random variable with p=0.5 (the default)
 >>> X = pr.Ber()
 >>> # A Bernoulli random variable independent of X
 >>> Y = pr.Ber(0.9)
->>> # A uniform random variable on the interval [*10, 10]
+>>> # A uniform random variable on the interval [-10, 10]
 >>> Z = pr.Unif(-10, 10)
 
 Calling a random variable produces a random sample from its distribution.
@@ -92,14 +82,14 @@ The output should be close to ``0.5`` for most seed choices. Try running the
 code above with a few different seeds to see this (this will not affect
 reproducibility).	
 
-**************************
-Random variable arithmetic
-**************************
+*****************************
+Manipulating random variables
+*****************************
 Random variables can be combined via arithmetical operations. The
 result of such operations is itself a random variable whose
 distribution may not be know explicitly.
 
->>> W = (1 + X) * Z / (1 + Y)
+>>> W = (1 + X) * Z / (5 + Y)
 >>> # W is a new random object
 >>> type(W)
 <class 'probly.core.RandomVar'>
@@ -107,7 +97,7 @@ distribution may not be know explicitly.
 We can nevertheless sample from this unknown distribution!
 
 >>> W(seed)
--4.340731821079555
+-1.4469106070265185
 
 Note that ``W`` is *dependent* on ``X``, ``Y``, and ``Z``.
 This essentially means that the following outputs ``True``.
@@ -124,32 +114,6 @@ For more information, see :ref:`dependence`.
 .. todo::
 
    Link to LLN and CLT examples.
-
-Other arithmetical functions
-============================
-Any function that acts on one of its arguments using only arithmetical
-operations can be applied to a random variable to produce a new random
-variable (the *composition* of the first random variable and the function)
-
->>> def f(x, y, z):
-...     return (1 + x) * z / (1 + y)
->>> UU = f(X, Y, Z)
->>> UU(seed) == W(seed)
-True
->>> UU is W
-False
-
-.. UU._id == 15
-.. UU._offset == 1416695020
-
-Notice that ``UU`` produces the same values as ``W`` for a given seed
-although they are different objects. This is because, although they
-are distinct from the perspective of the Python interpreter, they are
-the same random variables from the perspective of probability.
-
-.. todo::
-
-   Discuss making independent copies.
 
 ***************
 Random matrices
@@ -170,16 +134,32 @@ True
 >>> S(seed) == X(seed) + Z(seed) + W(seed) + Y(seed)
 True
 
-*****************
-Lifting functions
-*****************
+We could also sum the elements of ``M`` as follows, but read the note below.
+
+>>> T = np.sum([[X, Z], [W, Y]])
+>>> T(seed) == S(seed)
+True
+
+.. note::
+
+   Due to the way in which NumPy sums arrays and the recursive nature of a
+   random variable's call method, summing a large collection
+   of random variables has the potential to result in a ``RecursionError``.
+   So, for example, instead of applying ``np.linalg.sum`` directly to an
+   array or list ``array`` of random variables, it is preferable to convert
+   this collection to a random variable by running
+   ``np.linalg.sum(pr.array(collection))``.
+
+
+********************
+Function composition
+********************
 Certain functions don't work automatically with random variables.
 However, any functions can be lifted to maps between random variables
 using the
 ``@pr.Lift`` decorator.
 
 >>> Det = pr.Lift(np.linalg.det)
->>> D = Det(M)
 
 An equivalent way of doing this is as follows::
 
@@ -192,4 +172,4 @@ The function ``Det`` can now be applied to ``M``.
 
 >>> D = Det(M)
 >>> D(seed)
--17.841952742532634
+-5.280650914177544
