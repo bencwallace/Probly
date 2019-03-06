@@ -2,7 +2,7 @@
 Quick start
 ###########
 
-First, make sure that Probly is `installed <https://bencwallace.github.io/installation.html>`_.
+First, make sure that Probly is :doc:`installed <installation>`.
 
 ******************************
 A note on reproducible results

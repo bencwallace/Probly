@@ -1,7 +1,7 @@
 # Probly
 by Benjamin Wallace
 
-Website: https://bencwallace.github.io/
+[probly.readthedocs.io](https://probly.readthedocs.io/)
 
 ## Description
 
@@ -25,4 +25,4 @@ For instance, when sampling `Z = [X, X + log(X)]` (regardless of the distributio
 
 ### Quick start
 
-Click [here](https://bencwallace.github.io/quick.html)
+Click [here](https://probly.readthedocs.io/en/latest/quick.html)
