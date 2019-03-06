@@ -3,11 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-######
-Probly
-######
-
-Probly is a Python package for symbolic computation of random variables.
+.. include:: ../../README.rst
 
 .. toctree::
    :maxdepth: 2
