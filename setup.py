@@ -25,4 +25,4 @@ setup(name='probly',
                    'Topic :: Scientific/Engineering :: Mathematics'
       ],
       packages=['probly'],
-      install_requires=['numpy', 'networkx'])
+      install_requires=['numpy'])
