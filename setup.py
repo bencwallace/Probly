@@ -11,20 +11,18 @@ with open('README.md') as f:
 
 setup(name='probly',
       version=version,
-      description='Probabilistic computations in Python',
+      description='A Python package for the symbolic computation of'
+                  ' random variables.',
       long_description=README,
       long_description_content_type='text/markdown',
       url='https://probly.readthedocs.io/',
       author='Benjamin Wallace',
       author_email='bencwallace@gmail.com',
-      classifiers=[
-                   'Environment :: Console',
+      classifiers=['Environment :: Console',
                    'Intended Audience :: Science/Research',
-                   'Intended Audience :: Developers',
                    'Intended Audience :: Education',
                    'License :: OSI Approved :: BSD License',
-                   'Topic :: Scientific/Engineering :: Mathematics'
-      ],
+                   'Topic :: Scientific/Engineering :: Mathematics'],
       packages=['probly'],
       install_requires=['numpy'],
       include_package_data=True,
