@@ -44,8 +44,8 @@ False
 Dependence
 **********
 
-ProblY tracks the *dependence structure* of random variables.
-This is a very important feature of ProblY. For instance, this
+Probly tracks the *dependence structure* of random variables.
+This is a very important feature of Probly. For instance, this
 ensures that a random variable minus itself is alsways ``0``!
 
 >>> import probly as pr

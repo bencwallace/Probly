@@ -5,7 +5,7 @@ Installation
 ************
 Requirements
 ************
-ProblY makes use of the following packages:
+Probly makes use of the following packages:
 
 * `NumPy <http://www.numpy.org/>`_
 * `NetworkX <https://networkx.github.io/>`_
@@ -13,6 +13,6 @@ ProblY makes use of the following packages:
 ************
 Installation
 ************
-ProblY can be installed from GitHub as follows::
+Probly can be installed from GitHub as follows::
 
    pip install git+https://github.com/bencwallace/probly#egg#probly

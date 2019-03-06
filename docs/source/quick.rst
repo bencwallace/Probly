@@ -2,7 +2,7 @@
 Quick start
 ###########
 
-First, make sure that ProblY is `installed <https://bencwallace.github.io/installation.html>`_.
+First, make sure that Probly is `installed <https://bencwallace.github.io/installation.html>`_.
 
 ******************************
 A note on reproducible results
@@ -31,7 +31,7 @@ We begin by importing ``probly``.
 
 Next, we initialize some pre-packaged random variables.
 A complete list of available distributions is available at the :ref:`api`. See
-also also the :class:`~ProblY.RandomVar` documentation if you want to create your own
+also also the :class:`~Probly.RandomVar` documentation if you want to create your own
 random variables from scratch.
 
 >>> # A Bernoulli random variable with p=0.5 (the default)
