@@ -9,12 +9,9 @@ Probly
 
 Probly is a Python package for symbolic computation of random variables.
 
-*************
-Documentation
-*************
-
 .. toctree::
    :maxdepth: 2
+   :caption: Documentation
 
    quick
    topics
