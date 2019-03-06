@@ -1,15 +1,16 @@
 import pathlib
 from setuptools import setup
 
-HERE = pathlib.Path(__file__).parent
-README = (HERE / 'README.md').read_text()
+here = pathlib.Path(__file__).parent
+version = (here / 'version').read_text()
+README = (here / 'README.md').read_text()
 
 
 with open('README.md') as f:
     long_description = f.read()
 
 setup(name='probly',
-      version='0.1.0',
+      version=version,
       description='Probabilistic computations in Python',
       long_description=README,
       long_description_content_type='text/markdown',
@@ -25,4 +26,6 @@ setup(name='probly',
                    'Topic :: Scientific/Engineering :: Mathematics'
       ],
       packages=['probly'],
-      install_requires=['numpy'])
+      install_requires=['numpy'],
+      include_package_data=True,
+      zip_safe=False)
