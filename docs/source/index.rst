@@ -11,12 +11,17 @@
 
    quick
    topics
-   ref
+   ref/index
 
 
 ******************
 Indices and tables
 ******************
+
+.. * :ref:`genindex`
+.. * :ref:`modindex`
+.. * :ref:`search`
+.. * :ref:`glossary`
 
 * :ref:`genindex`
 * :ref:`search`

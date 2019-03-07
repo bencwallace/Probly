@@ -1,3 +1,13 @@
+"""
+Probly implements random variables and methods to aid in their construction.
+
+The main objects of Probly are random variable classes. These inherit from the
+core class ``RandomVar``, which acts as a subclassing interface for a node in a
+computational graph. Probly also provides methods to help in the formation of
+new random variables.
+"""
+
+
 # Helpers
 from .helpers import Lift, array
 

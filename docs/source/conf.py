@@ -47,7 +47,8 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autosummary'
 ]
 
 # Autodoc settings
@@ -55,6 +56,9 @@ extensions = [
 
 # Napoleon settings
 napoleon_google_docstring = False
+
+# Autosummary settings
+autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

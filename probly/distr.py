@@ -1,5 +1,5 @@
 """
-Families of random variables defined from a distribution.
+Random variables following common distributions.
 """
 
 import numpy as np

@@ -1,5 +1,7 @@
 """
-This module defines a random variable as a node in a computational graph.
+The basic type underlying all random variables is a node in a computational
+graph. Random variables are defined as nodes that obey arithmetical and
+independence relations.
 """
 
 import numpy as np

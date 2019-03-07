@@ -1,3 +1,8 @@
+"""
+Additional methods for random variable formation.
+"""
+
+
 import numpy as np
 from collections.abc import Sequence
 from functools import wraps
