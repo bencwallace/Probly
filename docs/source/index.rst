@@ -14,6 +14,11 @@
    topics
    ref/index
 
+**********
+Repository
+**********
+
+Probly is open source and available on `GitHub <https://github.com/bencwallace/probly>`_.
 
 ******************
 Indices and tables
