@@ -8,16 +8,15 @@ Examples
 Central limit theorem
 *********************
 
-Consider the following collection of independent
-Bernoulli random variables.
+Let ``X`` be a Bernoulli random variable.
 
 >>> import probly as pr
->>> X = [pr.Ber() for _ in range(1000)]
+>>> X = pr.Ber()
 
-We are interested in the sum of these random variables
+We are interested in the sum of many independent copies of ``X``. For this
+example, let's take "many" to be 1000.
 
->>> import numpy as np
->>> Z = pr.sum(X)
+>>> Z = pr.sum(X, num=1000)     # Returns the sum of 1000 independent copies of X
 
 The sum ``Z`` is itself a random variable, but its precise distribution,
 unlike that of ``X``, is unknown.

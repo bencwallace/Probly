@@ -90,10 +90,21 @@ def hist(rv, num_samples, bins=20, density=True):
     plt.show()
 
 
-def sum(rvs):
+def sum(summands, num=None):
     """
     Sums a collection of random variables.
+
+    If `num` is provided, `summands` is taken to be a single random variable
+    and the sum of `num` independent copies of `summands` is returned.
+    Otherwise, `summands` is taken to be a collection of random variables or
+    random array and its sum is returned.
     """
 
-    rvs = array(rvs)
-    return np.sum(rvs)
+    if num is not None:
+        # Assume summands is a random variable
+        summands = array([summands.copy() for _ in range(num)])
+    else:
+        # Assume summands is a collection of random variables or random array
+        summands = array(summands)
+
+    return np.sum(summands)

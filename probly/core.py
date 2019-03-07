@@ -8,6 +8,7 @@ import numpy as np
 from numpy.lib.mixins import NDArrayOperatorsMixin
 import itertools
 import functools
+import copy
 
 
 class Node(object):
@@ -54,6 +55,9 @@ class Node(object):
             out = out[0]
 
         return out
+
+    def copy(self):
+        return copy.copy(self)
 
     # Getters
     def op(self):
@@ -147,6 +151,16 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
+
+    def copy(self):
+        """Returns an independent, identically distributed random variable."""
+
+        Copy = super().copy()
+
+        Copy._id = next(self._last_id)
+        Copy._offset = self.get_random(Copy._id)
+
+        return Copy
 
     @classmethod
     def reset(cls):
