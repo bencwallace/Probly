@@ -10,6 +10,7 @@
    :caption: Documentation
 
    quick
+   examples
    topics
    ref/index
 

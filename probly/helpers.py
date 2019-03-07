@@ -2,8 +2,8 @@
 Additional methods for random variable formation.
 """
 
-
 import numpy as np
+import matplotlib.pyplot as plt
 from collections.abc import Sequence
 from functools import wraps
 from .core import RandomVar
@@ -78,3 +78,22 @@ def array(arr):
     else:
         # Treat as constant
         return RandomVar(arr)
+
+
+def hist(rv, num_samples, bins=20, density=True):
+    """
+    Plots a histogram from samples of a random variable.
+    """
+
+    samples = [rv() for _ in range(num_samples)]
+    plt.hist(samples, bins=bins, density=density)
+    plt.show()
+
+
+def sum(rvs):
+    """
+    Sums a collection of random variables.
+    """
+
+    rvs = array(rvs)
+    return np.sum(rvs)

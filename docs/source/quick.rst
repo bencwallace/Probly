@@ -29,7 +29,7 @@ We begin by importing ``probly``.
 
 Next, we initialize some pre-packaged random variables.
 A complete list of available distributions is available at the :ref:`api`.
-See also also the :class:`~Probly.RandomVar` documentation if you want to
+See also also the :class:`~probly.core.RandomVar` documentation if you want to
 create your own random variables from scratch.
 
 .. note::
@@ -82,22 +82,31 @@ The output should be close to ``0.5`` for most seed choices. Try running the
 code above with a few different seeds to see this (this will not affect
 reproducibility).	
 
-*****************************
-Manipulating random variables
-*****************************
-Random variables can be combined via arithmetical operations. The
-result of such operations is itself a random variable whose
-distribution may not be know explicitly.
+**************************
+Random variable arithmetic
+**************************
+Random variables can be combined via arithmetical operations.
 
 >>> W = (1 + X) * Z / (5 + Y)
 >>> # W is a new random object
 >>> type(W)
 <class 'probly.core.RandomVar'>
 
+The result of such operations is itself a random variable whose
+distribution may not be know explicitly.
 We can nevertheless sample from this unknown distribution!
 
 >>> W(seed)
 -1.4469106070265185
+
+We can also try to visualize the (unknown) distribution with a histogram.
+
+>>> pr.hist(W, samples=1000)
+
+.. image:: _static/quick_hist.png
+
+For an interesting application of random variable arithmetic and histograms,
+see the :ref:`clt` example.
 
 Note that ``W`` is *dependent* on ``X``, ``Y``, and ``Z``.
 This essentially means that the following outputs ``True``.
@@ -149,6 +158,8 @@ True
    array or list ``array`` of random variables, it is preferable to convert
    this collection to a random variable by running
    ``np.linalg.sum(pr.array(collection))``.
+
+   A shortcut for this procedure is provided by :func:`probly.sum`.
 
 
 ********************

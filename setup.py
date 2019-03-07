@@ -3,11 +3,7 @@ from setuptools import setup
 
 here = pathlib.Path(__file__).parent
 version = (here / 'version').read_text()
-README = (here / 'README.md').read_text()
-
-
-with open('README.md') as f:
-    long_description = f.read()
+README = (here / 'README.rst').read_text()
 
 setup(name='probly',
       version=version,

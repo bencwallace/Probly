@@ -9,7 +9,7 @@ new random variables.
 
 
 # Helpers
-from .helpers import Lift, array
+from .helpers import Lift, array, hist, sum
 
 # Discrete random variables
 from .distr import DUnif
@@ -29,7 +29,7 @@ from .distr import Weibull
 __all__ = []
 
 # Helpers
-__all__ += ['Lift', 'array']
+__all__ += ['Lift', 'array', 'hist', 'sum']
 
 # Discrete random variables
 __all__ += ['DUnif']

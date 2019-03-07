@@ -3,4 +3,9 @@ Additional methods
 ##################
 
 .. automodule:: probly.helpers
-   :members:
+
+.. currentmodule:: probly
+
+.. autofunction:: Lift
+.. autofunction:: array
+.. autofunction:: sum
