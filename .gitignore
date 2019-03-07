@@ -1,10 +1,9 @@
 .ipynb_checkpoints
 __pycache__
 
-*.egg-info
-docs/build
-
+probly.egg-info
 todo.md
-compiled.py
-web.sh
+
+docs/build
+docs/source/ref/generated
 
