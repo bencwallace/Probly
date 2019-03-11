@@ -35,6 +35,9 @@ class Wigner(RandomVar):
 
         return array(arr)
 
+    def __init__(self, dim, rv=None):
+        self.dim = dim
+
 
 class Wishart(RandomVar):
     """
@@ -52,6 +55,12 @@ class Wishart(RandomVar):
         The second dimension parameter.
     rv : RandomVar, optional
         A random variable.
+
+
+    Attributes
+    ----------
+    lambda_ : float
+        The ratio `m / n`.
     """
 
     def __new__(self, m, n, rv=None):
@@ -62,3 +71,8 @@ class Wishart(RandomVar):
         square = np.dot(rect.T, rect)
 
         return array(square)
+
+    def __init__(self, m, n, rv=None):
+        self.m = m
+        self.n = n
+        self.lambda_ = self.m / self.n
