@@ -1,4 +1,5 @@
 from .core import RandomVar
+from .distr import Normal
 from .helpers import array
 
 
@@ -11,13 +12,16 @@ class Wigner(RandomVar):
 
     Parameters
     ----------
-    rv : RandomVar
-        A random variable whose distribution the entries will share.
     dim : int
         The matrix dimension.
+    rv : RandomVar, optional
+        A random variable whose distribution the entries will share. Default is
+        a standard normal random variable.
     """
 
-    def __new__(self, rv, dim):
+    def __new__(self, dim, rv=None):
+        if rv is None:
+            rv = Normal(0, 1)
         # Upper-diagonal part
         arr = [[rv.copy() if i <= j else 0 for j in range(dim)]
                for i in range(dim)]

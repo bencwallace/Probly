@@ -50,7 +50,7 @@ Wigner matrix with normally distributed entries.
 
 >>> import probly as pr
 >>> dim = 1000
->>> M = pr.Wigner(pr.Normal(), dim)
+>>> M = pr.Wigner(dim)
 
 The *semicircle law* states that if we normalize this matrix by dividing by the
 square root of 1000, then the eigenvalues of the resulting (random) matrix should
