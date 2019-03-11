@@ -1,6 +1,6 @@
-################
-Random variables
-################
+#######################
+Simple random variables
+#######################
 
 .. automodule:: probly.distr
 
@@ -44,3 +44,12 @@ Continuous random variables
    Pareto
    VonMises
    Weibull
+
+###############
+Random matrices
+###############
+
+.. autosummary::
+   :toctree: generated/
+
+   Wigner
