@@ -103,6 +103,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     """
 
     # ---------------------------- Independence ---------------------------- #
+
     # Counter for _id. Set start=1 or else first RandomVar acts as increment
     _last_id = itertools.count(start=1)
 
@@ -122,6 +123,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return Copy
 
     # ------------------------------ Interface ------------------------------ #
+
     def __new__(cls, *args, **kwargs):
         """
         Defines the random variable subclassing interface.
@@ -165,6 +167,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return obj
 
     # ------------------------------ Sampling ------------------------------ #
+
     # NumPy max seed
     _max_seed = 2 ** 32 - 1
 
@@ -205,6 +208,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return self._get_seed(seed)
 
     # ------------------------ Arrays and arithmetic ------------------------ #
+
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
         # Allows NumPy ufuncs (in particular, addition) and derived methods
         # (for example, summation, which is the ufunc reduce method of
@@ -235,3 +239,11 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         def get_item_from_key(array):
             return array[key]
         return RandomVar(get_item_from_key, self)
+
+    # --------------------------- Representation --------------------------- #
+
+    def __repr__(self):
+        if self.shape:
+            return repr(self.__array__())
+        else:
+            return super().__repr__()
