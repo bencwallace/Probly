@@ -120,7 +120,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         Copy = super().copy()
 
         Copy._id = next(self._last_id)
-        Copy._offset = self.get_random(Copy._id)
+        Copy._offset = self._get_random(Copy._id)
 
         return Copy
 
@@ -153,7 +153,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             op = obj._sampler
             parents = ()
 
-            _offset = cls.get_random(_id)
+            _offset = cls._get_random(_id)
 
         # Then initialize it
         super().__init__(obj, op, *parents)
@@ -173,11 +173,11 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         Produces a random sample.
         """
 
-        new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
+        new_seed = (self._get_seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
 
     @classmethod
-    def get_seed(cls, seed=None, return_if_seeded=True):
+    def _get_seed(cls, seed=None, return_if_seeded=True):
         """
         Produces a random seed.
 
@@ -191,18 +191,18 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return np.random.randint(cls._max_seed)
 
     @classmethod
-    def get_random(cls, seed, old=False):
+    def _get_random(cls, seed, old=False):
         """
         Produces a pseudo-random number from a given input seed.
         """
 
-        return cls.get_seed(seed, False)
+        return cls._get_seed(seed, False)
 
     def _sampler(self, seed=None):
         # Default sampler. Behaves as random number since called through
         # __call__, which adds _offset to seed.
 
-        return self.get_seed(seed)
+        return self._get_seed(seed)
 
     # --------------------------- Array protocols --------------------------- #
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
