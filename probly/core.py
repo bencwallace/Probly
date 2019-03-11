@@ -222,12 +222,16 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
         if self.shape:
-            items = [p.__array__() for p in self.parents()]
+            items = self.parents()
             return np.array(items, dtype=object)
         else:
-            return np.array([self])
+            # return np.array([self])   # causes stackoverflow
+            return self
 
     def __getitem__(self, key):
+        if not self.shape:
+            raise TypeError('Scalar random variable is not subscriptable.')
+
         def get_item_from_key(array):
             return array[key]
         return RandomVar(get_item_from_key, self)
