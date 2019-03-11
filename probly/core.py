@@ -1,4 +1,6 @@
 """
+Random variables are implemented as certain nodes in a computational graph.
+
 The basic type underlying all random variables is a node in a computational
 graph. Random variables are defined as nodes that obey arithmetical and
 independence relations.
@@ -13,7 +15,7 @@ import copy
 
 class Node(object):
     """
-    A node in a computational graph.
+    A node in a computational graph, representing the output of an operation.
 
     Acts as a function by passing the outputs of its `parents` (computed
     recursively) to an operation `op`.
@@ -57,13 +59,18 @@ class Node(object):
         return out
 
     def copy(self):
+        """Returns a copy of the current node."""
+
         return copy.copy(self)
 
     # Getters
     def op(self):
+        """Returns the operation producing the value of the current node."""
+
         return self._op
 
     def parents(self):
+        """Returns the parents of the current node."""
         return self._parents
 
 
@@ -90,22 +97,37 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
 
-    Instantiate a random variable from this family with support `[1, 2]` and
-    sample from its distribution:
+    Instantiate a random variable from this family with support `[1, 2].
 
     >>> X = UnifShift(0, 1)
-    >>> X() # doctest: +SKIP
     """
-
-    # Counter for _id. Set start=1 or else first RandomVar acts as increment
-    _last_id = itertools.count(start=1)
 
     # NumPy max seed
     _max_seed = 2 ** 32 - 1
 
+    # ---------------------------- Independence ---------------------------- #
+    # Counter for _id. Set start=1 or else first RandomVar acts as increment
+    _last_id = itertools.count(start=1)
+
+    @classmethod
+    def _reset(cls):
+        # For debugging only
+        cls._last_id = itertools.count(start=1)
+
+    def copy(self):
+        """Returns an independent, identically distributed random variable."""
+
+        Copy = super().copy()
+
+        Copy._id = next(self._last_id)
+        Copy._offset = self.get_random(Copy._id)
+
+        return Copy
+
+    # ------------------------ Subclassing interface ------------------------ #
     def __new__(cls, *args, **kwargs):
         """
-        Defines the subclassing interface.
+        Defines the random variable subclassing interface.
 
         A subclass of RandomVar contains: a method _sampler that produces
         samples from a distribution given some seed; and possibly a method
@@ -140,11 +162,12 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         obj._id = _id
         obj._offset = _offset
 
-        # Mark as not an array by default
+        # Mark as not an array by default. For RandomVar.__array__
         obj._isarray = False
 
         return obj
 
+    # ---------------------------- Call methods ---------------------------- #
     def __call__(self, seed=None):
         """
         Produces a random sample.
@@ -152,21 +175,6 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         new_seed = (self.get_seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
-
-    def copy(self):
-        """Returns an independent, identically distributed random variable."""
-
-        Copy = super().copy()
-
-        Copy._id = next(self._last_id)
-        Copy._offset = self.get_random(Copy._id)
-
-        return Copy
-
-    @classmethod
-    def reset(cls):
-        # For debugging only
-        cls._last_id = itertools.count(start=1)
 
     @classmethod
     def get_seed(cls, seed=None, return_if_seeded=True):
@@ -190,6 +198,13 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         return cls.get_seed(seed, False)
 
+    def _sampler(self, seed=None):
+        # Default sampler. Behaves as random number since called through
+        # __call__, which adds _offset to seed.
+
+        return self.get_seed(seed)
+
+    # --------------------------- Array protocols --------------------------- #
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
         # Allows NumPy ufuncs (in particular, addition) and derived methods
         # (for example, summation, which is the ufunc reduce method of
@@ -216,9 +231,3 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         def get_item_from_key(array):
             return array[key]
         return RandomVar(get_item_from_key, self)
-
-    def _sampler(self, seed=None):
-        # Default sampler. Behaves as random number since called through
-        # __call__, which adds _offset to seed.
-
-        return self.get_seed(seed)
