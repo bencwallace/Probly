@@ -5,7 +5,7 @@ Additional methods for random variable formation.
 import numpy as np
 import matplotlib.pyplot as plt
 from collections.abc import Sequence
-from functools import wraps
+from functools import partial, wraps
 from .core import RandomVar
 
 
@@ -35,11 +35,12 @@ def Lift(f):
     """
 
     @wraps(f)
-    def F(*args):
+    def F(*args, **kwargs):
         if any((isinstance(arg, RandomVar) for arg in args)):
-            return RandomVar(f, *args)
+            fkwargs = partial(f, **kwargs)
+            return RandomVar(fkwargs, *args)
         else:
-            return f(*args)
+            return f(*args, **kwargs)
 
     return F
 
@@ -71,7 +72,7 @@ def array(arr):
         RV = RandomVar(op, *parents)
 
         # For RandomVar.__array__
-        RV._isarray = True
+        RV.shape = np.shape(arr)
 
         return RV
     elif isinstance(arr, RandomVar):

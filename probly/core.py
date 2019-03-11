@@ -155,12 +155,12 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         # Then initialize it
         super().__init__(obj, op, *parents)
 
-        # Add _id and _offset attributes for independence.
+        # Add _id and _offset attributes for independence
         obj._id = _id
         obj._offset = _offset
 
-        # Mark as not an array by default. For RandomVar.__array__
-        obj._isarray = False
+        # Scalar by default but overwritten by helpers.array
+        obj.shape = ()
 
         return obj
 
@@ -221,7 +221,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
-        if self._isarray:
+        if self.shape:
             items = [p.__array__() for p in self.parents()]
             return np.array(items, dtype=object)
         else:
