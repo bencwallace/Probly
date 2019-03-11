@@ -15,7 +15,6 @@ def Lift(f):
 
     Can be used as a decorator.
 
-
     Example
     -------
     Construct a random variable given by the determinant of a Wigner matrix.
@@ -112,6 +111,8 @@ def sum(summands, num=None):
     Otherwise, `summands` is taken to be a collection of random variables or
     random array and its sum is returned.
 
+    Parameters
+    ----------
     summands : array_like of RandomVar or RandomVar
         Either a collection of random variables to be summed, a random array
         whose entries are to be summed, or a single random variable, of which

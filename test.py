@@ -6,7 +6,7 @@ from unittest import TestCase
 from probly.core import RandomVar
 
 
-get_random = RandomVar.get_random
+get_random = RandomVar._get_random
 _max_seed = RandomVar._max_seed
 msg_low_prob = 'Test fails with low probability. Try running tests again.'
 

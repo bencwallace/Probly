@@ -27,7 +27,7 @@ from .distr import Laplace, Logistic, Pareto, VonMises
 from .distr import Weibull
 
 # Random matrices
-from .rmat import Wigner
+from .rmat import Wigner, Wishart
 
 __all__ = []
 
@@ -50,4 +50,4 @@ __all__ += ['Laplace', 'Logistic', 'Pareto', 'VonMises']
 __all__ += ['Weibull']
 
 # Random matrices
-__all__ += ['Wigner']
+__all__ += ['Wigner', 'Wishart']

@@ -55,3 +55,4 @@ Random matrices
    :toctree: generated/
 
    Wigner
+   Wishart
