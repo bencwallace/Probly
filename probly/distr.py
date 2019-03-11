@@ -312,17 +312,23 @@ class Normal(RandomVar):
     ----------
     mean : float, optional
         Mean.
-    sd : float, optional
-        Standard deviation.
+    cov : float, optional
+        Covariance matrix (variance if 1-dimensional).
+    dim : int, optional
+        Dimension of the ambient space.
     """
 
-    def __init__(self, mean=0, sd=1):
+    def __init__(self, mean=0, cov=1, dim=1):
         self.mean = mean
-        self.sd = sd
+        self.cov = cov
+        self.dim = dim
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
-        return np.random.normal(self.mean, self.sd)
+        if self.dim == 1:
+            return np.random.normal(self.mean, np.sqrt(self.cov))
+        else:
+            return np.random.multivariate_normal(self.mean, self.cov, self.dim)
 
 
 class LogNormal(RandomVar):

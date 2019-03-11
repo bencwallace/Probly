@@ -101,7 +101,7 @@ We can nevertheless sample from this unknown distribution!
 
 We can also try to visualize the (unknown) distribution with a histogram.
 
->>> pr.hist(W, samples=1000)
+>>> pr.hist(W, num_samples=1000) # doctest: +SKIP
 
 .. image:: _static/quick_hist.png
 

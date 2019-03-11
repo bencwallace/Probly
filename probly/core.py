@@ -80,6 +80,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     -------
     Define a family of "shifted" uniform random variables:
 
+    >>> from probly.core import RandomVar
     >>> import numpy as np
     >>> class UnifShift(RandomVar):
     ...     def __init__(self, a, b):
@@ -93,7 +94,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     sample from its distribution:
 
     >>> X = UnifShift(0, 1)
-    >>> X()
+    >>> X() # doctest: +SKIP
     """
 
     # Counter for _id. Set start=1 or else first RandomVar acts as increment

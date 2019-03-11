@@ -16,7 +16,8 @@ Let ``X`` be a Bernoulli random variable.
 We are interested in the sum of many independent copies of ``X``. For this
 example, let's take "many" to be 1000.
 
->>> Z = pr.sum(X, num=1000)     # Returns the sum of 1000 independent copies of X
+>>> num_copies = 1000
+>>> Z = pr.sum(X, num=num_copies)     # Returns the sum of 1000 independent copies of X
 
 The sum ``Z`` is itself a random variable, but its precise distribution,
 unlike that of ``X``, is unknown.
@@ -32,8 +33,45 @@ random variables and sum the results, so computing a histogram from very many
 samples can take a long time. Below we use 1000 samples, but you may want to
 reduce this number if running the code takes too long.
 
->>> pr.hist(Z, samples=1000)
+>>> pr.hist(Z, num_samples=1000)
 
 The result resembles the famous bell-shaped curve of the normal distribution.
 
 .. image:: _static/clt_ber_1000_1000.png
+
+*******************
+The semicircle law
+*******************
+
+A Wigner random matrix is a random symmetric matrix whose upper-diagonal entries
+are independent and identically distributed. We can construct a Wigner matrix
+using :class:`~probly.rmat.Wigner`. For instance, let's create a 1000-dimensional
+Wigner matrix with normally distributed entries.
+
+.. testsetup::
+
+   dim = 2
+
+>>> import probly as pr
+>>> dim = 1000  # doctest: +SKIP
+>>> M = pr.Wigner(pr.Normal(), dim)
+
+The *semicircle law* states that if we normalize this matrix by dividing by the
+square root of 1000, then the eigenvalues of the resulting (random) matrix should
+follow the
+`semicircle distribution <https://en.wikipedia.org/wiki/Wigner_semicircle_distribution>`_.
+Let's check this empirically. First, we normalize ``M`` and then we construct its
+(random) eigenvalues by applying NumPy's
+`numpy.linalg.eigvals <https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.eigvals.html>`_ using :func:`~probly.helpers.Lift`.
+
+>>> import numpy as np
+>>> M = M / np.sqrt(dim)
+>>> Eigvals = pr.Lift(np.linalg.eigvals)
+>>> E = Eigvals(M)
+
+The distribution of the eigenvalues can be visualized using the :func:`~probly.helpers.hist`
+function. Note that we need only take 1 sample.
+
+>>> pr.hist(E, num_samples=1)  # doctest: +SKIP
+
+.. image:: _static/semicircle_normal_1000.png

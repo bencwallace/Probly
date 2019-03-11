@@ -26,6 +26,9 @@ from .distr import F, Student_t
 from .distr import Laplace, Logistic, Pareto, VonMises
 from .distr import Weibull
 
+# Random matrices
+from .rmat import Wigner
+
 __all__ = []
 
 # Helpers
@@ -45,3 +48,6 @@ __all__ += ['Beta', 'PowerLaw']
 __all__ += ['F', 'Student_t']
 __all__ += ['Laplace', 'Logistic', 'Pareto', 'VonMises']
 __all__ += ['Weibull']
+
+# Random matrices
+__all__ += ['Wigner']
