@@ -11,26 +11,28 @@ from .core import RandomVar
 
 def Lift(f):
     """
-    "Lifts" and returns a function to the composition map between random
-    variables.
+    Lifts a function to the composition map between random variables.
 
     Can be used as a decorator.
 
-    Note
-    ----
-    Functions that manipulate their arguments using already lifted functions
-    (such as arithmetical operations) do not need to be lifted themselves.
-    For instance, the following example, which does not make use of `Lift`,
-    works without issue:
 
-    >>> import probly as pr
-    >>> X = pr.Unif(0, 1)
-    >>> M = pr.array([[X, X + 10], [X + 100, X + 1000]])
-    >>> def f(x):
-    ...     return x[0, 0] - x[1, 1]
-    >>> Y = f(M)
-    >>> print(Y())
-    -1000
+    Example
+    -------
+    Construct a random variable given by the determinant of a Wigner matrix.
+
+    .. testsetup::
+
+       import probly as pr
+       from probly.core import RandomVar
+       RandomVar._reset()
+
+
+    >>> import numpy as np
+    >>> Det = pr.Lift(np.linalg.det)
+    >>> M = pr.Wigner(pr.Normal(), 2)
+    >>> D = Det(M)
+    >>> D(0)
+    1.2638214666689431
     """
 
     @wraps(f)
@@ -50,8 +52,8 @@ def array(arr):
     Parameters
     ----------
     arr : array_like
-        An `array_like` collection of `RandomVar` objects, constants, and other
-        `array_like` objects.
+        A collection of `RandomVar` objects, constants, and other
+        array_like objects.
 
     Returns
     -------
@@ -69,7 +71,7 @@ def array(arr):
 
         RV = RandomVar(op, *parents)
 
-        # Trying to get np.linalg.det to work
+        # For RandomVar.__array__
         RV._isarray = True
 
         return RV
@@ -83,6 +85,17 @@ def array(arr):
 def hist(rv, num_samples, bins=20, density=True):
     """
     Plots a histogram from samples of a random variable.
+
+    Parameters
+    ----------
+    rv : RandomVar
+        A random variable.
+    num_samples : int
+        The number of samples to draw from `rv`.
+    bins : int
+        The number of bins in the histogram.
+    density : bool
+        If True, the histogram is normalized to form a probability density.
     """
 
     samples = [rv() for _ in range(num_samples)]
@@ -98,6 +111,13 @@ def sum(summands, num=None):
     and the sum of `num` independent copies of `summands` is returned.
     Otherwise, `summands` is taken to be a collection of random variables or
     random array and its sum is returned.
+
+    summands : array_like of RandomVar or RandomVar
+        Either a collection of random variables to be summed, a random array
+        whose entries are to be summed, or a single random variable, of which
+        independent copies are to be summed.
+    num : int, optional
+        The number of independent copies of a random variable to sum.
     """
 
     if num is not None:
