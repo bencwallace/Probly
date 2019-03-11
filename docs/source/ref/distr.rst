@@ -1,12 +1,15 @@
-#######################
+################
+Random variables
+################
+
+***********************
 Simple random variables
-#######################
+***********************
 
 .. automodule:: probly.distr
 
-*************************
 Discrete random variables
-*************************
+=========================
 
 .. currentmodule:: probly
 
@@ -22,9 +25,8 @@ Discrete random variables
    HyperGeom
    Pois
 
-***************************
 Continuous random variables
-***************************
+===========================
 
 .. autosummary::
    :toctree: generated/
@@ -45,9 +47,9 @@ Continuous random variables
    VonMises
    Weibull
 
-###############
+***************
 Random matrices
-###############
+***************
 
 .. autosummary::
    :toctree: generated/

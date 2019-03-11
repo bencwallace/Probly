@@ -381,6 +381,7 @@ class PowerLaw(RandomVar):
     Parameters
     ----------
     power : float
+        The power determining the rate of decay.
     """
 
     def __init__(self, power):
@@ -400,7 +401,9 @@ class F(RandomVar):
     Parameters
     ----------
     d1 : int
+        The first degree of freedom parameter.
     d2 : int
+        The second degree of freedom parameter.
     """
 
     def __init__(self, d1, d2):
@@ -419,6 +422,7 @@ class Student_t(RandomVar):
     Parameters
     ----------
     deg : float
+        The degree.
     """
 
     def __init__(self, deg):
@@ -438,7 +442,9 @@ class Laplace(RandomVar):
     Parameters
     ----------
     loc : float, optional
+        The location parameter.
     scale : float, optional
+        The scale parameter.
     """
 
     def __init__(self, loc=0, scale=1):
@@ -457,7 +463,9 @@ class Logistic(RandomVar):
     Parameters
     ----------
     loc : float, optional
+        The location parameter.
     scale : float, optional
+        The scale parameter.
     """
 
     def __init__(self, loc=0, scale=1):
@@ -476,6 +484,7 @@ class Pareto(RandomVar):
     Parameters
     ----------
     shape : float
+        The shape parameter.
     """
 
     def __init__(self, shape):
@@ -493,7 +502,9 @@ class VonMises(RandomVar):
     Parameters
     ----------
     mean : float, optional
+        The mean.
     kappa : float, optional
+        The kapp parameter.
     """
 
     def __init__(self, mean=0, kappa=1):
@@ -512,6 +523,7 @@ class Weibull(RandomVar):
     Parameters
     ----------
     shape : float
+        The shape parameter.
     """
 
     def __init__(self, shape):

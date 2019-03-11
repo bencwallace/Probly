@@ -7,7 +7,7 @@ API Reference
 .. automodule:: probly
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Reference
 
    distr
