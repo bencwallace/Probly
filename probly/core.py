@@ -1,5 +1,5 @@
 """
-Random variables are implemented as certain nodes in a computational graph.
+Random variables are implemented as a kind of node in a computational graph.
 
 The basic type underlying all random variables is a node in a computational
 graph. Random variables are defined as nodes that obey arithmetical and
@@ -102,9 +102,6 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     >>> X = UnifShift(0, 1)
     """
 
-    # NumPy max seed
-    _max_seed = 2 ** 32 - 1
-
     # ---------------------------- Independence ---------------------------- #
     # Counter for _id. Set start=1 or else first RandomVar acts as increment
     _last_id = itertools.count(start=1)
@@ -124,7 +121,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         return Copy
 
-    # ------------------------ Subclassing interface ------------------------ #
+    # ------------------------------ Interface ------------------------------ #
     def __new__(cls, *args, **kwargs):
         """
         Defines the random variable subclassing interface.
@@ -167,7 +164,10 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         return obj
 
-    # ---------------------------- Call methods ---------------------------- #
+    # ------------------------------ Sampling ------------------------------ #
+    # NumPy max seed
+    _max_seed = 2 ** 32 - 1
+
     def __call__(self, seed=None):
         """
         Produces a random sample.
@@ -199,12 +199,12 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         return cls._get_seed(seed, False)
 
     def _sampler(self, seed=None):
-        # Default sampler. Behaves as random number since called through
+        # Default sampler. Behaves as random number generator when called via
         # __call__, which adds _offset to seed.
 
         return self._get_seed(seed)
 
-    # --------------------------- Array protocols --------------------------- #
+    # ------------------------ Arrays and arithmetic ------------------------ #
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
         # Allows NumPy ufuncs (in particular, addition) and derived methods
         # (for example, summation, which is the ufunc reduce method of
@@ -225,7 +225,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             items = [p.__array__() for p in self.parents()]
             return np.array(items, dtype=object)
         else:
-            return self
+            return np.array([self])
 
     def __getitem__(self, key):
         def get_item_from_key(array):
