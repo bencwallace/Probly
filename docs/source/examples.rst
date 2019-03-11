@@ -4,9 +4,9 @@ Examples
 
 .. _clt:
 
-*********************
-Central limit theorem
-*********************
+*************************
+The central limit theorem
+*************************
 
 Let ``X`` be a Bernoulli random variable.
 
@@ -33,7 +33,7 @@ random variables and sum the results, so computing a histogram from very many
 samples can take a long time. Below we use 1000 samples, but you may want to
 reduce this number if running the code takes too long.
 
->>> pr.hist(Z, num_samples=1000)
+>>> pr.hist(Z, num_samples=1000)    # doctest: +SKIP
 
 The result resembles the famous bell-shaped curve of the normal distribution.
 
@@ -45,15 +45,11 @@ The semicircle law
 
 A Wigner random matrix is a random symmetric matrix whose upper-diagonal entries
 are independent and identically distributed. We can construct a Wigner matrix
-using :class:`~probly.rmat.Wigner`. For instance, let's create a 1000-dimensional
+using :class:`~probly.Wigner`. For instance, let's create a 1000-dimensional
 Wigner matrix with normally distributed entries.
 
-.. testsetup::
-
-   dim = 2
-
 >>> import probly as pr
->>> dim = 1000  # doctest: +SKIP
+>>> dim = 1000
 >>> M = pr.Wigner(pr.Normal(), dim)
 
 The *semicircle law* states that if we normalize this matrix by dividing by the
@@ -62,14 +58,14 @@ follow the
 `semicircle distribution <https://en.wikipedia.org/wiki/Wigner_semicircle_distribution>`_.
 Let's check this empirically. First, we normalize ``M`` and then we construct its
 (random) eigenvalues by applying NumPy's
-`numpy.linalg.eigvals <https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.eigvals.html>`_ using :func:`~probly.helpers.Lift`.
+`numpy.linalg.eigvals <https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.eigvals.html>`_ using :func:`~probly.Lift`.
 
 >>> import numpy as np
 >>> M = M / np.sqrt(dim)
 >>> Eigvals = pr.Lift(np.linalg.eigvals)
 >>> E = Eigvals(M)
 
-The distribution of the eigenvalues can be visualized using the :func:`~probly.helpers.hist`
+The distribution of the eigenvalues can be visualized using the :func:`~probly.hist`
 function. Note that we need only take 1 sample.
 
 >>> pr.hist(E, num_samples=1)  # doctest: +SKIP

@@ -6,6 +6,7 @@ Additional methods
 
 .. currentmodule:: probly
 
-.. autofunction:: Lift
 .. autofunction:: array
+.. autofunction:: hist
+.. autofunction:: Lift
 .. autofunction:: sum

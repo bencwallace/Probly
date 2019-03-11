@@ -16,7 +16,7 @@ way*. Take the following for example.
 .. testsetup::
 
    from probly.core import RandomVar
-   RandomVar.reset()
+   RandomVar._reset()
 
 >>> import probly as pr
 >>> X = pr.Unif(0, 1)

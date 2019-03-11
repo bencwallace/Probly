@@ -25,7 +25,7 @@ We begin by importing ``probly``.
 .. testsetup::
 
    from probly.core import RandomVar
-   RandomVar.reset()
+   RandomVar._reset()
 
 Next, we initialize some pre-packaged random variables.
 A complete list of available distributions is available at the :ref:`api`.
