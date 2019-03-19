@@ -36,7 +36,7 @@ class Node(object):
     def __init__(self, op=None, *parents):
         self._parents = parents
 
-        if not op:
+        if op is None:
             # Must be root acting as identity
             assert not parents
             self._op = lambda *x: x
