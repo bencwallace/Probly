@@ -319,9 +319,16 @@ class Normal(RandomVar):
     """
 
     def __init__(self, mean=0, cov=1, dim=1):
+        self.dim = dim
         self.mean = mean
         self.cov = cov
-        self.dim = dim
+        self.shape = (dim, dim)
+
+        if dim > 1:
+            if mean == 0:
+                self.mean = np.array([0] * dim)
+            if cov == 1:
+                self.cov = np.eye(dim)
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
