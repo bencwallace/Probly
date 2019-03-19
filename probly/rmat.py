@@ -21,7 +21,7 @@ class Wigner(RandomVar):
         a standard normal random variable.
     """
 
-    def __new__(self, dim, rv=None):
+    def __new__(cls, dim, rv=None):
         if rv is None:
             rv = Normal()
 
@@ -33,7 +33,9 @@ class Wigner(RandomVar):
         arr = [[arr[i][j] if i <= j else arr[j][i] for j in range(dim)]
                for i in range(dim)]
 
-        return array(arr)
+        rarr = array(arr)
+        rarr.__class__ = cls
+        return rarr
 
     def __init__(self, dim, rv=None):
         self.dim = dim
@@ -63,14 +65,16 @@ class Wishart(RandomVar):
         The ratio `m / n`.
     """
 
-    def __new__(self, m, n, rv=None):
+    def __new__(cls, m, n, rv=None):
         if rv is None:
             rv = Normal()
 
         rect = np.array([[rv.copy() for j in range(n)] for i in range(m)])
         square = np.dot(rect.T, rect)
 
-        return array(square)
+        rarr = array(square)
+        rarr.__class__ = cls
+        return rarr
 
     def __init__(self, m, n, rv=None):
         self.m = m
