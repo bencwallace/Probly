@@ -51,8 +51,7 @@ def array(arr):
     Parameters
     ----------
     arr : array_like
-        A collection of `RandomVar` objects, constants, and other
-        array_like objects.
+        An array_like collection of `RandomVar` objects or constants.
 
     Returns
     -------
@@ -61,24 +60,16 @@ def array(arr):
         in `arr`.
     """
 
-    if isinstance(arr, (Sequence, np.ndarray)):
-        def op(*inputs):
-            return np.array(inputs)
+    def op(*inputs):
+        return np.array(inputs).reshape(np.shape(arr))
 
-        # Recursively turn elements into RandomVar objects
-        parents = (array(p) for p in arr)
+    parents = np.vectorize(RandomVar)(arr).flatten()
+    RV = RandomVar(op, *parents)
 
-        RV = RandomVar(op, *parents)
+    # For RandomVar.__array__
+    RV.shape = np.shape(arr)
 
-        # For RandomVar.__array__
-        RV.shape = np.shape(arr)
-
-        return RV
-    elif isinstance(arr, RandomVar):
-        return arr
-    else:
-        # Treat as constant
-        return RandomVar(arr)
+    return RV
 
 
 def sum(summands, num=None):

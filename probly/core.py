@@ -228,10 +228,10 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
         if self.shape:
-            # recursion should go deeper for multi-dimensional arrays
-            items = self.parents()
-            return np.array(items, dtype=object)
+            # Return the array represented by self
+            return np.asarray(self.parents()).reshape(self.shape)
         else:
+            # Form a single-element array
             arr = np.ndarray(1, dtype=object)
             arr[0] = self
             return arr
