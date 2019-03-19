@@ -6,7 +6,7 @@ import numpy as np
 
 from .core import RandomVar
 from .distr import Normal
-from .helpers import array
+from .construct import array
 
 
 class Wigner(RandomVar):

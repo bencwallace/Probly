@@ -11,6 +11,8 @@ from numpy.lib.mixins import NDArrayOperatorsMixin
 import itertools
 import functools
 import copy
+import warnings
+from .exceptions import ConvergenceWarning
 
 
 class Node(object):
@@ -226,10 +228,10 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
         if self.shape:
+            # recursion should go deeper for multi-dimensional arrays
             items = self.parents()
             return np.array(items, dtype=object)
         else:
-            # return np.array([self])   # infinite recursion / stackoverflow
             arr = np.ndarray(1, dtype=object)
             arr[0] = self
             return arr
@@ -241,3 +243,28 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         def get_item_from_key(array):
             return array[key]
         return RandomVar(get_item_from_key, self)
+
+    # -------------------------------- Other -------------------------------- #
+
+    def mean(self, max_iter=100000, tol=0.00001):
+        """Numerically approximates the mean."""
+
+        max_small_change = 100
+
+        total = 0
+        avg = 0
+        count = 0
+        delta = tol + 1
+        for i in range(1, max_iter):
+            total += self(i)
+            new_avg = total / i
+            delta = abs(new_avg - avg)
+            avg = new_avg
+
+            if delta <= tol:
+                count += 1
+                if count >= max_small_change:
+                    return avg
+
+        warnings.warn('Failed to converge.', ConvergenceWarning)
+        return avg

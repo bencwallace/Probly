@@ -2,11 +2,10 @@
 Methods for analyzing random variables.
 """
 
-
 import matplotlib.pyplot as plt
 
 
-def hist(rv, num_samples, bins=20, density=True):
+def hist(rv, num_samples, bins=None, density=True):
     """
     Plots a histogram from samples of a random variable.
 
@@ -16,9 +15,9 @@ def hist(rv, num_samples, bins=20, density=True):
         A random variable.
     num_samples : int
         The number of samples to draw from `rv`.
-    bins : int
-        The number of bins in the histogram.
-    density : bool
+    bins : int or sequence, optional
+        Specifies the bins in the histogram.
+    density : bool, optional
         If True, the histogram is normalized to form a probability density.
     """
 
@@ -27,24 +26,7 @@ def hist(rv, num_samples, bins=20, density=True):
     plt.show()
 
 
-def mean(rv, max_iter=100000, tol=0.00001):
-    """Numerically approximates the mean of a random variable."""
+def mean(rv):
+    """Alias for rv.mean()."""
 
-    max_small_change = 10
-
-    total = 0
-    avg = 0
-    count = 0
-    delta = tol + 1
-    for i in range(1, max_iter):
-        total += rv(i)
-        new_avg = total / i
-        delta = abs(new_avg - avg)
-        avg = new_avg
-
-        if delta <= tol:
-            count += 1
-            if count >= max_small_change:
-                return avg
-
-    print('Failed to converge')
+    return rv.mean()

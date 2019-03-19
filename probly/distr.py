@@ -4,6 +4,7 @@ Random variables following common distributions.
 
 import numpy as np
 from .core import RandomVar
+from .exceptions import UndefinedError
 
 
 # ======================== Discrete random variables ======================== #
@@ -34,6 +35,9 @@ class DUnif(RandomVar):
         np.random.seed(seed)
         return np.random.randint(self.a, self.b + 1)
 
+    def mean(self):
+        return (self.a + self.b) / 2
+
 
 # --------------------------- Multinomial family --------------------------- #
 
@@ -60,6 +64,9 @@ class Multinomial(RandomVar):
         np.random.seed(seed)
         return np.random.multinomial(self.n, self.pvals)
 
+    def mean(self):
+        return np.array([self.n * pval for pval in self.pvals])
+
 
 class Bin(Multinomial):
     """
@@ -85,6 +92,9 @@ class Bin(Multinomial):
         np.random.seed(seed)
         return np.random.binomial(self.n, self.p)
 
+    def mean(self):
+        return self.n * self.p
+
 
 class Ber(Bin):
     """
@@ -101,6 +111,9 @@ class Ber(Bin):
     # Uses np.random.binomial with n = 1 (much faster than np.random.choice)
     def __init__(self, p=0.5):
         super().__init__(1, p)
+
+    def mean(self):
+        return self.p
 
 
 # ------------------------ Negative binomial family ------------------------ #
@@ -129,6 +142,9 @@ class NegBin(RandomVar):
         np.random.seed(seed)
         return np.random.negative_binomial(self.n, self.p)
 
+    def mean(self):
+        return self.n * (1 - self.p) / self.p
+
 
 class Geom(NegBin):
     """
@@ -150,6 +166,9 @@ class Geom(NegBin):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.geometric(self.p)
+
+    def mean(self):
+        return 1 / self.p
 
 
 # --------------------- Other discrete random variables --------------------- #
@@ -174,6 +193,9 @@ class HyperGeom(RandomVar):
         np.random.seed(seed)
         return np.random.hypergeometric(self.ngood, self.nbad, self.nsample)
 
+    def mean(self):
+        return self.ngood * self.nbad / self.nsample
+
 
 class Pois(RandomVar):
     """
@@ -191,6 +213,9 @@ class Pois(RandomVar):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.poisson(self.rate)
+
+    def mean(self):
+        return self.rate
 
 
 # ======================= Continuous random variables ======================= #
@@ -231,6 +256,9 @@ class Gamma(RandomVar):
         np.random.seed(seed)
         return np.random.gamma(self.shape, self.scale)
 
+    def mean(self):
+        return self.shape * self.scale
+
 
 class ChiSquared(Gamma):
     """
@@ -256,6 +284,9 @@ class ChiSquared(Gamma):
         np.random.seed(seed)
         return np.random.chisquare(self.k)
 
+    def mean(self):
+        return self.k
+
 
 class Exp(Gamma):
     """
@@ -277,6 +308,9 @@ class Exp(Gamma):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.exponential(self.rate)
+
+    def mean(self):
+        return 1 / self.rate
 
 
 # ------------------------ Uniform random variables ------------------------ #
@@ -300,6 +334,9 @@ class Unif(RandomVar):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.uniform(self.a, self.b)
+
+    def mean(self):
+        return (self.a + self.b) / 2
 
 
 # ------------------- Stable random variables ------------------- #
@@ -337,6 +374,9 @@ class Normal(RandomVar):
         else:
             return np.random.multivariate_normal(self.mean, self.cov, self.dim)
 
+    def mean(self):
+        return self.mean
+
 
 class LogNormal(RandomVar):
     """
@@ -355,6 +395,9 @@ class LogNormal(RandomVar):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.lognormal(self.mean, self.sd)
+
+    def mean(self):
+        return np.exp(self.mean + self.sd ** 2 / 2)
 
 
 # --------------------- Beta distribution and power law --------------------- #
@@ -380,6 +423,9 @@ class Beta(RandomVar):
         np.random.seed(seed)
         return np.random.beta(self.alpha, self.beta)
 
+    def mean(self):
+        return self.alpha / (self.alpha + self.beta)
+
 
 class PowerLaw(RandomVar):
     """
@@ -397,6 +443,10 @@ class PowerLaw(RandomVar):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.power(self.power)
+
+    def mean(self):
+        # double check
+        return self.power / (self.power + 1)
 
 
 # ------------------------ F and t random variables ------------------------ #
@@ -421,6 +471,16 @@ class F(RandomVar):
         np.random.seed(seed)
         return np.random.f(self.d1, self.d2)
 
+    def mean(self):
+        if self.d2 <= 2:
+            msg = 'Mean not defined for {}'.format(str(self))
+            raise UndefinedError(msg)
+
+        return self.d2 / (self.d2 - 2)
+
+    def __str__(self):
+        return 'F({}, {})'.format(self.d1, self.d2)
+
 
 class Student_t(RandomVar):
     """
@@ -438,6 +498,16 @@ class Student_t(RandomVar):
     def _sampler(self, seed=None):
         np.random.seed(seed)
         return np.random.standard_t(self.deg)
+
+    def mean(self):
+        if self.deg <= 1:
+            msg = 'Mean not defined for {}'.format(str(self))
+            raise UndefinedError(msg)
+
+        return 0
+
+    def __str__(self):
+        return 't({})'.format(self.deg)
 
 
 # -------------------- Other continuous random variables -------------------- #
@@ -462,6 +532,9 @@ class Laplace(RandomVar):
         np.random.seed(seed)
         return np.random.laplace(self.loc, self.scale)
 
+    def mean(self):
+        return self.loc
+
 
 class Logistic(RandomVar):
     """
@@ -483,23 +556,8 @@ class Logistic(RandomVar):
         np.random.seed(seed)
         return np.random.logistic(self.loc, self.scale)
 
-
-class Pareto(RandomVar):
-    """
-    A Pareto random variable.
-
-    Parameters
-    ----------
-    shape : float
-        The shape parameter.
-    """
-
-    def __init__(self, shape):
-        self.shape = shape
-
-    def _sampler(self, seed=None):
-        np.random.seed(seed)
-        return np.random.pareto(self.shape)
+    def mean(self):
+        return self.loc
 
 
 class VonMises(RandomVar):
@@ -522,20 +580,5 @@ class VonMises(RandomVar):
         np.random.seed(seed)
         return np.random.vonmises(self.mean, self.kappa)
 
-
-class Weibull(RandomVar):
-    """
-    A Weibull random variable.
-
-    Parameters
-    ----------
-    shape : float
-        The shape parameter.
-    """
-
-    def __init__(self, shape):
-        self.shape = shape
-
-    def _sampler(self, seed=None):
-        np.random.seed(seed)
-        return np.random.weibull(self.shape)
+    def mean(self):
+        return self.mean
