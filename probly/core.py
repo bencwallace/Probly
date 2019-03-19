@@ -109,7 +109,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
     @classmethod
     def _reset(cls):
-        # For debugging only
+        # For debugging
         cls._last_id = itertools.count(start=1)
 
     def copy(self):
@@ -122,7 +122,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         return Copy
 
-    # ------------------------------ Interface ------------------------------ #
+    # ----------------------------- Constructor ----------------------------- #
 
     def __new__(cls, *args, **kwargs):
         """
@@ -210,9 +210,9 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     # ------------------------ Arrays and arithmetic ------------------------ #
 
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
-        # Allows NumPy ufuncs (in particular, addition) and derived methods
-        # (for example, summation, which is the ufunc reduce method of
-        # addition) to act on RandomVar objects.
+        # Allows NumPy ufuncs (e.g. addition) and derived methods
+        # (e.g. summation, which is the ufunc reduce method of addition)
+        # to act on RandomVar objects.
 
         # Cast inputs to RandomVar: If not RandomVar, treat as constant
         inputs = tuple(x if isinstance(x, RandomVar)
@@ -229,8 +229,10 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             items = self.parents()
             return np.array(items, dtype=object)
         else:
-            # return np.array([self])   # causes stackoverflow
-            return self
+            # return np.array([self])   # infinite recursion / stackoverflow
+            arr = np.ndarray(1, dtype=object)
+            arr[0] = self
+            return arr
 
     def __getitem__(self, key):
         if not self.shape:
@@ -239,11 +241,3 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         def get_item_from_key(array):
             return array[key]
         return RandomVar(get_item_from_key, self)
-
-    # --------------------------- Representation --------------------------- #
-
-    def __repr__(self):
-        if self.shape:
-            return repr(self.__array__())
-        else:
-            return super().__repr__()

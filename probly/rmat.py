@@ -1,3 +1,7 @@
+"""
+Random matrix constructors.
+"""
+
 import numpy as np
 
 from .core import RandomVar
