@@ -8,9 +8,12 @@ independence relations.
 
 import numpy as np
 from numpy.lib.mixins import NDArrayOperatorsMixin
+import scipy.misc
+
 import itertools
 import functools
 import copy
+
 import warnings
 from .exceptions import ConvergenceWarning
 
@@ -244,9 +247,10 @@ class RandomVar(Node, NDArrayOperatorsMixin):
             return array[key]
         return RandomVar(get_item_from_key, self)
 
-    # -------------------------------- Other -------------------------------- #
+    # ------------------------------ Integrals ------------------------------ #
 
-    def mean(self, max_iter=100000, tol=0.00001):
+    # All integrals (including probabilities) are defined in terms of the mean
+    def mean(self, max_iter=int(1e5), tol=1e-5):
         """Numerically approximates the mean."""
 
         max_small_change = 100
@@ -268,3 +272,32 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         warnings.warn('Failed to converge.', ConvergenceWarning)
         return avg
+
+    def moment(self, p, **kwargs):
+        """Numerically approximates the p-th moment."""
+
+        rv = self ** p
+        return rv.mean(**kwargs)
+
+    def cmoment(self, p, **kwargs):
+        """Numerically approximates the p-th central moment."""
+
+        # To do: Subclasses must allow kwargs
+        return self.moment(p, **kwargs) - (self.mean()) ** p
+
+    def Var(self, **kwargs):
+        """Numerically approximates the variance."""
+
+        return self.cmoment(2, **kwargs)
+
+    def cdf(self, x, **kwargs):
+        """Numerically approximates the cdf at x."""
+
+        return (self <= x).mean(**kwargs)
+
+    # Quite slow and inaccurate
+    def pdf(self, x, dx=1e-5, **kwargs):
+        """Numerically approximates the pdf at x."""
+
+        cdf = functools.partial(self.cdf, **kwargs)
+        return scipy.misc.derivative(cdf, x, dx)

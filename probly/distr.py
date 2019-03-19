@@ -377,7 +377,7 @@ class Unif(RandomVar):
         return 'Unif({}, {})'.format(self.a, self.b)
 
 
-# ------------------- Stable random variables ------------------- #
+# ------------------- Normal and related random variables ------------------- #
 
 class Normal(RandomVar):
     """
@@ -395,25 +395,26 @@ class Normal(RandomVar):
 
     def __init__(self, mean=0, cov=1, dim=1):
         self.dim = dim
-        self.mean = mean
+        self._mean = mean
         self.cov = cov
         self.shape = (dim, dim)
 
         if dim > 1:
             if mean == 0:
-                self.mean = np.array([0] * dim)
+                self._mean = np.array([0] * dim)
             if cov == 1:
                 self.cov = np.eye(dim)
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
         if self.dim == 1:
-            return np.random.normal(self.mean, np.sqrt(self.cov))
+            return np.random.normal(self._mean, np.sqrt(self.cov))
         else:
-            return np.random.multivariate_normal(self.mean, self.cov, self.dim)
+            return np.random.multivariate_normal(self._mean,
+                                                 self.cov, self.dim)
 
     def mean(self):
-        return self.mean
+        return self._mean
 
     def __str__(self):
         return 'Normal({}, {}, {})'.format(self.mean, self.cov, self.dim)
