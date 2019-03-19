@@ -38,6 +38,9 @@ class DUnif(RandomVar):
     def mean(self):
         return (self.a + self.b) / 2
 
+    def __str__(self):
+        return 'DUnif({}, {})'.format(self.a, self.b)
+
 
 # --------------------------- Multinomial family --------------------------- #
 
@@ -67,6 +70,9 @@ class Multinomial(RandomVar):
     def mean(self):
         return np.array([self.n * pval for pval in self.pvals])
 
+    def __str__(self):
+        return 'Multinomial({}, {})'.format(self.n, self.pvals)
+
 
 class Bin(Multinomial):
     """
@@ -95,6 +101,9 @@ class Bin(Multinomial):
     def mean(self):
         return self.n * self.p
 
+    def __str__(self):
+        return 'Bin({}, {})'.format(self.n, self.p)
+
 
 class Ber(Bin):
     """
@@ -114,6 +123,9 @@ class Ber(Bin):
 
     def mean(self):
         return self.p
+
+    def __str__(self):
+        return 'Ber({})'.format(self.p)
 
 
 # ------------------------ Negative binomial family ------------------------ #
@@ -145,6 +157,9 @@ class NegBin(RandomVar):
     def mean(self):
         return self.n * (1 - self.p) / self.p
 
+    def __str__(self):
+        return 'NegBin({}, {})'.format(self.n, self.p)
+
 
 class Geom(NegBin):
     """
@@ -169,6 +184,9 @@ class Geom(NegBin):
 
     def mean(self):
         return 1 / self.p
+
+    def __str__(self):
+        return 'Geom({})'.format(self.p)
 
 
 # --------------------- Other discrete random variables --------------------- #
@@ -196,6 +214,10 @@ class HyperGeom(RandomVar):
     def mean(self):
         return self.ngood * self.nbad / self.nsample
 
+    def __str__(self):
+        return 'HyperGeom({}, {},'\
+               ' {})'.format(self.ngood, self.nbad, self.nsample)
+
 
 class Pois(RandomVar):
     """
@@ -216,6 +238,9 @@ class Pois(RandomVar):
 
     def mean(self):
         return self.rate
+
+    def __str__(self):
+        return 'Pois({})'.format(self.rate)
 
 
 # ======================= Continuous random variables ======================= #
@@ -259,6 +284,10 @@ class Gamma(RandomVar):
     def mean(self):
         return self.shape * self.scale
 
+    def __str__(self):
+        return 'Gamma(shape={}, rate={},'\
+               ' scale={})'.format(self.shape, self.rate, self.scale)
+
 
 class ChiSquared(Gamma):
     """
@@ -287,6 +316,9 @@ class ChiSquared(Gamma):
     def mean(self):
         return self.k
 
+    def __str__(self):
+        return 'ChiSquared({})'.format(self.k)
+
 
 class Exp(Gamma):
     """
@@ -311,6 +343,9 @@ class Exp(Gamma):
 
     def mean(self):
         return 1 / self.rate
+
+    def __str__(self):
+        return 'Exp({})'.format(self.rate)
 
 
 # ------------------------ Uniform random variables ------------------------ #
@@ -337,6 +372,9 @@ class Unif(RandomVar):
 
     def mean(self):
         return (self.a + self.b) / 2
+
+    def __str__(self):
+        return 'Unif({}, {})'.format(self.a, self.b)
 
 
 # ------------------- Stable random variables ------------------- #
@@ -377,6 +415,9 @@ class Normal(RandomVar):
     def mean(self):
         return self.mean
 
+    def __str__(self):
+        return 'Normal({}, {}, {})'.format(self.mean, self.cov, self.dim)
+
 
 class LogNormal(RandomVar):
     """
@@ -398,6 +439,9 @@ class LogNormal(RandomVar):
 
     def mean(self):
         return np.exp(self.mean + self.sd ** 2 / 2)
+
+    def __str__(self):
+        return 'LogNormal({}, {})'.format(self.mean, self.sd)
 
 
 # --------------------- Beta distribution and power law --------------------- #
@@ -426,6 +470,9 @@ class Beta(RandomVar):
     def mean(self):
         return self.alpha / (self.alpha + self.beta)
 
+    def __str__(self):
+        return 'Beta({}, {})'.format(self.alpha, self.beta)
+
 
 class PowerLaw(RandomVar):
     """
@@ -447,6 +494,9 @@ class PowerLaw(RandomVar):
     def mean(self):
         # double check
         return self.power / (self.power + 1)
+
+    def __str__(self):
+        return 'PowerLaw({})'.format(self.power)
 
 
 # ------------------------ F and t random variables ------------------------ #
@@ -535,6 +585,9 @@ class Laplace(RandomVar):
     def mean(self):
         return self.loc
 
+    def __str__(self):
+        return 'Laplace({}, {})'.format(self.loc, self.scale)
+
 
 class Logistic(RandomVar):
     """
@@ -559,6 +612,9 @@ class Logistic(RandomVar):
     def mean(self):
         return self.loc
 
+    def __str__(self):
+        return 'Logistic({}, {})'.format(self.loc, self.scale)
+
 
 class VonMises(RandomVar):
     """
@@ -582,3 +638,6 @@ class VonMises(RandomVar):
 
     def mean(self):
         return self.mean
+
+    def __str__(self):
+        return 'VonMises({}, {})'.format(self.mean, self.kappa)

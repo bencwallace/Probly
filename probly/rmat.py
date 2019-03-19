@@ -43,6 +43,13 @@ class Wigner(RandomVar):
 
     def __init__(self, dim, rv=None):
         self.dim = dim
+        if rv is None:
+            self.rv = Normal()
+        else:
+            self.rv = rv
+
+    def __str__(self):
+        return 'Wigner({}, {})'.format(self.dim, self.rv)
 
 
 class Wishart(RandomVar):
@@ -84,3 +91,10 @@ class Wishart(RandomVar):
         self.m = m
         self.n = n
         self.lambda_ = self.m / self.n
+        if rv is None:
+            self.rv = Normal()
+        else:
+            self.rv = rv
+
+    def __str__(self):
+        return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
