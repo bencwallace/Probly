@@ -8,8 +8,9 @@ new random variables.
 """
 
 
-# Helpers
-from .helpers import Lift, array, hist, sum
+# Constructors and helpers
+from .construct import Lift, array, sum
+from .helpers import hist, mean
 
 # Discrete random variables
 from .distr import DUnif
@@ -31,8 +32,9 @@ from .rmat import Wigner, Wishart
 
 __all__ = []
 
-# Helpers
-__all__ += ['Lift', 'array', 'hist', 'sum']
+# Constructors and helpers
+__all__ += ['Lift', 'array', 'sum']
+__all__ += ['hist', 'mean']
 
 # Discrete random variables
 __all__ += ['DUnif']
