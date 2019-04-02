@@ -10,7 +10,6 @@ Core classes
 
 .. autosummary::
 
-   Node
    RandomVar
 
 .. currentmodule:: probly
