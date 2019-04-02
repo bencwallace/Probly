@@ -28,7 +28,7 @@
 
   <meta name="viewport" content="width=device-width">
   
-  <title>Probly/helpers.rst at 4d3bb4939627559b2eb7c3ddf6b2879481ad3453 · bencwallace/Probly</title>
+  <title>Probly/core.rst at 4d3bb4939627559b2eb7c3ddf6b2879481ad3453 · bencwallace/Probly</title>
     <meta name="description" content="A Python package for the symbolic computation of random variables - bencwallace/Probly">
     <link rel="search" type="application/opensearchdescription+xml" href="/opensearch.xml" title="GitHub">
   <link rel="fluid-icon" href="https://github.com/fluidicon.png" title="GitHub">
@@ -38,10 +38,10 @@
     <meta property="og:image" content="https://avatars3.githubusercontent.com/u/12981236?s=400&amp;v=4" /><meta property="og:site_name" content="GitHub" /><meta property="og:type" content="object" /><meta property="og:title" content="bencwallace/Probly" /><meta property="og:url" content="https://github.com/bencwallace/Probly" /><meta property="og:description" content="A Python package for the symbolic computation of random variables - bencwallace/Probly" />
 
   <link rel="assets" href="https://github.githubassets.com/">
-  <link rel="web-socket" href="wss://live.github.com/_sockets/VjI6Mzg3NzU5OTE2OjQwMTgzZGY2YmU0MWFlNjBhMjBkZTY4ZmU4ZDk4NTRjOWY1MDZkYjRiZGRlZGI2MzE3MDZiYTI3M2I2ZDhmZDE=--17a3b22fa8fb12784258e6820cd7ff5fc0470a70">
+  <link rel="web-socket" href="wss://live.github.com/_sockets/VjI6Mzg3NzU5OTE2OmU5YzM0YTkzYzc5ZmI0NjNjZDBlYjk0OTZlMGE1YzY1NGE3MWE1ODI5OTc1YTFlN2UyMmVmZWZmZDcwYjNmN2M=--d02892a4eb97298ee7eb1e069cbc445e9bbf3cb5">
   <meta name="pjax-timeout" content="1000">
   <link rel="sudo-modal" href="/sessions/sudo_modal">
-  <meta name="request-id" content="105A:2FC88:167A487:219F930:5CA38CB7" data-pjax-transient>
+  <meta name="request-id" content="105A:2FC88:1678F1D:219DC4B:5CA38C9F" data-pjax-transient>
 
 
   
@@ -52,7 +52,7 @@
     <meta name="google-site-verification" content="ZzhVyEFwb7w3e0-uOTltm8Jsck2F5StVihD0exw2fsA">
     <meta name="google-site-verification" content="GXs5KoUUkNCoaAZn7wPN-t01Pywp9M3sEjnt_3_ZWPc">
 
-  <meta name="octolytics-host" content="collector.githubapp.com" /><meta name="octolytics-app-id" content="github" /><meta name="octolytics-event-url" content="https://collector.githubapp.com/github-external/browser_event" /><meta name="octolytics-dimension-request_id" content="105A:2FC88:167A487:219F930:5CA38CB7" /><meta name="octolytics-dimension-region_edge" content="ams" /><meta name="octolytics-dimension-region_render" content="iad" /><meta name="octolytics-actor-id" content="12981236" /><meta name="octolytics-actor-login" content="bencwallace" /><meta name="octolytics-actor-hash" content="3fcb3c06a6fcf54c958f506ad4678c4b1010d0aa25e999c484b85adcfae698bf" />
+  <meta name="octolytics-host" content="collector.githubapp.com" /><meta name="octolytics-app-id" content="github" /><meta name="octolytics-event-url" content="https://collector.githubapp.com/github-external/browser_event" /><meta name="octolytics-dimension-request_id" content="105A:2FC88:1678F1D:219DC4B:5CA38C9F" /><meta name="octolytics-dimension-region_edge" content="ams" /><meta name="octolytics-dimension-region_render" content="iad" /><meta name="octolytics-actor-id" content="12981236" /><meta name="octolytics-actor-login" content="bencwallace" /><meta name="octolytics-actor-hash" content="3fcb3c06a6fcf54c958f506ad4678c4b1010d0aa25e999c484b85adcfae698bf" />
 <meta name="analytics-location" content="/&lt;user-name&gt;/&lt;repo-name&gt;/blob/show" data-pjax-transient="true" />
 
 
@@ -71,7 +71,7 @@
     <meta name="user-login" content="bencwallace">
 
       <meta name="expected-hostname" content="github.com">
-    <meta name="js-proxy-site-detection-payload" content="YTUxNDk5NWVmMmIzYWM5MmIyMTYyOWIwOTZhZWVkNGE4Y2Q2NGNiOGNiMWQ1MDg3ZGJiNmJjMWNhOWMxMjJjN3x7InJlbW90ZV9hZGRyZXNzIjoiODAuMTEwLjExNi44MyIsInJlcXVlc3RfaWQiOiIxMDVBOjJGQzg4OjE2N0E0ODc6MjE5RjkzMDo1Q0EzOENCNyIsInRpbWVzdGFtcCI6MTU1NDIyMjI3MSwiaG9zdCI6ImdpdGh1Yi5jb20ifQ==">
+    <meta name="js-proxy-site-detection-payload" content="NjYxYTJhMjE3ODZkYjhiODkwYjhmMTRiODM2N2U2MzQxNDE4ODc0YmI5NzhjZWY4NWE3ODk3NzEyODQyNTBhYnx7InJlbW90ZV9hZGRyZXNzIjoiODAuMTEwLjExNi44MyIsInJlcXVlc3RfaWQiOiIxMDVBOjJGQzg4OjE2NzhGMUQ6MjE5REM0Qjo1Q0EzOEM5RiIsInRpbWVzdGFtcCI6MTU1NDIyMjI0MywiaG9zdCI6ImdpdGh1Yi5jb20ifQ==">
 
     <meta name="enabled-features" content="UNIVERSE_BANNER,MARKETPLACE_SOCIAL_PROOF_CUSTOMERS,MARKETPLACE_TRENDING_SOCIAL_PROOF,MARKETPLACE_UNVERIFIED_LISTINGS,MARKETPLACE_PLAN_RESTRICTION_EDITOR,NOTIFY_ON_BLOCK,RELATED_ISSUES">
 
@@ -87,7 +87,7 @@
   <meta name="octolytics-dimension-user_id" content="12981236" /><meta name="octolytics-dimension-user_login" content="bencwallace" /><meta name="octolytics-dimension-repository_id" content="171701751" /><meta name="octolytics-dimension-repository_nwo" content="bencwallace/Probly" /><meta name="octolytics-dimension-repository_public" content="true" /><meta name="octolytics-dimension-repository_is_fork" content="false" /><meta name="octolytics-dimension-repository_network_root_id" content="171701751" /><meta name="octolytics-dimension-repository_network_root_nwo" content="bencwallace/Probly" /><meta name="octolytics-dimension-repository_explore_github_marketplace_ci_cta_shown" content="false" />
 
 
-    <link rel="canonical" href="https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst" data-pjax-transient>
+    <link rel="canonical" href="https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst" data-pjax-transient>
 
 
   <meta name="browser-stats-url" content="https://api.github.com/_private/browser/stats">
@@ -159,7 +159,7 @@
           aria-autocomplete="list"
           aria-controls="jump-to-results"
           aria-label="Search or jump to…"
-          data-jump-to-suggestions-path="/_graphql/GetSuggestedNavigationDestinations#csrf-token=UIWE5CAxIXvEnJFfPieFajFEyM+USE1AcPidpUWIC1+M9pSb0eBRAaxK0+/zacZRdAlpB35ygPCU5ouhRx4Y7g=="
+          data-jump-to-suggestions-path="/_graphql/GetSuggestedNavigationDestinations#csrf-token=zyl/8b1qPW5RiO7J782IB6SyC6I5sutYMywdAOB8ca8TWm+OTLtNFDlerHkig8s84f+qatOIJujXMgsE4upiHg=="
           spellcheck="false"
           autocomplete="off"
           >
@@ -377,7 +377,7 @@
             
 <div class="js-user-status-container user-status-compact" data-team-hovercards-enabled>
   <details class="js-user-status-details details-reset details-overlay details-overlay-dark">
-    <summary class="btn-link no-underline js-toggle-user-status-edit toggle-user-status-edit width-full" aria-haspopup="dialog" role="menuitem" data-hydro-click="{&quot;event_type&quot;:&quot;user_profile.click&quot;,&quot;payload&quot;:{&quot;profile_user_id&quot;:12981236,&quot;target&quot;:&quot;EDIT_USER_STATUS&quot;,&quot;user_id&quot;:12981236,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:167A487:219F930:5CA38CB7&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;}}" data-hydro-click-hmac="52045a9f7d4dd8a6f1597cef91dfc4120074455a18620827d3e1dd1eea6c0d6b">
+    <summary class="btn-link no-underline js-toggle-user-status-edit toggle-user-status-edit width-full" aria-haspopup="dialog" role="menuitem" data-hydro-click="{&quot;event_type&quot;:&quot;user_profile.click&quot;,&quot;payload&quot;:{&quot;profile_user_id&quot;:12981236,&quot;target&quot;:&quot;EDIT_USER_STATUS&quot;,&quot;user_id&quot;:12981236,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:1678F1D:219DC4B:5CA38C9F&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;}}" data-hydro-click-hmac="87bcb8950503169d39804ba26bdfbc541648af1d64fa3994fdea6cab340a2e59">
       <div class="f6 d-inline-block v-align-middle  user-status-emoji-only-header pl-0 circle lh-condensed user-status-header " style="max-width: 29px">
         <div class="user-status-emoji-container flex-shrink-0 mr-1">
           <svg class="octicon octicon-smiley" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8 0C3.58 0 0 3.58 0 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm4.81 12.81a6.72 6.72 0 0 1-2.17 1.45c-.83.36-1.72.53-2.64.53-.92 0-1.81-.17-2.64-.53-.81-.34-1.55-.83-2.17-1.45a6.773 6.773 0 0 1-1.45-2.17A6.59 6.59 0 0 1 1.21 8c0-.92.17-1.81.53-2.64.34-.81.83-1.55 1.45-2.17.62-.62 1.36-1.11 2.17-1.45A6.59 6.59 0 0 1 8 1.21c.92 0 1.81.17 2.64.53.81.34 1.55.83 2.17 1.45.62.62 1.11 1.36 1.45 2.17.36.83.53 1.72.53 2.64 0 .92-.17 1.81-.53 2.64-.34.81-.83 1.55-1.45 2.17zM4 6.8v-.59c0-.66.53-1.19 1.2-1.19h.59c.66 0 1.19.53 1.19 1.19v.59c0 .67-.53 1.2-1.19 1.2H5.2C4.53 8 4 7.47 4 6.8zm5 0v-.59c0-.66.53-1.19 1.2-1.19h.59c.66 0 1.19.53 1.19 1.19v.59c0 .67-.53 1.2-1.19 1.2h-.59C9.53 8 9 7.47 9 6.8zm4 3.2c-.72 1.88-2.91 3-5 3s-4.28-1.13-5-3c-.14-.39.23-1 .66-1h8.59c.41 0 .89.61.75 1z"/></svg>
@@ -387,7 +387,7 @@
           <span class="link-gray">Set your status</span>
       </div>
 </summary>    <details-dialog class="details-dialog rounded-1 anim-fade-in fast Box Box--overlay" role="dialog" tabindex="-1">
-      <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="position-relative flex-auto js-user-status-form" action="/users/status?compact=1&amp;link_mentions=0&amp;truncate=1" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="_method" value="put" /><input type="hidden" name="authenticity_token" value="3LCmwfl+/8hfHJ5sq1h/u8q2dzgcVsQPeo+/WHuYoIe3vFVyBpu7hqvArcm8hJkoacwnKg7iqeHrFf1SJlvH/Q==" />
+      <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="position-relative flex-auto js-user-status-form" action="/users/status?compact=1&amp;link_mentions=0&amp;truncate=1" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="_method" value="put" /><input type="hidden" name="authenticity_token" value="A+vQx4PGjM/HSnCYPW/JRVEvATaw+ToORnAs1d8yfd5o5yN0fCPIgTOWQz0qsy/W8lVRJKJNV+DX6m7fgvEapA==" />
         <div class="Box-header bg-gray border-bottom p-3">
           <button class="Box-btn-octicon js-toggle-user-status-edit btn-octicon float-right" type="reset" aria-label="Close dialog" data-close-dialog>
             <svg class="octicon octicon-x" viewBox="0 0 12 16" version="1.1" width="12" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M7.48 8l3.75 3.75-1.48 1.48L6 9.48l-3.75 3.75-1.48-1.48L4.52 8 .77 4.25l1.48-1.48L6 6.52l3.75-3.75 1.48 1.48L7.48 8z"/></svg>
@@ -499,17 +499,17 @@
       </li>
       <li class="dropdown-divider" role="separator"></li>
         <li>
-          <button type="button" class="btn-link dropdown-item ws-normal js-user-status-expire-button" title="in 30 minutes" value="2019-04-02T18:54:31+02:00">
+          <button type="button" class="btn-link dropdown-item ws-normal js-user-status-expire-button" title="in 30 minutes" value="2019-04-02T18:54:03+02:00">
             in 30 minutes
           </button>
         </li>
         <li>
-          <button type="button" class="btn-link dropdown-item ws-normal js-user-status-expire-button" title="in 1 hour" value="2019-04-02T19:24:31+02:00">
+          <button type="button" class="btn-link dropdown-item ws-normal js-user-status-expire-button" title="in 1 hour" value="2019-04-02T19:24:03+02:00">
             in 1 hour
           </button>
         </li>
         <li>
-          <button type="button" class="btn-link dropdown-item ws-normal js-user-status-expire-button" title="in 4 hours" value="2019-04-02T22:24:31+02:00">
+          <button type="button" class="btn-link dropdown-item ws-normal js-user-status-expire-button" title="in 4 hours" value="2019-04-02T22:24:03+02:00">
             in 4 hours
           </button>
         </li>
@@ -556,7 +556,7 @@
           <div role="none" class="dropdown-divider"></div>
           <a role="menuitem" class="dropdown-item" href="https://help.github.com" data-ga-click="Header, go to help, text:help">Help</a>
           <a role="menuitem" class="dropdown-item" href="/settings/profile" data-ga-click="Header, go to settings, icon:settings">Settings</a>
-          <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="logout-form" action="/logout" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="tm2p/P6fnCbaVyMehMEC3ol24SMIaLhbzuDojT6jsbQNx3IDi3nkKPS4OJd51lhs4gAMlOGFHlxXRwuPF4E6UA==" />
+          <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="logout-form" action="/logout" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="yqZAxd/BRv2UweqLaE+5sj8CHetgeIq2iVYqKfQjNLtxDJs6qic+87ou8QKVWOMAVHTwXImVLLEQ8ckr3QG/Xw==" />
             
             <button type="submit" class="dropdown-item dropdown-signout" data-ga-click="Header, sign out, icon:logout" role="menuitem">
               Sign out
@@ -568,7 +568,7 @@
 
 
 
-        <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="sr-only right-0" action="/logout" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="S9XaXhoAJhwZA0McX+Poy6369gW3ew7h5Wg391s5GqPwfwGhb+ZeEjfsWJWi9LJ5xowbsl6WqOZ8z9T1chuRRw==" />
+        <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="sr-only right-0" action="/logout" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="0d2A1TyDn6BZUjC2uHXqNufztqG0i/bCNPjvYF9tjGxqd1sqSWXnrne9Kz9FYrCEjIVbFl1mUMWtXwxidk8HiA==" />
           <button type="submit" class="dropdown-item dropdown-signout" data-ga-click="Header, sign out, icon:logout">
             Sign out
           </button>
@@ -611,10 +611,10 @@
 
   <li>
     
-    <!-- '"` --><!-- </textarea></xmp> --></option></form><form data-remote="true" class="clearfix js-social-form js-social-container" action="/notifications/subscribe" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="CV/sXbO4xww7eXkoFouxH9IwiU1kbiK9Eva3PU6W2qKBfTMdhu4bOYOnQqLnXHBCUxRYBuz0FCeSeD8XHY9MxA==" />      <input type="hidden" name="repository_id" value="171701751">
+    <!-- '"` --><!-- </textarea></xmp> --></option></form><form data-remote="true" class="clearfix js-social-form js-social-container" action="/notifications/subscribe" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="zByQa3xFXxAxZEX8QZ6ZfBltgy+21uOSNbOIhzJkO8ZEPk8rSRODJYm6fnawSVghmElSZD5M1Qi1PQCtYX2toA==" />      <input type="hidden" name="repository_id" value="171701751">
 
       <details class="details-reset details-overlay select-menu float-left">
-        <summary class="select-menu-button float-left btn btn-sm btn-with-count" data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;target&quot;:&quot;WATCH_BUTTON&quot;,&quot;repository_id&quot;:171701751,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:167A487:219F930:5CA38CB7&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;,&quot;user_id&quot;:12981236}}" data-hydro-click-hmac="72ebaf009c04243d21532829787f70cc08e8402741ab6f46f3a1622ddec0c9ed" data-ga-click="Repository, click Watch settings, action:blob#show">            <span data-menu-button>
+        <summary class="select-menu-button float-left btn btn-sm btn-with-count" data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;target&quot;:&quot;WATCH_BUTTON&quot;,&quot;repository_id&quot;:171701751,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:1678F1D:219DC4B:5CA38C9F&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;,&quot;user_id&quot;:12981236}}" data-hydro-click-hmac="648492ce301b6300ee9293aa137425ac44a5ac707a750d21555830f0d7fc718a" data-ga-click="Repository, click Watch settings, action:blob#show">            <span data-menu-button>
                 <svg class="octicon octicon-eye v-align-text-bottom" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M8.06 2C3 2 0 8 0 8s3 6 8.06 6C13 14 16 8 16 8s-3-6-7.94-6zM8 12c-2.2 0-4-1.78-4-4 0-2.2 1.8-4 4-4 2.22 0 4 1.8 4 4 0 2.22-1.78 4-4 4zm2-4c0 1.11-.89 2-2 2-1.11 0-2-.89-2-2 0-1.11.89-2 2-2 1.11 0 2 .89 2 2z"/></svg>
                 Unwatch
             </span>
@@ -686,18 +686,18 @@
 
   <li>
       <div class="js-toggler-container js-social-container starring-container ">
-    <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="starred js-social-form" action="/bencwallace/Probly/unstar" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="M1S4V/wkINhvVS4TH3A+2evputTX32XslcFM7m4s0CE8fTNJm8wKZ5/Bp+wlFfwfbNDGvOJvEE+IlUu7lvdflw==" />
+    <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="starred js-social-form" action="/bencwallace/Probly/unstar" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="rX2i8gcQfBsk+mabsxX1UeVPwiBYWcOPCliMcH+FBAiiVCnsYPhWpNRu72SJcDeXYna+SG3ptiwXDIslh16Lvg==" />
       <input type="hidden" name="context" value="repository"></input>
-      <button type="submit" class="btn btn-sm btn-with-count js-toggler-target" aria-label="Unstar this repository" title="Unstar bencwallace/Probly" data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;target&quot;:&quot;UNSTAR_BUTTON&quot;,&quot;repository_id&quot;:171701751,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:167A487:219F930:5CA38CB7&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;,&quot;user_id&quot;:12981236}}" data-hydro-click-hmac="9f6925a56dd2bb184295d3d369f1a4ebe4e6a611ce9bd0dbe25caa6c2f3e0ea6" data-ga-click="Repository, click unstar button, action:blob#show; text:Unstar">        <svg class="octicon octicon-star v-align-text-bottom" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
+      <button type="submit" class="btn btn-sm btn-with-count js-toggler-target" aria-label="Unstar this repository" title="Unstar bencwallace/Probly" data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;target&quot;:&quot;UNSTAR_BUTTON&quot;,&quot;repository_id&quot;:171701751,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:1678F1D:219DC4B:5CA38C9F&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;,&quot;user_id&quot;:12981236}}" data-hydro-click-hmac="3363b2c654f38826a5d736c3fa4f127eb60fe24fc2d0ceaff146001ed893f7e1" data-ga-click="Repository, click unstar button, action:blob#show; text:Unstar">        <svg class="octicon octicon-star v-align-text-bottom" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
         Unstar
 </button>        <a class="social-count js-social-count" href="/bencwallace/Probly/stargazers"
            aria-label="1 user starred this repository">
           1
         </a>
 </form>
-    <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="unstarred js-social-form" action="/bencwallace/Probly/star" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="OwX1qr1VDbj1oh+Olk2WR/BgWaiZom44q4cCgCTUSFqL2BAYQHT2JrVMw3JjAvYqk0NIOPj9TjGyS6/iEXPF1Q==" />
+    <!-- '"` --><!-- </textarea></xmp> --></option></form><form class="unstarred js-social-form" action="/bencwallace/Probly/star" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="&#x2713;" /><input type="hidden" name="authenticity_token" value="PHoYZSyyKM/kSp78G6No/hmXLzYAcatBlmQpmWxJhjqMp/3X0ZPTUaSkQgDu7AiTerQ+pmEui0iPqIT7We4LtQ==" />
       <input type="hidden" name="context" value="repository"></input>
-      <button type="submit" class="btn btn-sm btn-with-count js-toggler-target" aria-label="Unstar this repository" title="Star bencwallace/Probly" data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;target&quot;:&quot;STAR_BUTTON&quot;,&quot;repository_id&quot;:171701751,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:167A487:219F930:5CA38CB7&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;,&quot;user_id&quot;:12981236}}" data-hydro-click-hmac="ed25e6edcc09dc504bedde187bf647136c7043a9b2ce7bc2be40cbac9c6e7c1c" data-ga-click="Repository, click star button, action:blob#show; text:Star">        <svg class="octicon octicon-star v-align-text-bottom" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
+      <button type="submit" class="btn btn-sm btn-with-count js-toggler-target" aria-label="Unstar this repository" title="Star bencwallace/Probly" data-hydro-click="{&quot;event_type&quot;:&quot;repository.click&quot;,&quot;payload&quot;:{&quot;target&quot;:&quot;STAR_BUTTON&quot;,&quot;repository_id&quot;:171701751,&quot;client_id&quot;:&quot;1834133515.1553720408&quot;,&quot;originating_request_id&quot;:&quot;105A:2FC88:1678F1D:219DC4B:5CA38C9F&quot;,&quot;originating_url&quot;:&quot;https://github.com/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst&quot;,&quot;referrer&quot;:&quot;https://github.com/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref&quot;,&quot;user_id&quot;:12981236}}" data-hydro-click-hmac="80404cedfd681c062d9901335991d643e830b916c5021d8b5736d8f40730cc99" data-ga-click="Repository, click star button, action:blob#show; text:Star">        <svg class="octicon octicon-star v-align-text-bottom" viewBox="0 0 14 16" version="1.1" width="14" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M14 6l-4.9-.64L7 1 4.9 5.36 0 6l3.6 3.26L2.67 14 7 11.67 11.33 14l-.93-4.74L14 6z"/></svg>
         Star
 </button>        <a class="social-count js-social-count" href="/bencwallace/Probly/stargazers"
            aria-label="1 user starred this repository">
@@ -791,9 +791,9 @@
 
 
   
-    <a class="d-none js-permalink-shortcut" data-hotkey="y" href="/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst">Permalink</a>
+    <a class="d-none js-permalink-shortcut" data-hotkey="y" href="/bencwallace/Probly/blob/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst">Permalink</a>
 
-    <!-- blob contrib key: blob_contributors:v21:83b062c5cd076957fe621a8eb46c08f1 -->
+    <!-- blob contrib key: blob_contributors:v21:910c8779975273c33c761e72d5c9d1b8 -->
 
     
 
@@ -808,7 +808,7 @@
     <span class="css-truncate-target">4d3bb49396</span>
   </summary>
 
-  <details-menu class="select-menu-modal position-absolute" style="z-index: 99;" src="/bencwallace/Probly/ref-list/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst?source_action=show&amp;source_controller=blob" preload>
+  <details-menu class="select-menu-modal position-absolute" style="z-index: 99;" src="/bencwallace/Probly/ref-list/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst?source_action=show&amp;source_controller=blob" preload>
     <include-fragment class="select-menu-loading-overlay anim-pulse">
       <svg height="32" class="octicon octicon-octoface" viewBox="0 0 16 16" version="1.1" width="32" aria-hidden="true"><path fill-rule="evenodd" d="M14.7 5.34c.13-.32.55-1.59-.13-3.31 0 0-1.05-.33-3.44 1.3-1-.28-2.07-.32-3.13-.32s-2.13.04-3.13.32c-2.39-1.64-3.44-1.3-3.44-1.3-.68 1.72-.26 2.99-.13 3.31C.49 6.21 0 7.33 0 8.69 0 13.84 3.33 15 7.98 15S16 13.84 16 8.69c0-1.36-.49-2.48-1.3-3.35zM8 14.02c-3.3 0-5.98-.15-5.98-3.35 0-.76.38-1.48 1.02-2.07 1.07-.98 2.9-.46 4.96-.46 2.07 0 3.88-.52 4.96.46.65.59 1.02 1.3 1.02 2.07 0 3.19-2.68 3.35-5.98 3.35zM5.49 9.01c-.66 0-1.2.8-1.2 1.78s.54 1.79 1.2 1.79c.66 0 1.2-.8 1.2-1.79s-.54-1.78-1.2-1.78zm5.02 0c-.66 0-1.2.79-1.2 1.78s.54 1.79 1.2 1.79c.66 0 1.2-.8 1.2-1.79s-.53-1.78-1.2-1.78z"/></svg>
     </include-fragment>
@@ -816,7 +816,7 @@
 </details>
 
       <div id="blob-path" class="breadcrumb flex-auto ml-2">
-        <span class="js-repo-root text-bold"><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453"><span>Probly</span></a></span></span><span class="separator">/</span><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs"><span>docs</span></a></span><span class="separator">/</span><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source"><span>source</span></a></span><span class="separator">/</span><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref"><span>ref</span></a></span><span class="separator">/</span><strong class="final-path">helpers.rst</strong>
+        <span class="js-repo-root text-bold"><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453"><span>Probly</span></a></span></span><span class="separator">/</span><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs"><span>docs</span></a></span><span class="separator">/</span><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source"><span>source</span></a></span><span class="separator">/</span><span class="js-path-segment"><a data-pjax="true" rel="nofollow" href="/bencwallace/Probly/tree/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref"><span>ref</span></a></span><span class="separator">/</span><strong class="final-path">core.rst</strong>
       </div>
       <div class="BtnGroup">
         <a href="/bencwallace/Probly/find/4d3bb4939627559b2eb7c3ddf6b2879481ad3453"
@@ -833,7 +833,7 @@
 
 
 
-    <include-fragment src="/bencwallace/Probly/contributors/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst" class="Box Box--condensed commit-loader">
+    <include-fragment src="/bencwallace/Probly/contributors/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst" class="Box Box--condensed commit-loader">
       <div class="Box-body bg-blue-light f6">
         Fetching contributors&hellip;
       </div>
@@ -852,17 +852,17 @@
 <div class="Box-header py-2 d-flex flex-justify-between flex-items-center">
 
   <div class="text-mono f6">
-      13 lines (9 sloc)
+      7 lines (5 sloc)
       <span class="file-info-divider"></span>
-    209 Bytes
+    81 Bytes
   </div>
 
   <div class="d-flex">
 
     <div class="BtnGroup">
-      <a id="raw-url" class="btn btn-sm BtnGroup-item" href="/bencwallace/Probly/raw/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst">Raw</a>
-        <a class="btn btn-sm js-update-url-with-hash BtnGroup-item" data-hotkey="b" href="/bencwallace/Probly/blame/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst">Blame</a>
-      <a rel="nofollow" class="btn btn-sm BtnGroup-item" href="/bencwallace/Probly/commits/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/helpers.rst">History</a>
+      <a id="raw-url" class="btn btn-sm BtnGroup-item" href="/bencwallace/Probly/raw/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst">Raw</a>
+        <a class="btn btn-sm js-update-url-with-hash BtnGroup-item" data-hotkey="b" href="/bencwallace/Probly/blame/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst">Blame</a>
+      <a rel="nofollow" class="btn btn-sm BtnGroup-item" href="/bencwallace/Probly/commits/4d3bb4939627559b2eb7c3ddf6b2879481ad3453/docs/source/ref/core.rst">History</a>
     </div>
 
 
@@ -882,20 +882,9 @@
 
       
   <div id="readme" class="Box-body readme blob instapaper_body js-code-block-container">
-    <article class="markdown-body entry-content p-5" itemprop="text"><h1><a id="user-content-additional-methods" class="anchor" aria-hidden="true" href="#additional-methods"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Additional methods</h1>
-<pre>.. automodule:: probly.helpers
-
-</pre>
-<pre>.. currentmodule:: probly
-
-</pre>
-<pre>.. autofunction:: array
-</pre>
-<pre>.. autofunction:: hist
-</pre>
-<pre>.. autofunction:: Lift
-</pre>
-<pre>.. autofunction:: sum
+    <article class="markdown-body entry-content p-5" itemprop="text"><h1><a id="user-content-core-classes" class="anchor" aria-hidden="true" href="#core-classes"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Core classes</h1>
+<pre>.. automodule:: probly.core
+   :members:
 </pre>
 
 </article>
@@ -930,7 +919,7 @@
 <div class="footer container-lg width-full px-3" role="contentinfo">
   <div class="position-relative d-flex flex-justify-between pt-6 pb-2 mt-6 f6 text-gray border-top border-gray-light ">
     <ul class="list-style-none d-flex flex-wrap ">
-      <li class="mr-3">&copy; 2019 <span title="0.32676s from unicorn-7447b49866-sszz7">GitHub</span>, Inc.</li>
+      <li class="mr-3">&copy; 2019 <span title="0.56856s from unicorn-6cc8478d94-pdqpd">GitHub</span>, Inc.</li>
         <li class="mr-3"><a data-ga-click="Footer, go to terms, text:terms" href="https://github.com/site/terms">Terms</a></li>
         <li class="mr-3"><a data-ga-click="Footer, go to privacy, text:privacy" href="https://github.com/site/privacy">Privacy</a></li>
         <li class="mr-3"><a data-ga-click="Footer, go to security, text:security" href="https://github.com/security">Security</a></li>
