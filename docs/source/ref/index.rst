@@ -12,4 +12,3 @@ API Reference
 
    distr
    helpers
-   core
