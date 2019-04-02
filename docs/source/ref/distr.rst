@@ -2,16 +2,6 @@
 Random variables
 ################
 
-************
-Core classes
-************
-
-.. currentmodule:: probly.core
-
-.. autosummary::
-
-   RandomVar
-
 .. currentmodule:: probly
 
 *************************
@@ -59,13 +49,6 @@ Random matrices
    Wishart
 
 .. Detailed descriptions follow
-
-.. currentmodule:: probly.core
-
-.. automodule:: probly.core
-   :members: RandomVar
-
-.. currentmodule:: probly
 
 .. autoclass:: DUnif
 .. autoclass:: Multinomial

@@ -19,23 +19,6 @@ from .exceptions import ConvergenceWarning
 
 
 class Node(object):
-    """
-    A node in a computational graph, representing the output of an operation.
-
-    Acts as a function by passing the outputs of its `parents` (computed
-    recursively) to an operation `op`.
-
-    Parameters
-    ----------
-    op : optional
-        An operation accepting `len(parents)` arguments.
-        Defaults to the identity map.
-        If not callable, understood as the constant map returning itself.
-        Mandatory if parents not specified.
-    parents : optional
-        A collection of callable (typically `Node`) objects.
-    """
-
     def __init__(self, op=None, *parents):
         self._parents = parents
 
