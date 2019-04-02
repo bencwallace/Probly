@@ -20,6 +20,6 @@ setup(name='probly',
                    'License :: OSI Approved :: BSD License',
                    'Topic :: Scientific/Engineering :: Mathematics'],
       packages=['probly'],
-      install_requires=['numpy'],
+      install_requires=['numpy', 'scipy'],
       include_package_data=True,
       zip_safe=False)
