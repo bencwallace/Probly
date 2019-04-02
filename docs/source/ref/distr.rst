@@ -48,8 +48,6 @@ Random matrices
    Wigner
    Wishart
 
-.. Detailed descriptions follow
-
 .. autoclass:: DUnif
 .. autoclass:: Multinomial
 .. autoclass:: Bin
