@@ -59,6 +59,8 @@ Random matrices
    Wigner
    Wishart
 
+.. Detailed descriptions follow
+
 .. currentmodule:: probly.core
 
 .. automodule:: probly.core
