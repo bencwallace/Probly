@@ -64,7 +64,7 @@ Random matrices
 .. currentmodule:: probly.core
 
 .. automodule:: probly.core
-   :members:
+   :members: RandomVar
 
 .. currentmodule:: probly
 
