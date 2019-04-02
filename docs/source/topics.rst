@@ -1,6 +1,6 @@
-###############
-Assorted topics
-###############
+############
+Other topics
+############
 
 .. _independence:
 

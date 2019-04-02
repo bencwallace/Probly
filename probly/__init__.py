@@ -10,7 +10,7 @@ new random variables.
 
 # Constructors and helpers
 from .construct import Lift, array, sum
-from .helpers import hist, mean
+from .helpers import hist
 
 # Discrete random variables
 from .distr import DUnif

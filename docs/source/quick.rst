@@ -55,6 +55,10 @@ will produce the same result.
 -4.340731821079555
 >>> # Repeat the last step to obtain the same output
 
+******************
+Computing the mean
+******************
+
 When called with no argument, a seed produced by a random number generator
 is used and the output is not reproducible.
 
@@ -63,7 +67,10 @@ is used and the output is not reproducible.
 -7.722714026707818
 
 Nevertheless, the outputs of ``Z()`` are uniformly distributed on the
-interval ``[-10, 10]``. Similarly, we can check ``X`` is equally likely
+interval ``[-10, 10]``.
+
+
+Similarly, we can check ``X`` is equally likely
 to take on the values ``0`` and ``1`` by computing its empirical mean.
 
 >>> trials = 1000
@@ -81,6 +88,12 @@ The following output is close to ``0.5`` as expected by the
 The output should be close to ``0.5`` for most seed choices. Try running the
 code above with a few different seeds to see this (this will not affect
 reproducibility).	
+
+In fact, built-in random variables like ``X`` typically have a ``mean`` method
+that returns the exact mean.
+
+>>> X.mean()
+0.5
 
 **************************
 Random variable arithmetic
@@ -120,9 +133,11 @@ True
 
 For more information, see :ref:`dependence`.
 
-.. todo::
+For composite random variables like ``W``, the ``mean`` method returns an approximate
+value.
 
-   Link to LLN and CLT examples.
+>>> W.mean()
+-0.038899600641915444
 
 ***************
 Random matrices

@@ -2,6 +2,17 @@
 Random variables
 ################
 
+************
+Core classes
+************
+
+.. currentmodule:: probly.core
+
+.. autosummary::
+
+   Node
+   RandomVar
+
 .. currentmodule:: probly
 
 *************************
@@ -37,9 +48,7 @@ Continuous random variables
    Student_t
    Laplace
    Logistic
-   Pareto
    VonMises
-   Weibull
 
 ***************
 Random matrices
@@ -49,6 +58,13 @@ Random matrices
 
    Wigner
    Wishart
+
+.. currentmodule:: probly.core
+
+.. automodule:: probly.core
+   :members:
+
+.. currentmodule:: probly
 
 .. autoclass:: DUnif
 .. autoclass:: Multinomial
@@ -71,9 +87,7 @@ Random matrices
 .. autoclass:: Student_t
 .. autoclass:: Laplace
 .. autoclass:: Logistic
-.. autoclass:: Pareto
 .. autoclass:: VonMises
-.. autoclass:: Weibull
 
 .. autoclass:: Wigner
 .. autoclass:: Wishart

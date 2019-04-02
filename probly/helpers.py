@@ -24,9 +24,3 @@ def hist(rv, num_samples, bins=None, density=True):
     samples = [rv() for _ in range(num_samples)]
     plt.hist(samples, bins=bins, density=density)
     plt.show()
-
-
-def mean(rv):
-    """Alias for rv.mean()."""
-
-    return rv.mean()
