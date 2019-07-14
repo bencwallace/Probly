@@ -85,7 +85,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
 
-    Instantiate a random variable from this family with support `[1, 2].
+    Instantiate a random variable from this family with support `[1, 2]`.
 
     >>> X = UnifShift(0, 1)
     """

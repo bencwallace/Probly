@@ -137,7 +137,7 @@ For composite random variables like ``W``, the ``mean`` method returns an approx
 value.
 
 >>> W.mean()
--0.038899600641915444
+0.023611159797914952
 
 ***************
 Random matrices
