@@ -12,7 +12,7 @@ Probly can be installed using `pip <https://pypi.org/project/pip/>`_ from GitHub
 
 .. note::
 
-   Probly makes use of `NumPy <http://www.numpy.org/>`_.
+   Probly makes use of `NumPy <http://www.numpy.org/>`_, `SciPy <https://www.scipy.org/>`_, and `Matplotlib <https://matplotlib.org/>`_.
 
 ***********************
 Simple random variables

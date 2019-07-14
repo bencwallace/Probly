@@ -76,10 +76,10 @@ def sum(summands, num=None):
     """
     Sums a collection of random variables.
 
-    If `num` is provided, `summands` is taken to be a single random variable
+    If `num` is provided, `summands` is treated as a single random variable
     and the sum of `num` independent copies of `summands` is returned.
-    Otherwise, `summands` is taken to be a collection of random variables or
-    random array and its sum is returned.
+    Otherwise, `summands` treated as a collection of random variables or
+    a random array and its sum is returned.
 
     Parameters
     ----------
