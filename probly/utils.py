@@ -2,7 +2,7 @@
 Utilities for working with random variables.
 """
 
-from .core import RandomVar
+from .core import RandomVariable
 from .distributions import Normal
 from collections.abc import Sequence
 from functools import partial, wraps
@@ -11,7 +11,7 @@ import numpy as np
 
 # ------------------------ Random matrix constructors ------------------------ #
 
-class Wigner(RandomVar):
+class Wigner(RandomVariable):
     """
     A Wigner random matrix.
 
@@ -22,7 +22,7 @@ class Wigner(RandomVar):
     ----------
     dim : int
         The matrix dimension.
-    rv : RandomVar, optional
+    rv : RandomVariable, optional
         A random variable whose distribution the entries will share. Default is
         a standard normal random variable.
     """
@@ -54,7 +54,7 @@ class Wigner(RandomVar):
         return 'Wigner({}, {})'.format(self.dim, self.rv)
 
 
-class Wishart(RandomVar):
+class Wishart(RandomVariable):
     """
     A Wishart random matrix.
 
@@ -68,7 +68,7 @@ class Wishart(RandomVar):
         The first dimension parameter.
     n : int
         The second dimension parameter.
-    rv : RandomVar, optional
+    rv : RandomVariable, optional
         A random variable.
 
 
@@ -116,8 +116,8 @@ def Lift(f):
     .. testsetup::
 
        import probly as pr
-       from probly.core import RandomVar
-       RandomVar._reset()
+       from probly.core import RandomVariable
+       RandomVariable._reset()
 
 
     >>> import numpy as np
@@ -130,9 +130,9 @@ def Lift(f):
 
     @wraps(f)
     def F(*args, **kwargs):
-        if any((isinstance(arg, RandomVar) for arg in args)):
+        if any((isinstance(arg, RandomVariable) for arg in args)):
             fkwargs = partial(f, **kwargs)
-            return RandomVar(fkwargs, *args)
+            return RandomVariable(fkwargs, *args)
         else:
             return f(*args, **kwargs)
 
@@ -146,11 +146,11 @@ def array(arr):
     Parameters
     ----------
     arr : array_like
-        An array_like collection of `RandomVar` objects or constants.
+        An array_like collection of `RandomVariable` objects or constants.
 
     Returns
     -------
-    RandomVar
+    RandomVariable
         A random variable whose samples are arrays of samples of the objects
         in `arr`.
     """
@@ -158,10 +158,10 @@ def array(arr):
     def op(*inputs):
         return np.array(inputs).reshape(np.shape(arr))
 
-    parents = np.vectorize(RandomVar)(arr).flatten()
-    RV = RandomVar(op, *parents)
+    parents = np.vectorize(RandomVariable)(arr).flatten()
+    RV = RandomVariable(op, *parents)
 
-    # For RandomVar.__array__
+    # For RandomVariable.__array__
     RV.shape = np.shape(arr)
 
     return RV
@@ -178,7 +178,7 @@ def sum(summands, num=None):
 
     Parameters
     ----------
-    summands : array_like of RandomVar or RandomVar
+    summands : array_like of RandomVariable or RandomVariable
         Either a collection of random variables to be summed, a random array
         whose entries are to be summed, or a single random variable, of which
         independent copies are to be summed.
@@ -203,7 +203,7 @@ def hist(rv, num_samples, bins=None, density=True):
 
     Parameters
     ----------
-    rv : RandomVar
+    rv : RandomVariable
         A random variable.
     num_samples : int
         The number of samples to draw from `rv`.

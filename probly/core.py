@@ -62,22 +62,22 @@ class Node(object):
         return self._parents
 
 
-class RandomVar(Node, NDArrayOperatorsMixin):
+class RandomVariable(Node, NDArrayOperatorsMixin):
     """
     A random variable.
 
     Behaves like a `Node` object that can be acted on by any NumPy ufunc in a
     way compatible with the graph structure. Also acts as an interface for the
     definition of families of random variables via subclassing. Such families
-    should be defined by subclassing RandomVar rather than Node.
+    should be defined by subclassing RandomVariable rather than Node.
 
     Example
     -------
     Define a family of "shifted" uniform random variables:
 
-    >>> from probly.core import RandomVar
+    >>> from probly.core import RandomVariable
     >>> import numpy as np
-    >>> class UnifShift(RandomVar):
+    >>> class UnifShift(RandomVariable):
     ...     def __init__(self, a, b):
     ...         self.a = a + 1
     ...         self.b = b + 1
@@ -92,7 +92,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
     # ---------------------------- Independence ---------------------------- #
 
-    # Counter for _id. Set start=1 or else first RandomVar acts as increment
+    # Counter for _id. Set start=1 or else first RandomVariable acts as increment
     _last_id = itertools.count(start=1)
 
     @classmethod
@@ -116,7 +116,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         """
         Defines the random variable subclassing interface.
 
-        A subclass of RandomVar contains: a method _sampler that produces
+        A subclass of RandomVariable contains: a method _sampler that produces
         samples from a distribution given some seed; and possibly a method
         __init__ to specify parameters. The __new__ method initializes an
         object of such a subclass as a Node object with no parents and with
@@ -129,14 +129,14 @@ class RandomVar(Node, NDArrayOperatorsMixin):
         # First constructs a bare Node object
         obj = super().__new__(cls)
 
-        if cls is RandomVar:
-            # Dependent RandomVar initialized from args
+        if cls is RandomVariable:
+            # Dependent RandomVariable initialized from args
             op = args[0]
             parents = args[1:]
 
             _offset = 0
         else:
-            # Independent RandomVar initialized from _sampler
+            # Independent RandomVariable initialized from _sampler
             op = obj._sampler
             parents = ()
 
@@ -200,16 +200,16 @@ class RandomVar(Node, NDArrayOperatorsMixin):
     def __array_ufunc__(self, op, method, *inputs, **kwargs):
         # Allows NumPy ufuncs (e.g. addition) and derived methods
         # (e.g. summation, which is the ufunc reduce method of addition)
-        # to act on RandomVar objects.
+        # to act on RandomVariable objects.
 
-        # Cast inputs to RandomVar: If not RandomVar, treat as constant
-        inputs = tuple(x if isinstance(x, RandomVar)
-                       else RandomVar(x) for x in inputs)
+        # Cast inputs to RandomVariable: If not RandomVariable, treat as constant
+        inputs = tuple(x if isinstance(x, RandomVariable)
+                       else RandomVariable(x) for x in inputs)
 
         fcn = getattr(op, method)
         partial = functools.partial(fcn, **kwargs)
 
-        return RandomVar(partial, *inputs)
+        return RandomVariable(partial, *inputs)
 
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
@@ -228,7 +228,7 @@ class RandomVar(Node, NDArrayOperatorsMixin):
 
         def get_item_from_key(array):
             return array[key]
-        return RandomVar(get_item_from_key, self)
+        return RandomVariable(get_item_from_key, self)
 
     # ------------------------------ Integrals ------------------------------ #
 

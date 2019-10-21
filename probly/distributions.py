@@ -3,7 +3,7 @@ Random variables following common distributions.
 """
 
 import numpy as np
-from .core import RandomVar
+from .core import RandomVariable
 from .exceptions import UndefinedError
 
 
@@ -12,7 +12,7 @@ from .exceptions import UndefinedError
 
 # -------------------- Discrete uniform random variable -------------------- #
 
-class DUnif(RandomVar):
+class DUnif(RandomVariable):
     """
     A discrete uniform random variable.
 
@@ -44,7 +44,7 @@ class DUnif(RandomVar):
 
 # --------------------------- Multinomial family --------------------------- #
 
-class Multinomial(RandomVar):
+class Multinomial(RandomVariable):
     """
     A multinomial random variable.
 
@@ -130,7 +130,7 @@ class Ber(Bin):
 
 # ------------------------ Negative binomial family ------------------------ #
 
-class NegBin(RandomVar):
+class NegBin(RandomVariable):
     """
     A negative binomial random variable.
 
@@ -191,7 +191,7 @@ class Geom(NegBin):
 
 # --------------------- Other discrete random variables --------------------- #
 
-class HyperGeom(RandomVar):
+class HyperGeom(RandomVariable):
     """
     A hypergeometric random variable.
 
@@ -219,7 +219,7 @@ class HyperGeom(RandomVar):
                ' {})'.format(self.ngood, self.nbad, self.nsample)
 
 
-class Pois(RandomVar):
+class Pois(RandomVariable):
     """
     A Poisson random variable.
 
@@ -248,7 +248,7 @@ class Pois(RandomVar):
 
 # ------------------------------ Gamma family ------------------------------ #
 
-class Gamma(RandomVar):
+class Gamma(RandomVariable):
     """
     A gamma random variable.
 
@@ -350,7 +350,7 @@ class Exp(Gamma):
 
 # ------------------------ Uniform random variables ------------------------ #
 
-class Unif(RandomVar):
+class Unif(RandomVariable):
     """
     A uniform random variable.
 
@@ -359,7 +359,7 @@ class Unif(RandomVar):
     a : float, optional
         Left endpoint of the support interval.
     b : float, optional
-        Right endpoint of the selfupport inteRandomVaral.
+        Right endpoint of the selfupport inteRandomVariableal.
     """
 
     def __init__(self, a=0, b=1):
@@ -379,7 +379,7 @@ class Unif(RandomVar):
 
 # ------------------- Normal and related random variables ------------------- #
 
-class Normal(RandomVar):
+class Normal(RandomVariable):
     """
     A normal random variable.
 
@@ -420,7 +420,7 @@ class Normal(RandomVar):
         return 'Normal({}, {}, {})'.format(self.mean, self.cov, self.dim)
 
 
-class LogNormal(RandomVar):
+class LogNormal(RandomVariable):
     """
     A log-normal random variable.
 
@@ -447,7 +447,7 @@ class LogNormal(RandomVar):
 
 # --------------------- Beta distribution and power law --------------------- #
 
-class Beta(RandomVar):
+class Beta(RandomVariable):
     """
     A beta random variable.
 
@@ -475,7 +475,7 @@ class Beta(RandomVar):
         return 'Beta({}, {})'.format(self.alpha, self.beta)
 
 
-class PowerLaw(RandomVar):
+class PowerLaw(RandomVariable):
     """
     A random variable following a power law.
 
@@ -502,7 +502,7 @@ class PowerLaw(RandomVar):
 
 # ------------------------ F and t random variables ------------------------ #
 
-class F(RandomVar):
+class F(RandomVariable):
     """
     An F random variable.
 
@@ -533,7 +533,7 @@ class F(RandomVar):
         return 'F({}, {})'.format(self.d1, self.d2)
 
 
-class Student_t(RandomVar):
+class Student_t(RandomVariable):
     """
     A Student's t random variable.
 
@@ -563,7 +563,7 @@ class Student_t(RandomVar):
 
 # -------------------- Other continuous random variables -------------------- #
 
-class Laplace(RandomVar):
+class Laplace(RandomVariable):
     """
     A Laplace random variable.
 
@@ -590,7 +590,7 @@ class Laplace(RandomVar):
         return 'Laplace({}, {})'.format(self.loc, self.scale)
 
 
-class Logistic(RandomVar):
+class Logistic(RandomVariable):
     """
     A logistic random variable.
 
@@ -617,7 +617,7 @@ class Logistic(RandomVar):
         return 'Logistic({}, {})'.format(self.loc, self.scale)
 
 
-class VonMises(RandomVar):
+class VonMises(RandomVariable):
     """
     A von Mises random variable.
 

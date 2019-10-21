@@ -2,12 +2,11 @@ import numpy as np
 import probly as pr
 import unittest
 from unittest import TestCase
-# from probly.core import Node
-from probly.core import RandomVar
+from probly.core import RandomVariable
 
 
-get_random = RandomVar._get_random
-_max_seed = RandomVar._max_seed
+get_random = RandomVariable._get_random
+_max_seed = RandomVariable._max_seed
 msg_low_prob = 'Test fails with low probability. Try running tests again.'
 
 
