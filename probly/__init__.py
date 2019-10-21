@@ -8,26 +8,23 @@ new random variables.
 """
 
 
-# Constructors and helpers
-from .construct import Lift, array, sum
-from .helpers import hist
+# Utilities
+from .utils import array, hist, Lift, sum
+from .utils import Wigner, Wishart
 
 # Discrete random variables
-from .distr import DUnif
-from .distr import Multinomial, Bin, Ber
-from .distr import NegBin, Geom
-from .distr import HyperGeom, Pois
+from .distributions import DUnif
+from .distributions import Multinomial, Bin, Ber
+from .distributions import NegBin, Geom
+from .distributions import HyperGeom, Pois
 
 # Continuous random variables
-from .distr import Gamma, ChiSquared, Exp
-from .distr import Unif
-from .distr import Normal, LogNormal
-from .distr import Beta, PowerLaw
-from .distr import F, Student_t
-from .distr import Laplace, Logistic, VonMises
-
-# Random matrices
-from .rmat import Wigner, Wishart
+from .distributions import Gamma, ChiSquared, Exp
+from .distributions import Unif
+from .distributions import Normal, LogNormal
+from .distributions import Beta, PowerLaw
+from .distributions import F, Student_t
+from .distributions import Laplace, Logistic, VonMises
 
 __all__ = []
 
