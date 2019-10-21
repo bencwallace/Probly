@@ -166,21 +166,21 @@ class TestScalar(TestCase):
         self.assertEqual(Z(self.seed), -x)
 
 
-# class TestCopy(TestCase):
-#     def setUp(self):
-#         self.seed = 1
+class TestCopy(TestCase):
+    def setUp(self):
+        self.seed = 1
 
-#     def test_indep_copy(self):
-#         X = pr.Unif(-1, 1)
-#         Y = X.copy()
+    def test_indep_copy(self):
+        X = pr.Unif(-1, 1)
+        Y = X.copy()
 
-#         self.assertNotEqual(X(self.seed), Y(self.seed))
+        self.assertNotEqual(X(self.seed), Y(self.seed))
 
-#     def test_dependent_copy(self):
-#         X = pr.Unif(-1, 1)
-#         Z = pr.array([X, X])
+    def test_dependent_copy(self):
+        X = pr.Unif(-1, 1)
+        Z = pr.array([X, X])
 
-#         self.assertEqual(Z(self.seed)[0], Z(self.seed)[1])
+        self.assertEqual(Z(self.seed)[0], Z(self.seed)[1])
 
 
 class TestArray(TestCase):
