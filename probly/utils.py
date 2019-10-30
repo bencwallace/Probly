@@ -101,7 +101,35 @@ class Wishart(RandomVariable):
     def __str__(self):
         return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
 
-# -------------------- Other random variable constructors -------------------- #
+# ---------------------------- Other constructors ---------------------------- #
+
+def array(arr):
+    """
+    Casts an array of random variables to a random variable.
+
+    Parameters
+    ----------
+    arr : array_like
+        An array_like collection of `RandomVariable` objects or constants.
+
+    Returns
+    -------
+    RandomVariable
+        A random variable whose samples are arrays of samples of the objects
+        in `arr`.
+    """
+
+    def op(*inputs):
+        return np.array(inputs).reshape(np.shape(arr))
+
+    parents = np.vectorize(RandomVariable)(arr).flatten()
+    RV = RandomVariable(op, *parents)
+
+    # For RandomVariable.__array__
+    RV.shape = np.shape(arr)
+
+    return RV
+
 
 def lift(f):
     """
@@ -139,34 +167,6 @@ def lift(f):
     return F
 
 
-def array(arr):
-    """
-    Casts an array of random variables to a random variable.
-
-    Parameters
-    ----------
-    arr : array_like
-        An array_like collection of `RandomVariable` objects or constants.
-
-    Returns
-    -------
-    RandomVariable
-        A random variable whose samples are arrays of samples of the objects
-        in `arr`.
-    """
-
-    def op(*inputs):
-        return np.array(inputs).reshape(np.shape(arr))
-
-    parents = np.vectorize(RandomVariable)(arr).flatten()
-    RV = RandomVariable(op, *parents)
-
-    # For RandomVariable.__array__
-    RV.shape = np.shape(arr)
-
-    return RV
-
-
 def sum(summands, num=None):
     """
     Sums a collection of random variables.
@@ -195,7 +195,7 @@ def sum(summands, num=None):
 
     return np.sum(summands)
 
-# --------------------------------- Moments --------------------------------- #
+# -------------------------------- Properties -------------------------------- #
 
 def mean(rv, max_iter=int(1e5), tol=1e-5):
     return rv.mean(max_iter=max_iter, tol=tol)
@@ -220,7 +220,7 @@ def cdf(rv, x, **kwargs):
 def pdf(rv, x, dx=1e-5, **kwargs):
     return rv.pdf(x, dx, **kwargs)
 
-# ----------------------------- Other utilities ----------------------------- #
+# ---------------------------------- Other ---------------------------------- #
 
 def hist(rv, num_samples, bins=None, density=True):
     """
