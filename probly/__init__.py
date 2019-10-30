@@ -10,6 +10,7 @@ of new random variables.
 
 # Utilities
 from .utils import array, hist, lift, sum
+from .utils import mean, moment, cmoment, variance, cdf, pdf
 from .utils import Wigner, Wishart
 
 # Discrete random variables
@@ -31,6 +32,9 @@ __all__ = []
 # Constructors and helpers
 __all__ += ['Lift', 'array', 'sum']
 __all__ += ['hist', 'mean']
+
+# Moment methods
+__all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
 
 # Discrete random variables
 __all__ += ['DUnif']

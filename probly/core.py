@@ -263,7 +263,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         # To do: Subclasses must allow kwargs
         return self.moment(p, **kwargs) - (self.mean()) ** p
 
-    def Var(self, **kwargs):
+    def variance(self, **kwargs):
         """Numerically approximates the variance."""
 
         return self.cmoment(2, **kwargs)

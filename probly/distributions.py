@@ -35,7 +35,7 @@ class DUnif(RandomVariable):
         np.random.seed(seed)
         return np.random.randint(self.a, self.b + 1)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return (self.a + self.b) / 2
 
     def __str__(self):
@@ -67,7 +67,7 @@ class Multinomial(RandomVariable):
         np.random.seed(seed)
         return np.random.multinomial(self.n, self.pvals)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return np.array([self.n * pval for pval in self.pvals])
 
     def __str__(self):
@@ -98,7 +98,7 @@ class Bin(Multinomial):
         np.random.seed(seed)
         return np.random.binomial(self.n, self.p)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.n * self.p
 
     def __str__(self):
@@ -121,7 +121,7 @@ class Ber(Bin):
     def __init__(self, p=0.5):
         super().__init__(1, p)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.p
 
     def __str__(self):
@@ -154,7 +154,7 @@ class NegBin(RandomVariable):
         np.random.seed(seed)
         return np.random.negative_binomial(self.n, self.p)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.n * (1 - self.p) / self.p
 
     def __str__(self):
@@ -182,7 +182,7 @@ class Geom(NegBin):
         np.random.seed(seed)
         return np.random.geometric(self.p)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return 1 / self.p
 
     def __str__(self):
@@ -211,7 +211,7 @@ class HyperGeom(RandomVariable):
         np.random.seed(seed)
         return np.random.hypergeometric(self.ngood, self.nbad, self.nsample)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.ngood * self.nbad / self.nsample
 
     def __str__(self):
@@ -236,7 +236,7 @@ class Pois(RandomVariable):
         np.random.seed(seed)
         return np.random.poisson(self.rate)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.rate
 
     def __str__(self):
@@ -281,7 +281,7 @@ class Gamma(RandomVariable):
         np.random.seed(seed)
         return np.random.gamma(self.shape, self.scale)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.shape * self.scale
 
     def __str__(self):
@@ -313,7 +313,7 @@ class ChiSquared(Gamma):
         np.random.seed(seed)
         return np.random.chisquare(self.k)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.k
 
     def __str__(self):
@@ -341,7 +341,7 @@ class Exp(Gamma):
         np.random.seed(seed)
         return np.random.exponential(self.rate)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return 1 / self.rate
 
     def __str__(self):
@@ -370,7 +370,7 @@ class Unif(RandomVariable):
         np.random.seed(seed)
         return np.random.uniform(self.a, self.b)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return (self.a + self.b) / 2
 
     def __str__(self):
@@ -413,7 +413,7 @@ class Normal(RandomVariable):
             return np.random.multivariate_normal(self._mean,
                                                  self.cov, self.dim)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self._mean
 
     def __str__(self):
@@ -438,7 +438,7 @@ class LogNormal(RandomVariable):
         np.random.seed(seed)
         return np.random.lognormal(self.mean, self.sd)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return np.exp(self.mean + self.sd ** 2 / 2)
 
     def __str__(self):
@@ -468,7 +468,7 @@ class Beta(RandomVariable):
         np.random.seed(seed)
         return np.random.beta(self.alpha, self.beta)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.alpha / (self.alpha + self.beta)
 
     def __str__(self):
@@ -492,7 +492,7 @@ class PowerLaw(RandomVariable):
         np.random.seed(seed)
         return np.random.power(self.power)
 
-    def mean(self):
+    def mean(self, **kwargs):
         # double check
         return self.power / (self.power + 1)
 
@@ -522,7 +522,7 @@ class F(RandomVariable):
         np.random.seed(seed)
         return np.random.f(self.d1, self.d2)
 
-    def mean(self):
+    def mean(self, **kwargs):
         if self.d2 <= 2:
             msg = 'Mean not defined for {}'.format(str(self))
             raise UndefinedError(msg)
@@ -550,7 +550,7 @@ class Student_t(RandomVariable):
         np.random.seed(seed)
         return np.random.standard_t(self.deg)
 
-    def mean(self):
+    def mean(self, **kwargs):
         if self.deg <= 1:
             msg = 'Mean not defined for {}'.format(str(self))
             raise UndefinedError(msg)
@@ -583,7 +583,7 @@ class Laplace(RandomVariable):
         np.random.seed(seed)
         return np.random.laplace(self.loc, self.scale)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.loc
 
     def __str__(self):
@@ -610,7 +610,7 @@ class Logistic(RandomVariable):
         np.random.seed(seed)
         return np.random.logistic(self.loc, self.scale)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.loc
 
     def __str__(self):
@@ -637,7 +637,7 @@ class VonMises(RandomVariable):
         np.random.seed(seed)
         return np.random.vonmises(self.mean, self.kappa)
 
-    def mean(self):
+    def mean(self, **kwargs):
         return self.mean
 
     def __str__(self):
