@@ -9,7 +9,7 @@ of new random variables.
 
 
 # Utilities
-from .utils import array, hist, Lift, sum
+from .utils import array, hist, lift, sum
 from .utils import Wigner, Wishart
 
 # Discrete random variables

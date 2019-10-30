@@ -183,14 +183,14 @@ Function composition
 Certain functions don't work automatically with random variables.
 However, any functions can be lifted to maps between random variables
 using the
-``@pr.Lift`` decorator.
+``@pr.lift`` decorator.
 
->>> Det = pr.Lift(np.linalg.det)
+>>> Det = pr.lift(np.linalg.det)
 
 An equivalent way of doing this is as follows::
 
 	import numpy as np
-	@pr.Lift
+	@pr.lift
 	def Det(m):
 		return np.linalg.det(m)
 

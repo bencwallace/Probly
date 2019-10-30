@@ -58,11 +58,11 @@ follow the
 `semicircle distribution <https://en.wikipedia.org/wiki/Wigner_semicircle_distribution>`_.
 Let's check this empirically. First, we normalize ``M`` and then we construct its
 (random) eigenvalues by applying NumPy's
-`numpy.linalg.eigvals <https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.eigvals.html>`_ using :func:`~probly.Lift`.
+`numpy.linalg.eigvals <https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.eigvals.html>`_ using :func:`~probly.lift`.
 
 >>> import numpy as np
 >>> M = M / np.sqrt(dim)
->>> Eigvals = pr.Lift(np.linalg.eigvals)
+>>> Eigvals = pr.lift(np.linalg.eigvals)
 >>> E = Eigvals(M)
 
 The distribution of the eigenvalues can be visualized using the :func:`~probly.hist`

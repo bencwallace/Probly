@@ -103,7 +103,7 @@ class Wishart(RandomVariable):
 
 # -------------------- Other random variable constructors -------------------- #
 
-def Lift(f):
+def lift(f):
     """
     Lifts a function to the composition map between random variables.
 
