@@ -95,11 +95,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
     _last_id = itertools.count(start=1)
 
-    @classmethod
-    def _reset(cls):
-        # For debugging
-        cls._last_id = itertools.count(start=1)
-
     def copy(self):
         """Returns an independent, identically distributed random variable."""
 
