@@ -2,14 +2,17 @@
 Utilities for working with random variables.
 """
 
-from .core import RandomVariable
-from .distributions import Normal
-from collections.abc import Sequence
 from functools import partial, wraps
+
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .core import RandomVariable
+from .distributions import Normal
+
+
 # ------------------------ Random matrix constructors ------------------------ #
+
 
 class Wigner(RandomVariable):
     """
@@ -82,7 +85,7 @@ class Wishart(RandomVariable):
         if rv is None:
             rv = Normal()
 
-        rect = np.array([[rv.copy() for j in range(n)] for i in range(m)])
+        rect = np.array([[rv.copy() for _ in range(n)] for _ in range(m)])
         square = np.dot(rect.T, rect)
 
         rarr = array(square)
@@ -101,7 +104,9 @@ class Wishart(RandomVariable):
     def __str__(self):
         return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
 
+
 # ---------------------------- Other constructors ---------------------------- #
+
 
 def array(arr):
     """
@@ -123,12 +128,12 @@ def array(arr):
         return np.array(inputs).reshape(np.shape(arr))
 
     parents = np.vectorize(RandomVariable)(arr).flatten()
-    RV = RandomVariable(op, *parents)
+    rv = RandomVariable(op, *parents)
 
     # For RandomVariable.__array__
-    RV.shape = np.shape(arr)
+    rv.shape = np.shape(arr)
 
-    return RV
+    return rv
 
 
 def lift(f):
@@ -157,14 +162,14 @@ def lift(f):
     """
 
     @wraps(f)
-    def F(*args, **kwargs):
+    def lifted(*args, **kwargs):
         if any((isinstance(arg, RandomVariable) for arg in args)):
             fkwargs = partial(f, **kwargs)
             return RandomVariable(fkwargs, *args)
         else:
             return f(*args, **kwargs)
 
-    return F
+    return lifted
 
 
 def sum(summands, num=None):
@@ -195,7 +200,9 @@ def sum(summands, num=None):
 
     return np.sum(summands)
 
+
 # -------------------------------- Properties -------------------------------- #
+
 
 def mean(rv, max_iter=int(1e5), tol=1e-5):
     return rv.mean(max_iter=max_iter, tol=tol)
@@ -220,7 +227,9 @@ def cdf(rv, x, **kwargs):
 def pdf(rv, x, dx=1e-5, **kwargs):
     return rv.pdf(x, dx, **kwargs)
 
+
 # ---------------------------------- Other ---------------------------------- #
+
 
 def hist(rv, num_samples, bins=None, density=True):
     """
@@ -241,4 +250,3 @@ def hist(rv, num_samples, bins=None, density=True):
     samples = [rv() for _ in range(num_samples)]
     plt.hist(samples, bins=bins, density=density)
     plt.show()
-

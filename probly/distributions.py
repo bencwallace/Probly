@@ -3,6 +3,7 @@ Random variables following common distributions.
 """
 
 import numpy as np
+
 from .core import RandomVariable
 from .exceptions import UndefinedError
 

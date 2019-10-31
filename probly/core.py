@@ -6,15 +6,15 @@ graph. Random variables are defined as nodes that obey arithmetical and
 independence relations.
 """
 
+import copy
+import functools
+import itertools
+import warnings
+
 import numpy as np
 from numpy.lib.mixins import NDArrayOperatorsMixin
 import scipy.misc
 
-import itertools
-import functools
-import copy
-
-import warnings
 from .exceptions import ConvergenceWarning
 
 
@@ -98,12 +98,12 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     def copy(self):
         """Returns an independent, identically distributed random variable."""
 
-        Copy = super().copy()
+        c = super().copy()
 
-        Copy._id = next(self._last_id)
-        Copy._offset = self._get_random(Copy._id)
+        c._id = next(self._last_id)
+        c._offset = self._get_random(c._id)
 
-        return Copy
+        return c
 
     # ----------------------------- Constructor ----------------------------- #
 
@@ -177,7 +177,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return np.random.randint(cls._max_seed)
 
     @classmethod
-    def _get_random(cls, seed, old=False):
+    def _get_random(cls, seed):
         """
         Produces a pseudo-random number from a given input seed.
         """
@@ -236,7 +236,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         total = 0
         avg = 0
         count = 0
-        delta = tol + 1
         for i in range(1, max_iter):
             total += self(i)
             new_avg = total / i
