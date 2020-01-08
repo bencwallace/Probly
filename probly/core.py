@@ -147,6 +147,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         # Scalar by default but overwritten by helpers.array
         obj.shape = ()
 
+        # Initialize memo
+        obj.prev_seed = None
+        obj.prev_val = None
+
         return obj
 
     # ------------------------------ Sampling ------------------------------ #
@@ -159,8 +163,14 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         Produces a random sample.
         """
 
-        new_seed = (self._get_seed(seed) + self._offset) % self._max_seed
-        return super().__call__(new_seed)
+        # Check memo
+        if seed == self.prev_seed:
+            return self.prev_val
+        else:
+            # Recursively compute new value and update memo
+            self.prev_seed = (self._get_seed(seed) + self._offset) % self._max_seed
+            self.prev_val = super().__call__(self.prev_seed)
+            return self.prev_val
 
     @classmethod
     def _get_seed(cls, seed=None, return_if_seeded=True):
