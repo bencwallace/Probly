@@ -136,6 +136,16 @@ def array(arr):
     return rv
 
 
+def constrv(c):
+    """
+    Constructs a constant random variable.
+
+    :param c: constant value
+    :return: Constant random variable with value `c`
+    """
+
+    return RandomVariable(lambda _: c)
+
 def lift(f):
     """
     Lifts a function to the composition map between random variables.

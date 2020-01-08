@@ -11,7 +11,7 @@ max_seed = 2 ** 32 - 1
 current_id = itertools.count(start=1)
 
 
-class TestDistribution(TestCase):
+class TestDistributions(TestCase):
     def setUp(self):
         self.user_seed = 666
         rv_id = next(current_id)

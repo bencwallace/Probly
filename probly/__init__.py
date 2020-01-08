@@ -9,7 +9,7 @@ of new random variables.
 
 
 # Utilities
-from .utils import array, hist, lift, sum
+from .utils import array, constrv, hist, lift, sum
 from .utils import mean, moment, cmoment, variance, cdf, pdf
 from .utils import Wigner, Wishart
 
@@ -30,8 +30,7 @@ from .distributions import Laplace, Logistic, VonMises
 __all__ = []
 
 # Constructors and helpers
-__all__ += ['Lift', 'array', 'sum']
-__all__ += ['hist', 'mean']
+__all__ += ['array', 'constrv', 'hist', 'lift', 'sum']
 
 # Moment methods
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
