@@ -5,7 +5,6 @@ Random variables following common distributions.
 import numpy as np
 
 from .core import RandomVariable
-from .exceptions import UndefinedError
 
 
 # ======================== Discrete random variables ======================== #
@@ -13,7 +12,7 @@ from .exceptions import UndefinedError
 
 # -------------------- Discrete uniform random variable -------------------- #
 
-class DUnif(RandomVariable):
+class RandInt(RandomVariable):
     """
     A discrete uniform random variable.
 
@@ -25,12 +24,9 @@ class DUnif(RandomVariable):
         Highest possible value. Default is `a + 1`.
     """
 
-    def __init__(self, a=0, b=None):
+    def __init__(self, a, b):
         self.a = a
-        if b is None:
-            self.b = a + 1
-        else:
-            self.b = b
+        self.b = b
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -40,7 +36,7 @@ class DUnif(RandomVariable):
         return (self.a + self.b) / 2
 
     def __str__(self):
-        return 'DUnif({}, {})'.format(self.a, self.b)
+        return 'RandInt({}, {})'.format(self.a, self.b)
 
 
 # --------------------------- Multinomial family --------------------------- #
@@ -268,15 +264,10 @@ class Gamma(RandomVariable):
         Scale parameter.
     """
 
-    def __init__(self, shape=1, rate=None, scale=None):
+    def __init__(self, shape=1, scale=None):
         self.shape = shape
-
-        if scale is not None:
-            self.scale = scale
-            self.rate = 1 / scale
-        else:
-            self.rate = rate
-            self.scale = 1 / rate
+        self.scale = scale
+        self.rate = 1 / scale
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -286,8 +277,7 @@ class Gamma(RandomVariable):
         return self.shape * self.scale
 
     def __str__(self):
-        return 'Gamma(shape={}, rate={},'\
-               ' scale={})'.format(self.shape, self.rate, self.scale)
+        return 'Gamma(shape={}, scale={})'.format(self.shape, self.scale)
 
 
 class ChiSquared(Gamma):
@@ -305,9 +295,8 @@ class ChiSquared(Gamma):
 
         shape = float(k) / 2
         scale = 2
-        rate = 1 / scale
 
-        super().__init__(shape, rate, scale)
+        super().__init__(shape, scale)
 
     # Much faster than using np.random.gamma
     def _sampler(self, seed=None):
@@ -335,7 +324,7 @@ class Exp(Gamma):
         shape = 1
         scale = 1 / float(rate)
 
-        super().__init__(shape, rate, scale)
+        super().__init__(shape, scale)
 
     # A bit faster than using np.random.gamma
     def _sampler(self, seed=None):
@@ -494,7 +483,7 @@ class PowerLaw(RandomVariable):
         return np.random.power(self.power)
 
     def mean(self, **kwargs):
-        # double check
+        # todo: double check
         return self.power / (self.power + 1)
 
     def __str__(self):
@@ -525,8 +514,7 @@ class F(RandomVariable):
 
     def mean(self, **kwargs):
         if self.d2 <= 2:
-            msg = 'Mean not defined for {}'.format(str(self))
-            raise UndefinedError(msg)
+            return float('inf')
 
         return self.d2 / (self.d2 - 2)
 
@@ -553,8 +541,7 @@ class Student_t(RandomVariable):
 
     def mean(self, **kwargs):
         if self.deg <= 1:
-            msg = 'Mean not defined for {}'.format(str(self))
-            raise UndefinedError(msg)
+            return float('inf')
 
         return 0
 

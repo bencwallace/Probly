@@ -14,7 +14,7 @@ from .utils import mean, moment, cmoment, variance, cdf, pdf
 from .utils import Wigner, Wishart
 
 # Discrete random variables
-from .distributions import DUnif
+from .distributions import RandInt
 from .distributions import Multinomial, Bin, Ber
 from .distributions import NegBin, Geom
 from .distributions import HyperGeom, Pois

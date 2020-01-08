@@ -93,14 +93,14 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     # ---------------------------- Independence ---------------------------- #
 
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
-    _last_id = itertools.count(start=1)
+    _current_id = itertools.count(start=1)
 
     def copy(self):
         """Returns an independent, identically distributed random variable."""
 
         c = super().copy()
 
-        c._id = next(self._last_id)
+        c._id = next(self._current_id)
         c._offset = self._get_random(c._id)
 
         return c
@@ -119,7 +119,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         _offset attributes that are used to ensure independence.
         """
 
-        _id = next(cls._last_id)
+        _id = next(cls._current_id)
 
         # First constructs a bare Node object
         obj = super().__new__(cls)
@@ -210,7 +210,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         # Determines behaviour of np.array
         if self.shape:
             # Return the array represented by self
-            return np.asarray(self.parents()).reshape(self.shape)
+            return np.asarray(self._parents).reshape(self.shape)
         else:
             # Form a single-element array
             arr = np.ndarray(1, dtype=object)
@@ -259,7 +259,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     def cmoment(self, p, **kwargs):
         """Numerically approximates the p-th central moment."""
 
-        # To do: Subclasses must allow kwargs
+        # todo: Subclasses must allow kwargs
         return self.moment(p, **kwargs) - (self.mean()) ** p
 
     def variance(self, **kwargs):
@@ -272,7 +272,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
         return (self <= x).mean(**kwargs)
 
-    # Quite slow and inaccurate
+    # todo: slow and inaccurate
     def pdf(self, x, dx=1e-5, **kwargs):
         """Numerically approximates the pdf at x."""
 
