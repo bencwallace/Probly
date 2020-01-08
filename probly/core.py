@@ -14,7 +14,7 @@ import numpy as np
 from numpy.lib.mixins import NDArrayOperatorsMixin
 import scipy.misc
 
-from .exceptions import ConvergenceWarning
+from .exceptions import ConditionError, ConvergenceWarning
 
 
 class Node(object):
