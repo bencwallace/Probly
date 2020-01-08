@@ -1,9 +1,8 @@
 """
-Random variables are implemented as a kind of node in a computational graph.
+The base class for all random variables.
 
-The basic type underlying all random variables is a node in a computational
-graph. Random variables are defined as nodes that obey arithmetical and
-independence relations.
+Random variables are defined as nodes in a computational graph that obey arithmetical and
+(in)dependence relations.
 """
 
 import copy
@@ -235,6 +234,12 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
             return array[key]
         return RandomVariable(get_item_from_key, self)
 
+
+    # - Conditioning - #
+
+    def given(self, condition):
+        return Conditional(self, condition)
+
     # ------------------------------ Integrals ------------------------------ #
 
     # All integrals (including probabilities) are defined in terms of the mean
@@ -288,3 +293,28 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
         cdf = functools.partial(self.cdf, **kwargs)
         return scipy.misc.derivative(cdf, x, dx)
+
+    # - Other - #
+
+    def __hash__(self):
+        return id(self)
+
+
+class Conditional(RandomVariable):
+    _max_attempts = 100_000
+
+    def __init__(self, rv, condition):
+        self.rv = rv
+        self.condition = condition
+
+    def __call__(self, seed=None):
+        seed = self._get_seed(seed)
+
+        attempts = 0
+        while not self.condition.check(seed):
+            seed = (seed + 1) % self._max_seed
+            attempts += 1
+            if attempts > self._max_attempts:
+                raise ConditionError("Failed to meet condition")
+
+        return self.rv(seed)

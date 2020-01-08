@@ -106,31 +106,6 @@ class Wishart(RandomVariable):
         return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
 
 
-# -- Conditional random variables -- #
-
-
-class Conditional(RandomVariable):
-    _max_attempts = 100_000
-
-    def __init__(self, X, Y, p):
-        self.X = X
-        self.Y = Y
-        self.p = p
-
-    # todo: make seed optional
-    def __call__(self, seed=None):
-        seed = self._get_seed(seed)
-        # todo: ensure termination
-        attempts = 0
-        while not self.p(self.Y(seed)):
-            seed = (seed + 1) % self._max_seed
-            attempts += 1
-            if attempts > self._max_attempts:
-                raise ConditionError("Failed to meet condition")
-
-        return self.X(seed)
-
-
 # ---------------------------- Other constructors ---------------------------- #
 
 
