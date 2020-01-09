@@ -4,7 +4,7 @@ Random variables following common distributions.
 
 import numpy as np
 
-from .core import RandomVariable
+from .core import Distribution
 
 
 # ======================== Discrete random variables ======================== #
@@ -12,7 +12,7 @@ from .core import RandomVariable
 
 # -------------------- Discrete uniform random variable -------------------- #
 
-class RandInt(RandomVariable):
+class RandInt(Distribution):
     """
     A discrete uniform random variable.
 
@@ -27,6 +27,7 @@ class RandInt(RandomVariable):
     def __init__(self, a, b):
         self.a = a
         self.b = b
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -41,7 +42,7 @@ class RandInt(RandomVariable):
 
 # --------------------------- Multinomial family --------------------------- #
 
-class Multinomial(RandomVariable):
+class Multinomial(Distribution):
     """
     A multinomial random variable.
 
@@ -59,6 +60,7 @@ class Multinomial(RandomVariable):
             self.pvals = [1 / n] * n
         else:
             self.pvals = pvals
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -88,8 +90,8 @@ class Bin(Multinomial):
     """
 
     def __init__(self, n, p=0.5):
-        super().__init__(n, [1 - p, p])
         self.p = p
+        super().__init__(n, [1 - p, p])
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -127,7 +129,7 @@ class Ber(Bin):
 
 # ------------------------ Negative binomial family ------------------------ #
 
-class NegBin(RandomVariable):
+class NegBin(Distribution):
     """
     A negative binomial random variable.
 
@@ -146,6 +148,7 @@ class NegBin(RandomVariable):
     def __init__(self, n, p=0.5):
         self.n = n
         self.p = p
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -188,7 +191,7 @@ class Geom(NegBin):
 
 # --------------------- Other discrete random variables --------------------- #
 
-class HyperGeom(RandomVariable):
+class HyperGeom(Distribution):
     """
     A hypergeometric random variable.
 
@@ -203,6 +206,7 @@ class HyperGeom(RandomVariable):
         self.ngood = ngood
         self.nbad = nbad
         self.nsample = nsample
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -216,7 +220,7 @@ class HyperGeom(RandomVariable):
                ' {})'.format(self.ngood, self.nbad, self.nsample)
 
 
-class Pois(RandomVariable):
+class Pois(Distribution):
     """
     A Poisson random variable.
 
@@ -228,6 +232,7 @@ class Pois(RandomVariable):
 
     def __init__(self, rate=1):
         self.rate = rate
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -245,7 +250,7 @@ class Pois(RandomVariable):
 
 # ------------------------------ Gamma family ------------------------------ #
 
-class Gamma(RandomVariable):
+class Gamma(Distribution):
     """
     A gamma random variable.
 
@@ -258,8 +263,6 @@ class Gamma(RandomVariable):
     ----------
     shape : float, optional
         Shape parameter.
-    rate : float, optional if `scale` specified
-        Rate parameter.
     scale : float, optional if `rate` specified
         Scale parameter.
     """
@@ -268,6 +271,7 @@ class Gamma(RandomVariable):
         self.shape = shape
         self.scale = scale
         self.rate = 1 / scale
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -340,7 +344,7 @@ class Exp(Gamma):
 
 # ------------------------ Uniform random variables ------------------------ #
 
-class Unif(RandomVariable):
+class Unif(Distribution):
     """
     A uniform random variable.
 
@@ -349,12 +353,13 @@ class Unif(RandomVariable):
     a : float, optional
         Left endpoint of the support interval.
     b : float, optional
-        Right endpoint of the selfupport inteRandomVariableal.
+        Right endpoint of the selfupport inteDistributional.
     """
 
     def __init__(self, a=0, b=1):
         self.a = a
         self.b = b
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -369,7 +374,7 @@ class Unif(RandomVariable):
 
 # ------------------- Normal and related random variables ------------------- #
 
-class Normal(RandomVariable):
+class Normal(Distribution):
     """
     A normal random variable.
 
@@ -395,6 +400,8 @@ class Normal(RandomVariable):
             if cov == 1:
                 self.cov = np.eye(dim)
 
+        super().__init__()
+
     def _sampler(self, seed=None):
         np.random.seed(seed)
         if self.dim == 1:
@@ -410,7 +417,7 @@ class Normal(RandomVariable):
         return 'Normal({}, {}, {})'.format(self.mean, self.cov, self.dim)
 
 
-class LogNormal(RandomVariable):
+class LogNormal(Distribution):
     """
     A log-normal random variable.
 
@@ -423,6 +430,7 @@ class LogNormal(RandomVariable):
     def __init__(self, mean=0, sd=1):
         self.mean = mean
         self.sd = sd
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -437,7 +445,7 @@ class LogNormal(RandomVariable):
 
 # --------------------- Beta distribution and power law --------------------- #
 
-class Beta(RandomVariable):
+class Beta(Distribution):
     """
     A beta random variable.
 
@@ -453,6 +461,7 @@ class Beta(RandomVariable):
     def __init__(self, alpha, beta):
         self.alpha = alpha
         self.beta = beta
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -465,7 +474,7 @@ class Beta(RandomVariable):
         return 'Beta({}, {})'.format(self.alpha, self.beta)
 
 
-class PowerLaw(RandomVariable):
+class PowerLaw(Distribution):
     """
     A random variable following a power law.
 
@@ -477,6 +486,7 @@ class PowerLaw(RandomVariable):
 
     def __init__(self, power):
         self.power = power
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -492,7 +502,7 @@ class PowerLaw(RandomVariable):
 
 # ------------------------ F and t random variables ------------------------ #
 
-class F(RandomVariable):
+class F(Distribution):
     """
     An F random variable.
 
@@ -507,6 +517,7 @@ class F(RandomVariable):
     def __init__(self, d1, d2):
         self.d1 = d1
         self.d2 = d2
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -522,7 +533,7 @@ class F(RandomVariable):
         return 'F({}, {})'.format(self.d1, self.d2)
 
 
-class Student_t(RandomVariable):
+class StudentT(Distribution):
     """
     A Student's t random variable.
 
@@ -534,6 +545,7 @@ class Student_t(RandomVariable):
 
     def __init__(self, deg):
         self.deg = deg
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -551,7 +563,7 @@ class Student_t(RandomVariable):
 
 # -------------------- Other continuous random variables -------------------- #
 
-class Laplace(RandomVariable):
+class Laplace(Distribution):
     """
     A Laplace random variable.
 
@@ -566,6 +578,7 @@ class Laplace(RandomVariable):
     def __init__(self, loc=0, scale=1):
         self.loc = loc
         self.scale = scale
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -578,7 +591,7 @@ class Laplace(RandomVariable):
         return 'Laplace({}, {})'.format(self.loc, self.scale)
 
 
-class Logistic(RandomVariable):
+class Logistic(Distribution):
     """
     A logistic random variable.
 
@@ -593,6 +606,7 @@ class Logistic(RandomVariable):
     def __init__(self, loc=0, scale=1):
         self.loc = loc
         self.scale = scale
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
@@ -605,7 +619,7 @@ class Logistic(RandomVariable):
         return 'Logistic({}, {})'.format(self.loc, self.scale)
 
 
-class VonMises(RandomVariable):
+class VonMises(Distribution):
     """
     A von Mises random variable.
 
@@ -620,6 +634,7 @@ class VonMises(RandomVariable):
     def __init__(self, mean=0, kappa=1):
         self.mean = mean
         self.kappa = kappa
+        super().__init__()
 
     def _sampler(self, seed=None):
         np.random.seed(seed)
