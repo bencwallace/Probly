@@ -163,12 +163,12 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         """
 
         # Check memo
-        if seed == self.prev_seed:
+        if seed == self.current_seed:
             return self.prev_val
         else:
             # Recursively compute new value and update memo
-            self.prev_seed = (self._get_seed(seed) + self._offset) % self._max_seed
-            self.prev_val = super().__call__(self.prev_seed)
+            self.current_seed = (self._get_seed(seed) + self._offset) % self._max_seed
+            self.prev_val = super().__call__(self.current_seed)
             return self.prev_val
 
     @classmethod
