@@ -4,7 +4,7 @@ Random variables following common distributions.
 
 import numpy as np
 
-from .random_variables import RandomVariableWithIndependence
+from ..core.random_variables import RandomVariableWithIndependence
 
 
 class Distribution(RandomVariableWithIndependence):

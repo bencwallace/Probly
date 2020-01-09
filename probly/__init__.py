@@ -8,34 +8,17 @@ of new random variables.
 """
 
 
-from .utils import const, hist, lift, sum
-from .properties import mean, moment, cmoment, variance, cdf, pdf
-from .random_arrays import random_array, RandomArray, Wigner, Wishart
-
-# Discrete random variables
-from .distributions import RandInt
-from .distributions import Multinomial, Bin, Ber
-from .distributions import NegBin, Geom
-from .distributions import HyperGeom, Pois
-
-# Continuous random variables
-from .distributions import Gamma, ChiSquared, Exp
-from .distributions import Unif
-from .distributions import Normal, LogNormal
-from .distributions import Beta, PowerLaw
-from .distributions import F, StudentT
-from .distributions import Laplace, Logistic, VonMises
+from .core import *
+from .distr import *
+from .lib import *
 
 __all__ = []
-
-# Constructors and helpers
-__all__ += ['random_array', 'const', 'hist', 'lift', 'sum']
-
-# Moment methods
+__all__ += ['random_array', 'RandomArray', 'Wigner', 'Wishart']
+__all__ += ['const', 'hist', 'lift', 'sum']
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
 
 # Discrete random variables
-__all__ += ['DUnif']
+__all__ = ['RandInt']
 __all__ += ['Multinomial', 'Bin', 'Ber']
 __all__ += ['NegBin', 'Geom']
 __all__ += ['HyperGeom', 'Pois']
@@ -47,6 +30,3 @@ __all__ += ['Normal', 'LogNormal']
 __all__ += ['Beta', 'PowerLaw']
 __all__ += ['F', 'StudentT']
 __all__ += ['Laplace', 'Logistic', 'VonMises']
-
-# Random matrices
-__all__ += ['RandomArray', 'Wigner', 'Wishart']
