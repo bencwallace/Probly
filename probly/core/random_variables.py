@@ -190,7 +190,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
         return (self <= x).mean(**kwargs)
 
-    # todo: slow and inaccurate
     def pdf(self, x, dx=1e-5, **kwargs):
         """Numerically approximates the pdf at x."""
 
@@ -199,9 +198,15 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     # - Other - #
 
-    # todo: eq and hash
-    def __hash__(self):
-        return id(self)
+    # def __eq__(self, other):
+    #     if not(type(self).op == other.op):
+    #         return False
+    #     if not(len(self.parents) == len(other.parents)):
+    #         return False
+    #     return all([p == q for (p, q) in zip((self.parents, other.parents))])
+    #
+    # def __hash__(self):
+    #     return hash(self.op) + sum([hash(p) for p in self.parents])
 
 
 class RandomVariableWithIndependence(RandomVariable):
