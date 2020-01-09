@@ -14,7 +14,7 @@ from .lib import *
 
 __all__ = []
 __all__ += ['random_array', 'RandomArray', 'Wigner', 'Wishart']
-__all__ += ['const', 'hist', 'lift', 'sum']
+__all__ += ['const', 'hist', 'lift']
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
 
 # Discrete random variables

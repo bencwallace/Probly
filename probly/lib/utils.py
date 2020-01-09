@@ -7,7 +7,6 @@ from functools import partial, wraps
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .. import RandomArray
 from ..core.random_variables import RandomVariable
 
 
@@ -60,9 +59,10 @@ def lift(f):
        RandomVariable._reset()
 
 
+    >>> import probly as pr
     >>> import numpy as np
-    >>> Det = pr.Lift(np.linalg.det)
-    >>> M = pr.Wigner(pr.Normal(), 2)
+    >>> Det = pr.lift(np.linalg.det)
+    >>> M = pr.Wigner(2, pr.Normal())
     >>> D = Det(M)
     >>> D(0)
     1.2638214666689431
