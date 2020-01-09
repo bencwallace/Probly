@@ -9,9 +9,9 @@ of new random variables.
 
 
 # Utilities
-from .utils import array, constrv, hist, lift, sum
+from .utils import random_array, constrv, hist, lift, sum
 from .utils import mean, moment, cmoment, variance, cdf, pdf
-from .utils import Wigner, Wishart
+from .utils import RandomArray, Wigner, Wishart
 
 # Discrete random variables
 from .distributions import RandInt
@@ -30,7 +30,7 @@ from .distributions import Laplace, Logistic, VonMises
 __all__ = []
 
 # Constructors and helpers
-__all__ += ['array', 'constrv', 'hist', 'lift', 'sum']
+__all__ += ['random_array', 'constrv', 'hist', 'lift', 'sum']
 
 # Moment methods
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
@@ -50,4 +50,4 @@ __all__ += ['F', 'StudentT']
 __all__ += ['Laplace', 'Logistic', 'VonMises']
 
 # Random matrices
-__all__ += ['Wigner', 'Wishart']
+__all__ += ['RandomArray', 'Wigner', 'Wishart']
