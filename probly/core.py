@@ -117,7 +117,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         If `return_if_seeded` is True, returns `seed` (when provided).
         """
 
-        if seed and return_if_seeded:
+        if seed is not None and return_if_seeded:
             return seed
 
         np.random.seed(seed)
@@ -238,9 +238,9 @@ class RandomVariableWithIndependence(RandomVariable):
         self._offset = self._get_random(self._id)
         super().__init__(op, *parents)
 
-    def __call_(self, seed=None):
+    def __call__(self, seed=None):
         new_seed = (self._get_seed(seed) + self._offset) % self._max_seed
-        super().__call__(new_seed)
+        return super().__call__(new_seed)
 
     @classmethod
     def _get_random(cls, seed):

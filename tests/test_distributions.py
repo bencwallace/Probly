@@ -19,7 +19,7 @@ class TestDistributions(TestCase):
         current_offset = np.random.randint(max_seed)
         self.seed = (self.user_seed + current_offset) % max_seed
 
-    def test_choice(self):
+    def test_rand_int(self):
         a = -100
         b = 100
         X = pr.RandInt(a, b)
