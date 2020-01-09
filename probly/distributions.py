@@ -4,7 +4,13 @@ Random variables following common distributions.
 
 import numpy as np
 
-from .core import Distribution
+from .random_variables import RandomVariableWithIndependence
+
+
+class Distribution(RandomVariableWithIndependence):
+    def __init__(self):
+        op = self._sampler
+        super().__init__(op)
 
 
 # ======================== Discrete random variables ======================== #

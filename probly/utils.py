@@ -7,107 +7,11 @@ from functools import partial, wraps
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .core import RandomVariable
-from .distributions import Normal
+from .random_variables import RandomVariable
+from .random_arrays import RandomArray
 
 
-# ------------------------ Random matrix constructors ------------------------ #
-
-
-class RandomArray(RandomVariable):
-    def __init__(self, array):
-        self.shape = np.array(array).shape
-
-        def op(*inputs):
-            return np.array(inputs).reshape(np.shape(array))
-        super().__init__(op, array)
-
-
-class Wigner(RandomArray):
-    """
-    A Wigner random matrix.
-
-    A random symmetric matrix whose upper-diagonal entries are independent,
-    identically distributed random variables.
-
-    Parameters
-    ----------
-    dim : int
-        The matrix dimension.
-    rv : RandomVariable, optional
-        A random variable whose distribution the entries will share. Default is
-        a standard normal random variable.
-    """
-
-    def __init__(self, dim, rv=None):
-        self.dim = dim
-        if rv is None:
-            rv = Normal()
-        self.rv = rv
-
-        # Upper-diagonal part
-        array = [[rv.copy() if i <= j else 0
-                  for j in range(dim)] for i in range(dim)]
-
-        # Lower-diagonal part
-        array = [[array[i][j] if i <= j else array[j][i]
-                  for j in range(dim)] for i in range(dim)]
-
-        super().__init__(array)
-
-    def __str__(self):
-        return 'Wigner({}, {})'.format(self.dim, self.rv)
-
-
-class Wishart(RandomArray):
-    """
-    A Wishart random matrix.
-
-    An `n` by `n` random symmetric matrix obtained as the (matrix) product of
-    an `m` by `n` random matrix with independent, identically distributed
-    entries, and its transpose.
-
-    Parameters
-    ----------
-    m : int
-        The first dimension parameter.
-    n : int
-        The second dimension parameter.
-    rv : RandomVariable, optional
-        A random variable.
-
-
-    Attributes
-    ----------
-    lambda_ : float
-        The ratio `m / n`.
-    """
-
-    def __init__(self, m, n, rv=None):
-        self.m = m
-        self.n = n
-        self.lambda_ = m / n
-        if rv is None:
-            rv = Normal()
-        self.rv = rv
-
-        rect = np.array([[rv.copy() for _ in range(n)] for _ in range(m)])
-        square = np.dot(rect.T, rect)
-        super().__init__(square)
-
-    def __str__(self):
-        return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
-
-
-# ---------------------------- Other constructors ---------------------------- #
-
-
-def random_array(rv, shape):
-    array = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
-    return RandomArray(array)
-
-
-def constrv(c):
+def const(c):
     """
     Constructs a constant random variable.
 
@@ -116,6 +20,27 @@ def constrv(c):
     """
 
     return RandomVariable(lambda _: c)
+
+
+def hist(rv, num_samples, bins=None, density=True):
+    """
+    Plots a histogram from samples of a random variable.
+
+    Parameters
+    ----------
+    rv : RandomVariable
+        A random variable.
+    num_samples : int
+        The number of samples to draw from `rv`.
+    bins : int or sequence, optional
+        Specifies the bins in the histogram.
+    density : bool, optional
+        If True, the histogram is normalized to form a probability density.
+    """
+
+    samples = [rv() for _ in range(num_samples)]
+    plt.hist(samples, bins=bins, density=density)
+    plt.show()
 
 
 def lift(f):
@@ -182,54 +107,3 @@ def sum(summands, num=None):
         summands = RandomArray(summands)
 
     return np.sum(summands)
-
-
-# -------------------------------- Properties -------------------------------- #
-
-
-def mean(rv, max_iter=int(1e5), tol=1e-5):
-    return rv.mean(max_iter=max_iter, tol=tol)
-
-
-def moment(rv, p, **kwargs):
-    return rv.moment(p, **kwargs)
-
-
-def cmoment(rv, p, **kwargs):
-    return rv.cmoment(p, **kwargs)
-
-
-def variance(rv, **kwargs):
-    return rv.variance(**kwargs)
-
-
-def cdf(rv, x, **kwargs):
-    return rv.cdf(x, **kwargs)
-
-
-def pdf(rv, x, dx=1e-5, **kwargs):
-    return rv.pdf(x, dx, **kwargs)
-
-
-# ---------------------------------- Other ---------------------------------- #
-
-
-def hist(rv, num_samples, bins=None, density=True):
-    """
-    Plots a histogram from samples of a random variable.
-
-    Parameters
-    ----------
-    rv : RandomVariable
-        A random variable.
-    num_samples : int
-        The number of samples to draw from `rv`.
-    bins : int or sequence, optional
-        Specifies the bins in the histogram.
-    density : bool, optional
-        If True, the histogram is normalized to form a probability density.
-    """
-
-    samples = [rv() for _ in range(num_samples)]
-    plt.hist(samples, bins=bins, density=density)
-    plt.show()

@@ -10,8 +10,8 @@ class TestArithmetic(TestCase):
         self.x = 333
         self.y = 112
 
-        self.X = pr.constrv(self.x)
-        self.Y = pr.constrv(self.y)
+        self.X = pr.const(self.x)
+        self.Y = pr.const(self.y)
 
     def test_add(self):
         z = self.x + self.y

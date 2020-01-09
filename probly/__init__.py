@@ -8,10 +8,9 @@ of new random variables.
 """
 
 
-# Utilities
-from .utils import random_array, constrv, hist, lift, sum
-from .utils import mean, moment, cmoment, variance, cdf, pdf
-from .utils import RandomArray, Wigner, Wishart
+from .utils import const, hist, lift, sum
+from .properties import mean, moment, cmoment, variance, cdf, pdf
+from .random_arrays import random_array, RandomArray, Wigner, Wishart
 
 # Discrete random variables
 from .distributions import RandInt
@@ -30,7 +29,7 @@ from .distributions import Laplace, Logistic, VonMises
 __all__ = []
 
 # Constructors and helpers
-__all__ += ['random_array', 'constrv', 'hist', 'lift', 'sum']
+__all__ += ['random_array', 'const', 'hist', 'lift', 'sum']
 
 # Moment methods
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']

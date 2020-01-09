@@ -14,31 +14,7 @@ from numpy.lib.mixins import NDArrayOperatorsMixin
 import scipy.misc
 
 from .exceptions import ConditionError, ConvergenceWarning
-
-
-class Node(object):
-    def __init__(self, op, *parents):
-        self.parents = parents
-
-        if not callable(op):
-            # Treat op as constant
-            self.op = lambda *x: op
-        else:
-            self.op = op
-
-    def __call__(self, *args):
-        if not self.parents:
-            # Let root act directly on args
-            out = self.op(*args)
-        else:
-            inputs = (p(*args) for p in self.parents)
-            out = self.op(*inputs)
-
-        # For length 1 tuples
-        if hasattr(out, '__len__') and len(out) == 1:
-            out = out[0]
-
-        return out
+from .nodes import Node
 
 
 class RandomVariable(Node, NDArrayOperatorsMixin):
@@ -54,7 +30,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     -------
     Define a family of "shifted" uniform random variables:
 
-    >>> from probly.core import RandomVariable
     >>> import numpy as np
     >>> class UnifShift(RandomVariable):
     ...     def __init__(self, a, b):
@@ -166,8 +141,8 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     # - Conditioning - #
 
-    def given(self, condition):
-        return Conditional(self, condition)
+    def given(self, *conditions):
+        return Conditional(self, *conditions)
 
     # ------------------------------ Integrals ------------------------------ #
 
@@ -257,24 +232,19 @@ class IndependentCopy(RandomVariableWithIndependence):
         super().__init__(rv.op, *rv.parents)
 
 
-class Distribution(RandomVariableWithIndependence):
-    def __init__(self):
-        op = self._sampler
-        super().__init__(op)
-
-
 class Conditional(RandomVariable):
     _max_attempts = 100_000
 
-    def __init__(self, rv, condition):
+    def __init__(self, rv, *conditions):
         self.rv = rv
-        self.condition = condition
+        self.conditions = conditions
+        super().__init__(self._sampler)
 
-    def __call__(self, seed=None):
+    def _sampler(self, seed=None):
         seed = self._get_seed(seed)
 
         attempts = 0
-        while not self.condition.check(seed):
+        while not all([rv(seed) for rv in self.conditions]):
             seed = (seed + 1) % self._max_seed
             attempts += 1
             if attempts > self._max_attempts:
