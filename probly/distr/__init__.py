@@ -1,16 +1,16 @@
 # Discrete random variables
-from .distributions import RandInt
-from .distributions import Multinomial, Bin, Ber
-from .distributions import NegBin, Geom
-from .distributions import HyperGeom, Pois
+from .discrete import RandInt
+from .discrete import Multinomial, Bin, Ber
+from .discrete import NegBin, Geom
+from .discrete import HyperGeom, Pois
 
 # Continuous random variables
-from .distributions import Gamma, ChiSquared, Exp
-from .distributions import Unif
-from .distributions import Normal, LogNormal
-from .distributions import Beta, PowerLaw
-from .distributions import F, StudentT
-from .distributions import Laplace, Logistic, VonMises
+from .continuous import Gamma, ChiSquared, Exp
+from .continuous import Unif
+from .continuous import Normal, LogNormal
+from .continuous import Beta, PowerLaw
+from .continuous import F, StudentT
+from .continuous import Laplace, Logistic, VonMises
 
 # Discrete random variables
 __all__ = ['RandInt']

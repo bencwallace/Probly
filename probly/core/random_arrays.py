@@ -1,7 +1,7 @@
 import numpy as np
 
 from .random_variables import RandomVariable
-from ..distr.distributions import Normal
+from ..distr import Normal
 
 
 def random_array(rv, shape):

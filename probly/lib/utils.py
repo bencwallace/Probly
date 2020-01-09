@@ -7,8 +7,8 @@ from functools import partial, wraps
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .. import RandomArray
 from ..core.random_variables import RandomVariable
-from ..core.random_arrays import RandomArray
 
 
 def const(c):
