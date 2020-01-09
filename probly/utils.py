@@ -9,13 +9,21 @@ import numpy as np
 
 from .core import RandomVariable
 from .distributions import Normal
-from .exceptions import ConditionError
 
 
 # ------------------------ Random matrix constructors ------------------------ #
 
 
-class Wigner(RandomVariable):
+class RandomArray(RandomVariable):
+    def __init__(self, array):
+        self.shape = np.array(array).shape
+
+        def op(*inputs):
+            return np.array(inputs).reshape(np.shape(array))
+        super().__init__(op, array)
+
+
+class Wigner(RandomArray):
     """
     A Wigner random matrix.
 
@@ -31,35 +39,27 @@ class Wigner(RandomVariable):
         a standard normal random variable.
     """
 
-    # todo: remove
-    def __new__(cls, dim, rv=None):
-        if rv is None:
-            rv = Normal()
-
-        # Upper-diagonal part
-        arr = [[rv.copy() if i <= j else 0 for j in range(dim)]
-               for i in range(dim)]
-
-        # Lower-diagonal part
-        arr = [[arr[i][j] if i <= j else arr[j][i] for j in range(dim)]
-               for i in range(dim)]
-
-        rarr = array(arr)
-        rarr.__class__ = cls
-        return rarr
-
     def __init__(self, dim, rv=None):
         self.dim = dim
         if rv is None:
-            self.rv = Normal()
-        else:
-            self.rv = rv
+            rv = Normal()
+        self.rv = rv
+
+        # Upper-diagonal part
+        array = [[rv.copy() if i <= j else 0
+                  for j in range(dim)] for i in range(dim)]
+
+        # Lower-diagonal part
+        array = [[array[i][j] if i <= j else array[j][i]
+                  for j in range(dim)] for i in range(dim)]
+
+        super().__init__(array)
 
     def __str__(self):
         return 'Wigner({}, {})'.format(self.dim, self.rv)
 
 
-class Wishart(RandomVariable):
+class Wishart(RandomArray):
     """
     A Wishart random matrix.
 
@@ -83,25 +83,17 @@ class Wishart(RandomVariable):
         The ratio `m / n`.
     """
 
-    def __new__(cls, m, n, rv=None):
-        if rv is None:
-            rv = Normal()
-
-        rect = np.array([[rv.copy() for _ in range(n)] for _ in range(m)])
-        square = np.dot(rect.T, rect)
-
-        rarr = array(square)
-        rarr.__class__ = cls
-        return rarr
-
     def __init__(self, m, n, rv=None):
         self.m = m
         self.n = n
-        self.lambda_ = self.m / self.n
+        self.lambda_ = m / n
         if rv is None:
-            self.rv = Normal()
-        else:
-            self.rv = rv
+            rv = Normal()
+        self.rv = rv
+
+        rect = np.array([[rv.copy() for _ in range(n)] for _ in range(m)])
+        square = np.dot(rect.T, rect)
+        super().__init__(square)
 
     def __str__(self):
         return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
@@ -110,32 +102,9 @@ class Wishart(RandomVariable):
 # ---------------------------- Other constructors ---------------------------- #
 
 
-def array(arr):
-    """
-    Casts an array of random variables to a random variable.
-
-    Parameters
-    ----------
-    arr : array_like
-        An array_like collection of `RandomVariable` objects or constants.
-
-    Returns
-    -------
-    RandomVariable
-        A random variable whose samples are arrays of samples of the objects
-        in `arr`.
-    """
-
-    def op(*inputs):
-        return np.array(inputs).reshape(np.shape(arr))
-
-    parents = np.vectorize(RandomVariable)(arr).flatten()
-    rv = RandomVariable(op, *parents)
-
-    # For RandomVariable.__array__
-    rv.shape = np.shape(arr)
-
-    return rv
+def random_array(rv, shape):
+    array = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
+    return RandomArray(array)
 
 
 def constrv(c):
@@ -147,6 +116,7 @@ def constrv(c):
     """
 
     return RandomVariable(lambda _: c)
+
 
 def lift(f):
     """
@@ -184,6 +154,7 @@ def lift(f):
     return lifted
 
 
+# todo: summing dimension
 def sum(summands, num=None):
     """
     Sums a collection of random variables.
@@ -204,11 +175,11 @@ def sum(summands, num=None):
     """
 
     if num is not None:
-        # Assume summands is a random variable
-        summands = array([summands.copy() for _ in range(num)])
+        # assume summands is a random variable
+        summands = RandomArray([summands.copy() for _ in range(num)])
     else:
         # Assume summands is a collection of random variables or random array
-        summands = array(summands)
+        summands = RandomArray(summands)
 
     return np.sum(summands)
 
