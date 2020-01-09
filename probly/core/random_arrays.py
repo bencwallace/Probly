@@ -11,11 +11,11 @@ def random_array(rv, shape):
 
 class RandomArray(RandomVariable):
     def __init__(self, array):
-        self.shape = np.array(array).shape
-
         def op(*inputs):
             return np.array(inputs).reshape(np.shape(array))
-        super().__init__(op, array)
+        super().__init__(op, *array.flatten())
+
+        self.shape = np.array(array).shape
 
 
 class Wigner(RandomArray):

@@ -77,33 +77,3 @@ def lift(f):
             return f(*args, **kwargs)
 
     return lifted
-
-
-# todo: summing dimension
-def sum(summands, num=None):
-    """
-    Sums a collection of random variables.
-
-    If `num` is provided, `summands` is treated as a single random variable
-    and the sum of `num` independent copies of `summands` is returned.
-    Otherwise, `summands` treated as a collection of random variables or
-    a random array and its sum is returned.
-
-    Parameters
-    ----------
-    summands : array_like of RandomVariable or RandomVariable
-        Either a collection of random variables to be summed, a random array
-        whose entries are to be summed, or a single random variable, of which
-        independent copies are to be summed.
-    num : int, optional
-        The number of independent copies of a random variable to sum.
-    """
-
-    if num is not None:
-        # assume summands is a random variable
-        summands = RandomArray([summands.copy() for _ in range(num)])
-    else:
-        # Assume summands is a collection of random variables or random array
-        summands = RandomArray(summands)
-
-    return np.sum(summands)

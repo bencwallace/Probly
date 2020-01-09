@@ -248,7 +248,6 @@ class PowerLaw(Distribution):
         return np.random.power(self.power)
 
     def mean(self, **kwargs):
-        # todo: double check
         return self.power / (self.power + 1)
 
     def __str__(self):
