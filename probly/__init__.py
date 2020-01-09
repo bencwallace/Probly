@@ -27,8 +27,6 @@ from .distributions import Beta, PowerLaw
 from .distributions import F, StudentT
 from .distributions import Laplace, Logistic, VonMises
 
-from .condition import Condition
-
 __all__ = []
 
 # Constructors and helpers
@@ -53,5 +51,3 @@ __all__ += ['Laplace', 'Logistic', 'VonMises']
 
 # Random matrices
 __all__ += ['Wigner', 'Wishart']
-
-__all__ += ['Condition']

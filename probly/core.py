@@ -224,6 +224,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     # - Other - #
 
+    # todo: eq and hash
     def __hash__(self):
         return id(self)
 

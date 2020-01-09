@@ -31,6 +31,7 @@ class Wigner(RandomVariable):
         a standard normal random variable.
     """
 
+    # todo: remove
     def __new__(cls, dim, rv=None):
         if rv is None:
             rv = Normal()
