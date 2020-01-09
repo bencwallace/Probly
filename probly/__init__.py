@@ -24,7 +24,7 @@ from .distributions import Gamma, ChiSquared, Exp
 from .distributions import Unif
 from .distributions import Normal, LogNormal
 from .distributions import Beta, PowerLaw
-from .distributions import F, Student_t
+from .distributions import F, StudentT
 from .distributions import Laplace, Logistic, VonMises
 
 from .condition import Condition
@@ -48,7 +48,7 @@ __all__ += ['Gamma', 'ChiSquared', 'Exp']
 __all__ += ['Unif']
 __all__ += ['Normal', 'LogNormal']
 __all__ += ['Beta', 'PowerLaw']
-__all__ += ['F', 'Student_t']
+__all__ += ['F', 'StudentT']
 __all__ += ['Laplace', 'Logistic', 'VonMises']
 
 # Random matrices

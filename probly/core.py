@@ -83,10 +83,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         self.shape = ()
 
         # Initialize memo
-        self.prev_seed = None
-        self.prev_val = None
+        self._current_seed = None
+        self._current_val = None
 
-        super().__init__(self, op, *parents)
+        super().__init__(op, *parents)
 
     # ------------------------------ Sampling ------------------------------ #
 
@@ -98,14 +98,16 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         Produces a random sample.
         """
 
+        seed = self._get_seed(seed)
+
         # Check memo
         if seed == self._current_seed:
-            return self._prev_val
+            return self._current_val
         else:
             # Recursively compute new value and update memo
             self._current_seed = self._get_seed(seed)
-            self._prev_val = super().__call__(self._current_seed)
-            return self._prev_val
+            self._current_val = super().__call__(self._current_seed)
+            return self._current_val
 
     @classmethod
     def _get_seed(cls, seed=None, return_if_seeded=True):
@@ -234,7 +236,7 @@ class RandomVariableWithIndependence(RandomVariable):
         # Add _id and _offset attributes for independence
         self._id = next(self._current_id)
         self._offset = self._get_random(self._id)
-        super().__init__(op, parents)
+        super().__init__(op, *parents)
 
     def __call_(self, seed=None):
         new_seed = (self._get_seed(seed) + self._offset) % self._max_seed
@@ -257,8 +259,7 @@ class IndependentCopy(RandomVariableWithIndependence):
 class Distribution(RandomVariableWithIndependence):
     def __init__(self):
         op = self._sampler
-        parents = ()
-        super().__init__(self, op, *parents)
+        super().__init__(op)
 
 
 class Conditional(RandomVariable):
