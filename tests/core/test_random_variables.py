@@ -22,3 +22,14 @@ class TestArithmetic(TestCase):
         z = self.x - self.y
         Z = self.X - self.Y
         self.assertEqual(Z(self.seed), z)
+
+
+class TestConditional(TestCase):
+    def test_conditional(self):
+        n = 10
+        X = pr.Bin(n)
+        Y = X + 1
+        x = 5
+        y = x + 1
+        Z = Y.given(X == x)
+        self.assertEqual(Z(), y)

@@ -4,18 +4,18 @@ from .random_variables import RandomVariable
 from ..distr import Normal
 
 
-def random_array(rv, shape):
-    array = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
-    return RandomArray(array)
+def array(rv, shape):
+    arr = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
+    return RandomArray(arr)
 
 
 class RandomArray(RandomVariable):
-    def __init__(self, array):
+    def __init__(self, arr):
         def op(*inputs):
-            return np.array(inputs).reshape(np.shape(array))
-        super().__init__(op, *array.flatten())
+            return np.array(inputs).reshape(np.shape(arr))
+        super().__init__(op, *arr.flatten())
 
-        self.shape = np.array(array).shape
+        self.shape = np.array(arr).shape
 
 
 class Wigner(RandomArray):
@@ -41,14 +41,14 @@ class Wigner(RandomArray):
         self.rv = rv
 
         # Upper-diagonal part
-        array = [[rv.copy() if i <= j else 0
+        arr = [[rv.copy() if i <= j else 0
                   for j in range(dim)] for i in range(dim)]
 
         # Lower-diagonal part
-        array = [[array[i][j] if i <= j else array[j][i]
+        arr = [[arr[i][j] if i <= j else arr[j][i]
                   for j in range(dim)] for i in range(dim)]
 
-        super().__init__(array)
+        super().__init__(arr)
 
     def __str__(self):
         return 'Wigner({}, {})'.format(self.dim, self.rv)
