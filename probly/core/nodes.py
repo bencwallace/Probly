@@ -17,7 +17,7 @@ class Node(object):
             out = self.op(*inputs)
 
         # For length 1 tuples
-        if hasattr(out, '__len__') and len(out) == 1:
-            out = out[0]
+        # if hasattr(out, '__len__') and len(out) == 1:
+        #     out = out[0]
 
         return out

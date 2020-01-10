@@ -21,11 +21,12 @@ class TestDistributions(TestCase):
 
 class TestRandomDistributions(TestDistributions):
     def test_ber_of_unif(self):
+        n = 10
         p = 0.6
         U = pr.Unif(p)
-        X = pr.Ber(U)
+        X = pr.Bin(n, U)
         np.random.seed(self.seed(U))
         u = np.random.uniform(p)
         np.random.seed(self.user_seed)
-        x = np.random.binomial(1, u)
+        x = np.random.binomial(n, u)
         self.assertEqual(X(self.user_seed), x)

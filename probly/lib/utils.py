@@ -18,7 +18,10 @@ def const(c):
     :return: Constant random variable with value `c`
     """
 
-    return RandomVariable(lambda _: c)
+    if isinstance(c, RandomVariable):
+        return c
+    else:
+        return RandomVariable(lambda _: c)
 
 
 def hist(rv, num_samples, bins=None, density=True):
