@@ -196,6 +196,15 @@ We'd like to create a kind of normal distribution over possible humans. We can d
 >>>         height, weight = np.random.multivariate_normal(means, cov)
 >>>         return Human(gender, height, weight)
 
+All the capabilities of random variables, including all those discussed above, will be available to our new random
+variable objects.
+
+.. note::
+
+   Of course, certain operations may result in errors on sampling. For instance, sampling from the "sum" of two random
+   humans will raise an error unless we overload addition for humans by defining ``__add__(self, other)`` in the
+   ``Human`` class.
+
 Let's initialize an instance of this random variable.
 
 >>> f_cov = np.array([[80, 5], [5, 99]])
