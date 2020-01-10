@@ -2,7 +2,7 @@
 Probly implements random variables and methods to aid in their construction.
 
 The main objects of Probly are random variable classes. These inherit from the
-core class ``RandomVariable``, which acts as a subclassing interface for a node
+test_core class ``RandomVariable``, which acts as a subclassing interface for a node
 in a computational graph. Probly also provides methods to help in the formation
 of new random variables.
 """

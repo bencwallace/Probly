@@ -58,7 +58,7 @@ def lift(f):
     .. testsetup::
 
        import probly as pr
-       from probly.core import RandomVariable
+       from probly.test_core import RandomVariable
        RandomVariable._reset()
 
 

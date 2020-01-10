@@ -1,3 +1,5 @@
+import numpy as np
+
 from unittest import TestCase
 
 import probly as pr
@@ -12,11 +14,8 @@ class TestRandomArrays(TestCase):
         self.assertEqual(M(seed), N(seed))
 
     def test_array(self):
-        # make random array with array and test with getitem
-        pass
-
-    def test_wigner(self):
-        pass
-
-    def test_wishart(self):
-        pass
+        alpha = 1
+        beta = 2
+        X = pr.array(pr.const(10), 10)
+        Y = np.sum(X)
+        self.assertEqual(Y(), 100)
