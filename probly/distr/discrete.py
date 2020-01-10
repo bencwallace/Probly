@@ -22,7 +22,7 @@ class RandInt(Distribution):
         self.b = b
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.randint(self.a, self.b + 1)
 
@@ -55,7 +55,7 @@ class Multinomial(Distribution):
             self.pvals = pvals
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.multinomial(self.n, self.pvals)
 
@@ -86,7 +86,7 @@ class Bin(Multinomial):
         self.p = p
         super().__init__(n, [1 - p, p])
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.binomial(self.n, self.p)
 
@@ -143,7 +143,7 @@ class NegBin(Distribution):
         self.p = p
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.negative_binomial(self.n, self.p)
 
@@ -171,7 +171,7 @@ class Geom(NegBin):
         super().__init__(1, p)
 
     # Faster than using np.random.negative_binomial
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.geometric(self.p)
 
@@ -201,7 +201,7 @@ class HyperGeom(Distribution):
         self.nsample = nsample
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.hypergeometric(self.ngood, self.nbad, self.nsample)
 
@@ -227,7 +227,7 @@ class Pois(Distribution):
         self.rate = rate
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.poisson(self.rate)
 

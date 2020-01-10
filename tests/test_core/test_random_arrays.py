@@ -14,8 +14,6 @@ class TestRandomArrays(TestCase):
         self.assertEqual(M(seed), N(seed))
 
     def test_array(self):
-        alpha = 1
-        beta = 2
         X = pr.array(pr.const(10), 10)
         Y = np.sum(X)
         self.assertEqual(Y(), 100)

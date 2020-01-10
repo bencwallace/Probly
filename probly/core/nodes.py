@@ -1,4 +1,13 @@
 class Node(object):
+    """
+    A node in a computational graph.
+
+    :param op: callable
+        The operation represented by this node.
+    :param parents: Node, optional
+        The input nodes.
+    """
+
     def __init__(self, op, *parents):
         self.parents = parents
 
@@ -9,15 +18,17 @@ class Node(object):
             self.op = op
 
     def __call__(self, *args):
+        """
+        Evaluates the node.
+
+        If the node is a root node (i.e. has no parents), it's operation is evaluated
+        directly on the arguments.
+        """
         if not self.parents:
             # Let root act directly on args
             out = self.op(*args)
         else:
             inputs = (p(*args) for p in self.parents)
             out = self.op(*inputs)
-
-        # For length 1 tuples
-        # if hasattr(out, '__len__') and len(out) == 1:
-        #     out = out[0]
 
         return out

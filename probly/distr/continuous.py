@@ -28,7 +28,7 @@ class Gamma(Distribution):
         self.rate = 1 / scale
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.gamma(self.shape, self.scale)
 
@@ -58,7 +58,7 @@ class ChiSquared(Gamma):
         super().__init__(shape, scale)
 
     # Much faster than using np.random.gamma
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.chisquare(self.k)
 
@@ -86,7 +86,7 @@ class Exp(Gamma):
         super().__init__(shape, scale)
 
     # A bit faster than using np.random.gamma
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.exponential(self.rate)
 
@@ -116,7 +116,7 @@ class Unif(Distribution):
         self.b = b
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.uniform(self.a, self.b)
 
@@ -157,7 +157,7 @@ class Normal(Distribution):
 
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         if self.dim == 1:
             return np.random.normal(self._mean, np.sqrt(self.cov))
@@ -187,7 +187,7 @@ class LogNormal(Distribution):
         self.sd = sd
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.lognormal(self.mean, self.sd)
 
@@ -218,7 +218,7 @@ class Beta(Distribution):
         self.beta = beta
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.beta(self.alpha, self.beta)
 
@@ -243,7 +243,7 @@ class PowerLaw(Distribution):
         self.power = power
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.power(self.power)
 
@@ -273,7 +273,7 @@ class F(Distribution):
         self.d2 = d2
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.f(self.d1, self.d2)
 
@@ -301,7 +301,7 @@ class StudentT(Distribution):
         self.deg = deg
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.standard_t(self.deg)
 
@@ -334,7 +334,7 @@ class Laplace(Distribution):
         self.scale = scale
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.laplace(self.loc, self.scale)
 
@@ -362,7 +362,7 @@ class Logistic(Distribution):
         self.scale = scale
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.logistic(self.loc, self.scale)
 
@@ -390,7 +390,7 @@ class VonMises(Distribution):
         self.kappa = kappa
         super().__init__()
 
-    def _sampler(self, seed=None):
+    def _sampler(self, seed):
         np.random.seed(seed)
         return np.random.vonmises(self.mean, self.kappa)
 

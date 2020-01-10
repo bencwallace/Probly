@@ -1,7 +1,3 @@
-"""
-Utilities for working with random variables.
-"""
-
 from functools import partial, wraps
 
 import matplotlib.pyplot as plt
@@ -12,10 +8,9 @@ from ..core.random_variables import RandomVariable
 
 def const(c):
     """
-    Constructs a constant random variable.
+    Returns a constant random variable.
 
     :param c: constant value
-    :return: Constant random variable with value `c`
     """
 
     if isinstance(c, RandomVariable):
@@ -55,20 +50,11 @@ def lift(f):
     -------
     Construct a random variable given by the determinant of a Wigner matrix.
 
-    .. testsetup::
-
-       import probly as pr
-       from probly.test_core import RandomVariable
-       RandomVariable._reset()
-
-
     >>> import probly as pr
     >>> import numpy as np
     >>> Det = pr.lift(np.linalg.det)
     >>> M = pr.Wigner(2, pr.Normal())
     >>> D = Det(M)
-    >>> D(0)
-    1.2638214666689431
     """
 
     @wraps(f)

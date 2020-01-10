@@ -29,6 +29,35 @@ class RandomDistribution(RandomVariable):
 
 
 class Distribution(RandomVariableWithIndependence, metaclass=Lift):
+    """
+    A random variable given by some distribution.
+
+    Subclassing
+    -----------
+    Subclasses should call `super().__init__()` in their initializers.
+    A subclass should implement the method `_sampler(self, seed)`,
+    which produces a random sample from a given integer seed according
+    to the desired distribution.
+
+    Example
+    -------
+    Define a family of "shifted" uniform random variables:
+
+    >>> import probly as pr
+    >>> import numpy as np
+    >>> class UnifShift(Distribution):
+    ...     def __init__(self, a, b):
+    ...         self.a = a + 1
+    ...         self.b = b + 1
+    ...         super().__init__()
+    ...     def _sampler(self, seed):
+    ...         np.random.seed(seed)
+    ...         return np.random.uniform(self.a, self.b)
+    """
+
     def __init__(self):
         op = self._sampler
         super().__init__(op)
+
+    def _sampler(self, seed):
+        raise NotImplementedError("_sampler not defined")

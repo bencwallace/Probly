@@ -20,28 +20,6 @@ from .nodes import Node
 class RandomVariable(Node, NDArrayOperatorsMixin):
     """
     A random variable.
-
-    Behaves like a `Node` object that can be acted on by any NumPy ufunc in a
-    way compatible with the graph structure. Also acts as an interface for the
-    definition of families of random variables via subclassing. Such families
-    should be defined by subclassing RandomVariable rather than Node.
-
-    Example
-    -------
-    Define a family of "shifted" uniform random variables:
-
-    >>> import numpy as np
-    >>> class UnifShift(RandomVariable):
-    ...     def __init__(self, a, b):
-    ...         self.a = a + 1
-    ...         self.b = b + 1
-    ...     def _sampler(self, seed=None):
-    ...         np.random.seed(seed)
-    ...         return np.random.uniform(self.a, self.b)
-
-    Instantiate a random variable from this family with support `[1, 2]`.
-
-    >>> X = UnifShift(0, 1)
     """
 
     # ---------------------------- Independence ---------------------------- #
@@ -70,7 +48,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     def __call__(self, seed=None):
         """
-        Produces a random sample.
+        Returns a random sample of the random variable.
         """
 
         seed = self._get_seed(seed)
@@ -86,23 +64,11 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     @classmethod
     def _get_seed(cls, seed=None, return_if_seeded=True):
-        """
-        Produces a random seed.
-
-        If `return_if_seeded` is True, returns `seed` (when provided).
-        """
-
         if seed is not None and return_if_seeded:
             return seed
 
         np.random.seed(seed)
         return np.random.randint(cls._max_seed)
-
-    def _sampler(self, seed=None):
-        # Default sampler. Behaves as random number generator when called via
-        # __call__, which adds _offset to seed.
-
-        return self._get_seed(seed)
 
     # ------------------------ Arrays and arithmetic ------------------------ #
 
@@ -142,6 +108,12 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     # - Conditioning - #
 
     def given(self, *conditions):
+        """
+        Returns a conditional random variable.
+
+        :param conditions: RandomVariable
+            Random variables with boolean samples.
+        """
         return Conditional(self, *conditions)
 
     # ------------------------------ Integrals ------------------------------ #
@@ -196,18 +168,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         cdf = functools.partial(self.cdf, **kwargs)
         return scipy.misc.derivative(cdf, x, dx)
 
-    # - Other - #
-
-    # def __eq__(self, other):
-    #     if not(type(self).op == other.op):
-    #         return False
-    #     if not(len(self.parents) == len(other.parents)):
-    #         return False
-    #     return all([p == q for (p, q) in zip((self.parents, other.parents))])
-    #
-    # def __hash__(self):
-    #     return hash(self.op) + sum([hash(p) for p in self.parents])
-
 
 class RandomVariableWithIndependence(RandomVariable):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
@@ -225,10 +185,6 @@ class RandomVariableWithIndependence(RandomVariable):
 
     @classmethod
     def _get_random(cls, seed):
-        """
-        Produces a pseudo-random number from a given input seed.
-        """
-
         return cls._get_seed(seed, False)
 
 
