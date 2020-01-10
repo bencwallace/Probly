@@ -1,3 +1,5 @@
+from .distributions import Distribution
+
 # Discrete random variables
 from .discrete import RandInt
 from .discrete import Multinomial, Bin, Ber
@@ -13,7 +15,8 @@ from .continuous import F, StudentT
 from .continuous import Laplace, Logistic, VonMises
 
 # Discrete random variables
-__all__ = ['RandInt']
+__all__ = ['Distribution']
+__all__ += ['RandInt']
 __all__ += ['Multinomial', 'Bin', 'Ber']
 __all__ += ['NegBin', 'Geom']
 __all__ += ['HyperGeom', 'Pois']

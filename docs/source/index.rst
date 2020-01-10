@@ -11,7 +11,6 @@
 
    quick
    examples
-   topics
    ref/index
 
 **********

@@ -14,33 +14,20 @@ Probly can be installed using `pip <https://pypi.org/project/pip/>`_ from GitHub
 
    Probly makes use of `NumPy <http://www.numpy.org/>`_, `SciPy <https://www.scipy.org/>`_, and `Matplotlib <https://matplotlib.org/>`_.
 
-***********************
-Simple random variables
-***********************
+***************
+Getting started
+***************
 
 We begin by importing ``probly``.
 
 >>> import probly as pr
 
-.. testsetup::
-
-   from probly.core import RandomVar
-   RandomVar._reset()
-
 Next, we initialize some pre-packaged random variables.
 A complete list of available distributions is available at the :ref:`api`.
-See also also the :class:`~probly.core.RandomVar` documentation if you want to
-create your own random variables from scratch.
 
-.. note::
-
-   The following examples consist of code segments (prefaced by >>>) followed by expected outputs (no >>>). In order to reproduce the same results, the code segments must be executed in the prescribed order. Other code segments may be added between successive segments as long as they do not involve the instantiation of random variables.
-
-   For more information, see :ref:`independence`.
-
->>> # A Bernoulli random variable with p=0.5 (the default)
+>>> # A Bernoulli random variable with parameter 0.5
 >>> X = pr.Ber()
->>> # A Bernoulli random variable independent of X
+>>> # A Bernoulli random variable independent of X with parameter 0.9
 >>> Y = pr.Ber(0.9)
 >>> # A uniform random variable on the interval [-10, 10]
 >>> Z = pr.Unif(-10, 10)
@@ -53,57 +40,24 @@ will produce the same result.
 >>> seed = 99	# An arbitrary but fixed seed
 >>> Z(seed)
 -4.340731821079555
->>> # Repeat the last step to obtain the same output
+>>> Z(seed)
+-4.340731821079555
 
-******************
-Computing the mean
-******************
+.. note::
 
-When called with no argument, a seed produced by a random number generator
-is used and the output is not reproducible.
+   Since different instances of a random variable are independent, your samples from a distribution (even with the
+   same seed) may produce different results from those in this text. Nevertheless, a single instance sampled multiple
+   times with the same seed will always produce the same result.
 
->>> # We obtained the following output. You'll probably get something different.
->>> Z() # doctest: +SKIP
--7.722714026707818
-
-Nevertheless, the outputs of ``Z()`` are uniformly distributed on the
-interval ``[-10, 10]``.
-
-
-Similarly, we can check ``X`` is equally likely
-to take on the values ``0`` and ``1`` by computing its empirical mean.
-
->>> trials = 1000
->>> total = 0
->>> for i in range(trials):
-...     total += X(i)
->>> average = total / trials
-
-The following output is close to ``0.5`` as expected by the
-`law of large numbers <https://en.wikipedia.org/wiki/Law_of_large_numbers>`_.
-
->>> average
-0.476
-
-The output should be close to ``0.5`` for most seed choices. Try running the
-code above with a few different seeds to see this (this will not affect
-reproducibility).	
-
-In fact, built-in random variables like ``X`` typically have a ``mean`` method
-that returns the exact mean.
-
->>> X.mean()
-0.5
-
-**************************
-Random variable arithmetic
-**************************
+********************
+Symbolic computation
+********************
 Random variables can be combined via arithmetical operations.
 
 >>> W = (1 + X) * Z / (5 + Y)
 >>> # W is a new random object
 >>> type(W)
-<class 'probly.core.RandomVar'>
+<class 'probly.core.RandomVariable'>
 
 The result of such operations is itself a random variable whose
 distribution may not be know explicitly.
@@ -112,17 +66,11 @@ We can nevertheless sample from this unknown distribution!
 >>> W(seed)
 -1.4469106070265185
 
-We can also try to visualize the (unknown) distribution with a histogram.
-
->>> pr.hist(W, num_samples=1000) # doctest: +SKIP
-
-.. image:: _static/quick_hist.png
-
-For an interesting application of random variable arithmetic and histograms,
-see the :ref:`clt` example.
-
+**********
+Dependence
+**********
 Note that ``W`` is *dependent* on ``X``, ``Y``, and ``Z``.
-This essentially means that the following outputs ``True``.
+This essentially means that the following must output ``True``.
 
 >>> x = X(seed)
 >>> y = Y(seed)
@@ -131,13 +79,28 @@ This essentially means that the following outputs ``True``.
 >>> w == (1 + x) * z / (5 + y)
 True
 
-For more information, see :ref:`dependence`.
-
 For composite random variables like ``W``, the ``mean`` method returns an approximate
 value.
 
 >>> W.mean()
 0.023611159797914952
+
+******************
+Independent copies
+******************
+Separate instantiations of a random variable will produce independent copies: for instance, samples from two
+instantiations of a normal random variable will be independent of one another, even with the same seed.
+
+>>> pr.Normal()(seed)
+-0.8113001427396095
+>>> pr.Normal()(seed)
+0.09346601550504334
+
+Independent copies of a random variable can also be produced as follows.
+
+>>> Wcopy = W.copy()
+>>> Wcopy(seed)
+2.430468450181704
 
 ***************
 Random matrices
@@ -145,9 +108,9 @@ Random matrices
 Random NumPy arrays (in particular, random matrices) can be formed from
 other random variables.
 
->>> M = pr.array([[X, Z], [W, Y]])
+>>> M = pr.RandomArray([[X, Z], [W, Y]])
 >>> type(M)
-<class 'probly.core.RandomVar'>
+<class 'probly.core.RandomVariable'>
 
 Random arrays can be manipulated like ordinary NumPy arrays.
 
@@ -158,32 +121,11 @@ True
 >>> S(seed) == X(seed) + Z(seed) + W(seed) + Y(seed)
 True
 
-We could also sum the elements of ``M`` as follows, but read the note below.
-
->>> T = np.sum([[X, Z], [W, Y]])
->>> T(seed) == S(seed)
-True
-
-.. note::
-
-   Due to the way in which NumPy sums arrays and the recursive nature of a
-   random variable's call method, summing a large collection
-   of random variables has the potential to result in a ``RecursionError``.
-   So, for example, instead of applying ``np.linalg.sum`` directly to an
-   array or list ``array`` of random variables, it is preferable to convert
-   this collection to a random variable by running
-   ``np.linalg.sum(pr.array(collection))``.
-
-   A shortcut for this procedure is provided by :func:`probly.sum`.
-
-
 ********************
-Function composition
+Function application
 ********************
-Certain functions don't work automatically with random variables.
-However, any functions can be lifted to maps between random variables
-using the
-``@pr.lift`` decorator.
+Any functions can be lifted to a map between random variables
+using the ``@pr.lift`` decorator.
 
 >>> Det = pr.lift(np.linalg.det)
 
@@ -199,3 +141,74 @@ The function ``Det`` can now be applied to ``M``.
 >>> D = Det(M)
 >>> D(seed)
 -5.280650914177544
+
+************
+Conditioning
+************
+Random variables can be conditioned as in the following example:
+
+>>> C = W.given(Y == 1, Z > 0)
+>>> C(seed)
+1.97965814796514
+
+Any boolean-valued random variable can be used as a condition.
+
+*****************
+Random parameters
+*****************
+Random variables can themselves be used to parameterize other random variables, as in the following example:
+
+>>> U = pr.Unif()
+>>> B = pr.Ber(U)
+>>> B(seed)
+0
+
+********************
+Custom distributions
+********************
+
+The following example shows how to create a custom distribution. We'll start by constructing a simple non-random
+class.
+
+>>> class Human:
+>>>     def __init__(self, height, weight):
+>>>         self.height = height
+>>>         self.weight = weight
+
+We'd like to create a kind of normal distribution over possible humans. We can do this as follows.
+
+>>> import numpy as np
+>>> from probly.distr.distributions import Distribution
+>>> class NormalHuman(Distribution):
+>>>     def __init__(self, female_stats, male_stats):
+>>>         self.female_stats = female_stats
+>>>         self.male_stats = male_stats
+>>>         super().__init__()
+>>>     def _sampler(self, seed):
+>>>         np.random.seed(seed)
+>>>         gender = np.random.choice(2, p=[0.5, 0.5])
+>>>         if gender == 0:
+>>>             height_mean, weight_mean, cov = self.female_stats
+>>>         else:
+>>>             height_mean, weight_mean, cov = self.male_stats
+>>>         means = [height_mean, weight_mean]
+>>>         np.random.seed(seed)
+>>>         height, weight = np.random.multivariate_normal(means, cov)
+>>>         return Human(gender, height, weight)
+
+Let's initialize an instance of this random variable.
+
+>>> f_cov = np.array([[80, 5], [5, 99]])
+>>> f_stats = [160, 65, f_cov]
+>>> m_cov = np.array([[70, 4], [4, 11]])
+>>> m_stats = [180, 75, m_cov]
+>>> H = NormalHuman(f_stats, m_stats)
+
+We can sample from and manipulate such a random variable as usual.
+
+>>> @pr.lift
+>>> def bmi(human):
+>>>     return human.weight / (human.height / 100) ** 2
+>>> BMI = bmi(H)
+>>> BMI(seed)
+23.57076738620301

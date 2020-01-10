@@ -39,6 +39,10 @@ class Distribution(RandomVariableWithIndependence, metaclass=Lift):
     which produces a random sample from a given integer seed according
     to the desired distribution.
 
+    It is also recommended, when these quantities are relatively simple to
+    compute, to override `mean(self)`, `momen(self, p)`, `cmoment(self, p)`,
+    `variance(self)`, `cdf(self, x)`, and `pdf(self, x)`.
+
     Example
     -------
     Define a family of "shifted" uniform random variables:

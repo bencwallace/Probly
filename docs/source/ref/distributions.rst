@@ -1,14 +1,14 @@
-################
-Random variables
-################
+#############
+Distributions
+#############
 
-.. currentmodule:: probly.core
+.. automodule:: probly.distr
+
+.. currentmodule:: probly
 
 .. autosummary::
 
-   RandomVar
-
-.. currentmodule:: probly
+   Distribution
 
 *************************
 Discrete random variables
@@ -16,7 +16,7 @@ Discrete random variables
 
 .. autosummary::
 
-   DUnif
+   RandInt
    Multinomial
    Bin
    Ber
@@ -40,27 +40,25 @@ Continuous random variables
    Beta
    PowerLaw
    F
-   Student_t
+   StudentT
    Laplace
    Logistic
    VonMises
 
-***************
-Random matrices
-***************
+*************
+Random arrays
+*************
 
 .. autosummary::
 
    Wigner
    Wishart
 
-.. currentmodule:: probly.core
-
-.. autoclass:: RandomVar
+.. autoclass:: Distribution
 
 .. currentmodule:: probly
 
-.. autoclass:: DUnif
+.. autoclass:: RandInt
 .. autoclass:: Multinomial
 .. autoclass:: Bin
 .. autoclass:: Ber
@@ -78,7 +76,7 @@ Random matrices
 .. autoclass:: Beta
 .. autoclass:: PowerLaw
 .. autoclass:: F
-.. autoclass:: Student_t
+.. autoclass:: StudentT
 .. autoclass:: Laplace
 .. autoclass:: Logistic
 .. autoclass:: VonMises

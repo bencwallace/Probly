@@ -10,5 +10,5 @@ API Reference
    :maxdepth: 2
    :caption: Reference
 
-   distr
-   helpers
+   distributions
+   utilities
