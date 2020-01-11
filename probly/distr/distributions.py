@@ -58,7 +58,3 @@ class Distribution(IndependentCopy, metaclass=Lift):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
     """
-
-    # the only difference between `Distribution` and `IndependentCopy` is that the former has type `Lift`
-    def __init__(self):
-        super().__init__()

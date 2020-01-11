@@ -23,8 +23,9 @@ class Wigner(RandomArray):
     def __init__(self, dim, rv=None):
         self.dim = dim
         if rv is None:
-            rv = Normal()
-        self.rv = rv
+            self.rv = Normal()
+        else:
+            self.rv = rv
 
         # Upper-diagonal part
         arr = [[rv.copy() if i <= j else 0
