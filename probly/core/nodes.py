@@ -8,10 +8,12 @@ class Node(object):
         The input nodes.
     """
 
-    def __init__(self, op, *parents):
+    def __init__(self, op=None, *parents):
         self.parents = parents
 
-        if not callable(op):
+        if op is None:
+            self.op = self._default_op
+        elif not callable(op):
             # Treat op as constant
             self.op = lambda *x: op
         else:
@@ -32,3 +34,6 @@ class Node(object):
             out = self.op(*inputs)
 
         return out
+
+    def _default_op(self, *args):
+        return args

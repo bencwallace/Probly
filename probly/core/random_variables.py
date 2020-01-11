@@ -22,16 +22,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     A random variable.
     """
 
-    # ---------------------------- Independence ---------------------------- #
-
-    def copy(self):
-        """Returns an independent, identically distributed random variable."""
-
-        return IndependentCopy(self)
-
-    # ----------------------------- Constructor ----------------------------- #
-
-    def __init__(self, op, *parents):
+    def __init__(self, op=None, *parents):
         # Scalar by default but overwritten by helpers.array
         self.shape = ()
 
@@ -39,7 +30,23 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         self._current_seed = None
         self._current_val = None
 
+        if op is None:
+            op = self._sampler
         super().__init__(op, *parents)
+
+    def copy(self):
+        """Returns an independent, identically distributed random variable."""
+
+        return IndependentCopy(self)
+
+    def given(self, *conditions):
+        """
+        Returns a conditional random variable.
+
+        :param conditions: RandomVariable
+            Random variables with boolean samples.
+        """
+        return Conditional(self, *conditions)
 
     # ------------------------------ Sampling ------------------------------ #
 
@@ -51,24 +58,29 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         Returns a random sample of the random variable.
         """
 
-        seed = self._get_seed(seed)
+        seed = self._seed(seed)
 
         # Check memo
         if seed == self._current_seed:
             return self._current_val
         else:
             # Recursively compute new value and update memo
-            self._current_seed = self._get_seed(seed)
+            self._current_seed = seed
             self._current_val = super().__call__(self._current_seed)
             return self._current_val
 
     @classmethod
-    def _get_seed(cls, seed=None, return_if_seeded=True):
-        if seed is not None and return_if_seeded:
+    def _seed(cls, seed=None):
+        if seed is not None:
             return seed
-
         np.random.seed(seed)
         return np.random.randint(cls._max_seed)
+
+    def _default_op(self, *args):
+        return self._sampler(self, *args)
+
+    def _sampler(self, seed):
+        raise NotImplementedError
 
     # ------------------------ Arrays and arithmetic ------------------------ #
 
@@ -104,17 +116,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         def get_item_from_key(array):
             return array[key]
         return RandomVariable(get_item_from_key, self)
-
-    # - Conditioning - #
-
-    def given(self, *conditions):
-        """
-        Returns a conditional random variable.
-
-        :param conditions: RandomVariable
-            Random variables with boolean samples.
-        """
-        return Conditional(self, *conditions)
 
     # ------------------------------ Integrals ------------------------------ #
 
@@ -173,24 +174,21 @@ class RandomVariableWithIndependence(RandomVariable):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
     _current_id = itertools.count(start=1)
 
-    def __init__(self, op, *parents):
+    def __init__(self, op=None, *parents):
         # Add _id and _offset attributes for independence
         self._id = next(self._current_id)
-        self._offset = self._get_random(self._id)
+        np.random.seed(self._id)
+        self._offset = np.random.randint(self._max_seed)
         super().__init__(op, *parents)
 
     def __call__(self, seed=None):
-        new_seed = (self._get_seed(seed) + self._offset) % self._max_seed
+        new_seed = (self._seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
 
-    @classmethod
-    def _get_random(cls, seed):
-        return cls._get_seed(seed, False)
 
-
-class IndependentCopy(RandomVariableWithIndependence):
-    def __init__(self, rv):
-        super().__init__(rv.op, *rv.parents)
+# class IndependentCopy(RandomVariableWithIndependence):
+#     def __init__(self, rv):
+#         super().__init__(rv.op, *rv.parents)
 
 
 class Conditional(RandomVariable):
@@ -202,7 +200,7 @@ class Conditional(RandomVariable):
         super().__init__(self._sampler)
 
     def _sampler(self, seed=None):
-        seed = self._get_seed(seed)
+        seed = self._seed(seed)
 
         attempts = 0
         while not all([rv(seed) for rv in self.conditions]):
