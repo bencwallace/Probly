@@ -1,3 +1,3 @@
-from .random_arrays import array, RandomArray, Wigner, Wishart
+from probly.distr.matrix import Wigner, Wishart
 
-__all__ = ['array', 'RandomArray', 'Wigner', 'Wishart']
+__all__ = ['Wigner', 'Wishart']

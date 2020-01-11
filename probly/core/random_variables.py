@@ -23,9 +23,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     """
 
     def __init__(self, op=None, *parents):
-        # Scalar by default but overwritten by helpers.array
-        self.shape = ()
-
         # Initialize memo
         self._current_seed = None
         self._current_val = None
@@ -80,7 +77,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return self._sampler(self, *args)
 
     def _sampler(self, seed):
-        raise NotImplementedError
+        raise NotImplementedError("_sampler not defined")
 
     # ------------------------ Arrays and arithmetic ------------------------ #
 
@@ -98,31 +95,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
         return RandomVariable(partial, *inputs)
 
-    def __array__(self, dtype=object):
-        # Determines behaviour of np.array
-        if self.shape:
-            # Return the array represented by self
-            return np.asarray(self.parents).reshape(self.shape)
-        else:
-            # Form a single-element array
-            arr = np.ndarray(1, dtype=object)
-            arr[0] = self
-            return arr
-
-    def __getitem__(self, key):
-        if not self.shape:
-            raise TypeError('Scalar random variable is not subscriptable.')
-
-        def get_item_from_key(array):
-            return array[key]
-        return RandomVariable(get_item_from_key, self)
-
     # ------------------------------ Integrals ------------------------------ #
 
     # All integrals (including probabilities) are defined in terms of the mean
     def mean(self, max_iter=int(1e5), tol=1e-5):
-        """Numerically approximates the mean."""
-
         max_small_change = 100
 
         total = 0
@@ -143,29 +119,19 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return avg
 
     def moment(self, p, **kwargs):
-        """Numerically approximates the p-th moment."""
-
         rv = self ** p
         return rv.mean(**kwargs)
 
     def cmoment(self, p, **kwargs):
-        """Numerically approximates the p-th central moment."""
-
         return self.moment(p, **kwargs) - (self.mean()) ** p
 
     def variance(self, **kwargs):
-        """Numerically approximates the variance."""
-
         return self.cmoment(2, **kwargs)
 
     def cdf(self, x, **kwargs):
-        """Numerically approximates the cdf at x."""
-
         return (self <= x).mean(**kwargs)
 
     def pdf(self, x, dx=1e-5, **kwargs):
-        """Numerically approximates the pdf at x."""
-
         cdf = functools.partial(self.cdf, **kwargs)
         return scipy.misc.derivative(cdf, x, dx)
 

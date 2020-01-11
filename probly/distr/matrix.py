@@ -1,34 +1,7 @@
 import numpy as np
 
-from .random_variables import RandomVariable
-from ..distr import Normal
-
-
-def array(rv, shape):
-    """
-    Returns a random array of independent copies of a random variable.
-
-    :param rv: RandomVariable
-    :param shape: tuple of ints
-    :return: RandomArray
-    """
-    arr = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
-    return RandomArray(arr)
-
-
-class RandomArray(RandomVariable):
-    """
-    A random array.
-
-    :param arr: array of RandomVariable
-    """
-    def __init__(self, arr):
-        arr = np.array(arr)
-        def op(*inputs):
-            return np.array(inputs).reshape(np.shape(arr))
-        super().__init__(op, *arr.flatten())
-
-        self.shape = arr.shape
+from probly.lib.utils import RandomArray
+from probly.distr import Normal
 
 
 class Wigner(RandomArray):

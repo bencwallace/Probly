@@ -3,6 +3,7 @@ from functools import partial, wraps
 import matplotlib.pyplot as plt
 import numpy as np
 
+from probly.core.random_variables import RandomVariable
 from ..core.random_variables import RandomVariable
 
 
@@ -66,3 +67,39 @@ def lift(f):
             return f(*args, **kwargs)
 
     return lifted
+
+
+def array(rv, shape):
+    """
+    Returns a random array of independent copies of a random variable.
+
+    :param rv: RandomVariable
+    :param shape: tuple of ints
+    :return: RandomArray
+    """
+    arr = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
+    return RandomArray(arr)
+
+
+class RandomArray(RandomVariable):
+    """
+    A random array.
+
+    :param arr: array of RandomVariable
+    """
+    def __init__(self, arr):
+        arr = np.array(arr)
+        def op(*inputs):
+            return np.array(inputs).reshape(np.shape(arr))
+        super().__init__(op, *arr.flatten())
+
+        self.shape = arr.shape
+
+    def __array__(self, dtype=object):
+        # Determines behaviour of np.array
+        return np.asarray(self.parents).reshape(self.shape)
+
+    def __getitem__(self, key):
+        def get_item_from_key(array):
+            return array[key]
+        return RandomVariable(get_item_from_key, self)
