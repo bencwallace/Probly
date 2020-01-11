@@ -170,7 +170,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return scipy.misc.derivative(cdf, x, dx)
 
 
-class RandomVariableWithIndependence(RandomVariable):
+class IndependentCopy(RandomVariable):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
     _current_id = itertools.count(start=1)
 
@@ -184,11 +184,6 @@ class RandomVariableWithIndependence(RandomVariable):
     def __call__(self, seed=None):
         new_seed = (self._seed(seed) + self._offset) % self._max_seed
         return super().__call__(new_seed)
-
-
-# class IndependentCopy(RandomVariableWithIndependence):
-#     def __init__(self, rv):
-#         super().__init__(rv.op, *rv.parents)
 
 
 class Conditional(RandomVariable):

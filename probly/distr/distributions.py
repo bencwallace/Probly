@@ -2,7 +2,7 @@
 Random variables following common distributions.
 """
 
-from ..core.random_variables import RandomVariable, RandomVariableWithIndependence
+from ..core.random_variables import RandomVariable, IndependentCopy
 from ..lib import const
 
 
@@ -28,7 +28,7 @@ class RandomDistribution(RandomVariable):
         return self.distr(*(rv(seed) for rv in self.rvs))._sampler(seed)
 
 
-class Distribution(RandomVariableWithIndependence, metaclass=Lift):
+class Distribution(IndependentCopy, metaclass=Lift):
     """
     A random variable given by some distribution.
 
