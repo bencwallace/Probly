@@ -28,8 +28,9 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         self._current_val = None
 
         if op is None:
-            op = self._sampler
-        super().__init__(op, *parents)
+            super().__init__()
+        else:
+            super().__init__(op, *parents)
 
     def copy(self):
         """Returns an independent, identically distributed random variable."""
@@ -74,7 +75,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return np.random.randint(cls._max_seed)
 
     def _default_op(self, *args):
-        return self._sampler(self, *args)
+        return self._sampler(*args)
 
     def _sampler(self, seed):
         raise NotImplementedError("_sampler not defined")
@@ -158,7 +159,7 @@ class Conditional(RandomVariable):
     def __init__(self, rv, *conditions):
         self.rv = rv
         self.conditions = conditions
-        super().__init__(self._sampler)
+        super().__init__()
 
     def _sampler(self, seed=None):
         seed = self._seed(seed)

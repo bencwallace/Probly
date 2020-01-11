@@ -10,12 +10,8 @@ class Node(object):
 
     def __init__(self, op=None, *parents):
         self.parents = parents
-
-        if op is None:
-            self.op = self._default_op
-        elif not callable(op):
-            # Treat op as constant
-            self.op = lambda *x: op
+        if op is not None and not callable(op):
+            self.op = lambda _: op
         else:
             self.op = op
 
@@ -26,14 +22,14 @@ class Node(object):
         If the node is a root node (i.e. has no parents), it's operation is evaluated
         directly on the arguments.
         """
-        if not self.parents:
+        if self.op is None:
+            return self._default_op(*args)
+        elif not self.parents:
             # Let root act directly on args
-            out = self.op(*args)
+            return self.op(*args)
         else:
             inputs = (p(*args) for p in self.parents)
-            out = self.op(*inputs)
-
-        return out
+            return self.op(*inputs)
 
     def _default_op(self, *args):
         return args

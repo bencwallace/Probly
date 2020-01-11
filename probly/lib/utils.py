@@ -17,7 +17,7 @@ def const(c):
     if isinstance(c, RandomVariable):
         return c
     else:
-        return RandomVariable(lambda _: c)
+        return RandomVariable(c)
 
 
 def hist(rv, num_samples, bins=None, density=True):
