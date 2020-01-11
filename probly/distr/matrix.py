@@ -2,9 +2,10 @@ import numpy as np
 
 from probly.lib.utils import RandomArray
 from probly.distr import Normal
+from probly.distr.distributions import Distribution
 
 
-class Wigner(RandomArray):
+class Wigner(RandomArray, Distribution):
     """
     A Wigner random matrix.
 

@@ -9,11 +9,11 @@ from ..lib import const
 # ultimately makes Distribution an instance of a specialization of the reader monad
 # metaclasses needed so that subclasses also become instances
 class Lift(type):
-    def __call__(cls, *rvs, **kwargs):
-        if any((isinstance(rv, RandomVariable) for rv in rvs)):
-            return RandomDistribution(cls, *(const(rv) for rv in rvs))
+    def __call__(cls, *params, **kwargs):
+        if any((isinstance(rv, RandomVariable) for rv in params)):
+            return RandomDistribution(cls, *(const(rv) for rv in params))
         else:
-            return super().__call__(*rvs, **kwargs)
+            return super().__call__(*params, **kwargs)
 
 
 class RandomDistribution(RandomVariable):

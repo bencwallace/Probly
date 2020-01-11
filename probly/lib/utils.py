@@ -100,6 +100,6 @@ class RandomArray(RandomVariable):
         return np.asarray(self.parents).reshape(self.shape)
 
     def __getitem__(self, key):
-        def get_item_from_key(array):
+        def op(array):
             return array[key]
-        return RandomVariable(get_item_from_key, self)
+        return RandomVariable(op, self)
