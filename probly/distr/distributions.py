@@ -20,7 +20,7 @@ class RandomDistribution(RandomVariable):
     def __init__(self, distr, *rvs):
         self.distr = distr
         self.rvs = rvs
-        super().__init__(self._sampler)
+        super().__init__()
 
     def _sampler(self, seed=None):
         seed = self._seed(seed)
