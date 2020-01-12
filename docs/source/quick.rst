@@ -45,13 +45,10 @@ will produce the same result.
 
 .. note::
 
-   Since different instances of a random variable are independent, your samples from a distribution (even with the
-   same seed) may produce different results from those in this text. Nevertheless, a single instance sampled multiple
-   times with the same seed will always produce the same result.
+   An entire Probly session can be seeded by using ``pr.seed``. This will determine the sequence of outputs produced
+   by sampling a sequence of random variables initialized in a given order with a given sequence of seeds; it is
+   distinct from seeding the random variables themselves.
 
-********************
-Symbolic computation
-********************
 Random variables can be combined via arithmetical operations.
 
 >>> W = (1 + X) * Z / (5 + Y)
@@ -66,6 +63,11 @@ We can nevertheless sample from this unknown distribution!
 >>> W(seed)
 -1.4469106070265185
 
+We can also compute properties of a random variable, such as its mean.
+
+>>> W.mean()
+0.023611159797914952
+
 **********
 Dependence
 **********
@@ -78,12 +80,6 @@ This essentially means that the following must output ``True``.
 >>> w = W(seed)
 >>> w == (1 + x) * z / (5 + y)
 True
-
-For composite random variables like ``W``, the ``mean`` method returns an approximate
-value.
-
->>> W.mean()
-0.023611159797914952
 
 ******************
 Independent copies
@@ -127,18 +123,18 @@ Function application
 Any functions can be lifted to a map between random variables
 using the ``@pr.lift`` decorator.
 
->>> Det = pr.lift(np.linalg.det)
+>>> from numpy.linalg import det
+>>> det = pr.lift(det)
 
 An equivalent way of doing this is as follows::
 
-	import numpy as np
 	@pr.lift
-	def Det(m):
+	def det(m):
 		return np.linalg.det(m)
 
-The function ``Det`` can now be applied to ``M``.
+The function ``det`` can now be applied to ``M``.
 
->>> D = Det(M)
+>>> D = det(M)
 >>> D(seed)
 -5.280650914177544
 
