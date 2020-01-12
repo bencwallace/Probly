@@ -9,8 +9,9 @@ import functools
 import warnings
 
 import numpy as np
-from numpy.lib.mixins import NDArrayOperatorsMixin
 import scipy.misc
+
+from numpy.lib.mixins import NDArrayOperatorsMixin
 
 from .._exceptions import ConditionError, ConvergenceWarning
 from .nodes import Node
@@ -182,4 +183,7 @@ class Conditional(RandomVariable):
 
 
 def seed(seed=None):
+    """
+    Seeds the current Probly session.
+    """
     IndependentCopy._generator = np.random.default_rng(seed)

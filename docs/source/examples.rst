@@ -17,7 +17,7 @@ We are interested in the sum of many independent copies of ``X``. For this
 example, let's take "many" to be 1000.
 
 >>> num_copies = 1000
->>> Z = np.sum(pr.array(X, num_copies))
+>>> Z = np.sum(pr.iid(X, num_copies))
 
 The sum ``Z`` is itself a random variable, but its precise distribution,
 unlike that of ``X``, is unknown.

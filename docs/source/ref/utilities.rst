@@ -8,6 +8,8 @@ Utilities
 
 .. autofunction:: array
 .. autofunction:: const
+.. autofunction:: iid
+
 .. autofunction:: hist
 .. autofunction:: lift
 
@@ -18,5 +20,4 @@ Utilities
 .. autofunction:: cdf
 .. autofunction:: pdf
 
-.. autofunction:: array
-.. autofunction:: iid
+.. autofunction:: seed

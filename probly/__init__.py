@@ -9,6 +9,8 @@ from .lib import *
 
 __all__ = []
 
+__all__ += ['seed']
+
 __all__ += ['array']
 __all__ += ['const', 'hist', 'lift', 'iid']
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']

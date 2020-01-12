@@ -71,10 +71,10 @@ def lift(f):
 
 def iid(rv, shape):
     """
-    Returns a random array of independent copies of a random variable.
+    Returns a random array of shape `shape` of independent copies of a random variable.
 
     :param rv: RandomVariable
-    :param shape: tuple of ints
+    :param shape: int or tuple of ints
     :return: RandomVariable
     """
     arr = np.array([rv.copy() for _ in np.nditer(np.ndarray(shape))]).reshape(shape)
@@ -82,6 +82,12 @@ def iid(rv, shape):
 
 
 def array(arr):
+    """
+    Converts an array of random variables into a single array-valued random variable.
+
+    :param arr: array_like
+    :return: RandomVariable
+    """
     arr = np.array(arr)
     def op(*inputs):
         return np.array(inputs).reshape(np.shape(arr))
