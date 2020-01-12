@@ -28,12 +28,12 @@ class Wigner(RandomArray):
             self.rv = rv
 
         # Upper-diagonal part
-        arr = [[rv.copy() if i <= j else 0
-                  for j in range(dim)] for i in range(dim)]
+        arr = [[self.rv.copy() if i <= j else 0
+                for j in range(dim)] for i in range(dim)]
 
         # Lower-diagonal part
         arr = [[arr[i][j] if i <= j else arr[j][i]
-                  for j in range(dim)] for i in range(dim)]
+                for j in range(dim)] for i in range(dim)]
 
         super().__init__(arr)
 
