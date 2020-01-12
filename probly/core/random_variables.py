@@ -145,6 +145,7 @@ class IndependentCopy(RandomVariable):
         # Add _id and _offset attributes for independence
         self._id = next(self._current_id)
         np.random.seed(self._id)
+        # the following can be a bit of a bottleneck with many independent copies
         self._offset = np.random.randint(self._max_seed)
         super().__init__(op, *parents)
 

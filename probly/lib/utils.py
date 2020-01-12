@@ -81,6 +81,7 @@ def array(rv, shape):
     return RandomArray(arr)
 
 
+
 class RandomArray(RandomVariable):
     """
     A random array.

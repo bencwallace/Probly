@@ -17,7 +17,7 @@ We are interested in the sum of many independent copies of ``X``. For this
 example, let's take "many" to be 1000.
 
 >>> num_copies = 1000
->>> Z = pr.sum(X, num=num_copies)     # Returns the sum of 1000 independent copies of X
+>>> Z = np.sum(pr.array(X, num_copies))
 
 The sum ``Z`` is itself a random variable, but its precise distribution,
 unlike that of ``X``, is unknown.
@@ -33,7 +33,7 @@ random variables and sum the results, so computing a histogram from very many
 samples can take a long time. Below we use 1000 samples, but you may want to
 reduce this number if running the code takes too long.
 
->>> pr.hist(Z, num_samples=1000)    # doctest: +SKIP
+>>> pr.hist(Z, num_samples=1000)
 
 The result resembles the famous bell-shaped curve of the normal distribution.
 
@@ -60,10 +60,10 @@ Let's check this empirically. First, we normalize ``M`` and then we construct it
 (random) eigenvalues by applying NumPy's
 `numpy.linalg.eigvals <https://docs.scipy.org/doc/numpy-1.13.0/reference/generated/numpy.linalg.eigvals.html>`_ using :func:`~probly.lift`.
 
->>> import numpy as np
+>>> from numpy.linalg import eigvals
 >>> M = M / np.sqrt(dim)
->>> Eigvals = pr.lift(np.linalg.eigvals)
->>> E = Eigvals(M)
+>>> eigvals = pr.lift(eigvals)
+>>> E = eigvals(M)
 
 The distribution of the eigenvalues can be visualized using the :func:`~probly.hist`
 function. Note that we need only take 1 sample.
@@ -74,7 +74,7 @@ function. Note that we need only take 1 sample.
 
 
 ********************
-A custom distributions
+Custom distributions
 ********************
 The following example shows how to create a custom distribution. We'll start by constructing a simple non-random
 class.
