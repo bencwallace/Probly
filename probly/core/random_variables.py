@@ -6,7 +6,6 @@ Random variables are defined as nodes in a computational graph that obey arithme
 """
 
 import functools
-import itertools
 import warnings
 
 import numpy as np
@@ -140,15 +139,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
 class IndependentCopy(RandomVariable):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
-    # _current_id = itertools.count(start=1)
-    _current_offset = RandomIterator()
+    _current_offset = RandomIterator(1)
 
     def __init__(self, op=None, *parents):
         # Add _id and _offset attributes for independence
-        # self._id = next(self._current_id)
-        # np.random.seed(self._id)
-        # the following can be a bit of a bottleneck with many independent copies
-        # self._offset = np.random.randint(self._max_seed)
         self._offset = next(self._current_offset)
         super().__init__(op, *parents)
 
@@ -176,3 +170,7 @@ class Conditional(RandomVariable):
                 raise ConditionError("Failed to meet condition")
 
         return self.rv(seed)
+
+
+def seed(seed=None):
+    IndependentCopy._current_offset = RandomIterator(seed)

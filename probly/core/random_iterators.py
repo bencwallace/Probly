@@ -2,7 +2,7 @@ import numpy as np
 
 
 class RandomIterator:
-    def __init__(self, seed=1):
+    def __init__(self, seed):
         self.current_seed = seed
         self.random_state = np.random.RandomState(seed).get_state()[1]
         self.current_index = 0

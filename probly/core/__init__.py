@@ -1,3 +1,1 @@
-from probly.distr.matrix import Wigner, Wishart
-
-__all__ = ['Wigner', 'Wishart']
+from .random_variables import seed
