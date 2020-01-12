@@ -18,5 +18,5 @@ Utilities
 .. autofunction:: cdf
 .. autofunction:: pdf
 
-.. autoclass:: RandomArray
 .. autofunction:: array
+.. autofunction:: iid

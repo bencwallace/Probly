@@ -1,5 +1,5 @@
-from .utils import array, const, hist, lift, RandomArray
+from .utils import iid, const, hist, lift, array
 from .properties import mean, moment, cmoment, variance, cdf, pdf
 
-__all__ = ['array', 'const', 'hist', 'lift', 'RandomArray']
+__all__ = ['iid', 'const', 'hist', 'lift', 'array']
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']

@@ -104,7 +104,7 @@ Random matrices
 Random NumPy arrays (in particular, random matrices) can be formed from
 other random variables.
 
->>> M = pr.RandomArray([[X, Z], [W, Y]])
+>>> M = pr.array([[X, Z], [W, Y]])
 >>> type(M)
 <class 'probly.core.RandomVariable'>
 

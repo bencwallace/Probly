@@ -9,8 +9,8 @@ from .lib import *
 
 __all__ = []
 
-__all__ += ['random_array', 'RandomArray', 'Wigner', 'Wishart']
-__all__ += ['const', 'hist', 'lift']
+__all__ += ['array']
+__all__ += ['const', 'hist', 'lift', 'iid']
 __all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
 
 # Discrete random variables
@@ -27,3 +27,6 @@ __all__ += ['Normal', 'LogNormal']
 __all__ += ['Beta', 'PowerLaw']
 __all__ += ['F', 'StudentT']
 __all__ += ['Laplace', 'Logistic', 'VonMises']
+
+# Random matrices
+__all__ += ['Wigner', 'Wishart']

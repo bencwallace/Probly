@@ -22,6 +22,8 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     """
 
     def __init__(self, op=None, *parents):
+        self.shape = ()
+
         # Initialize memo
         self._current_seed = None
         self._current_val = None
@@ -94,6 +96,16 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         partial = functools.partial(fcn, **kwargs)
 
         return RandomVariable(partial, *inputs)
+
+
+    def __array__(self, dtype=object):
+        # Determines behaviour of np.array
+        return np.asarray(self.parents).reshape(self.shape)
+
+    def __getitem__(self, key):
+        def op(array):
+            return array[key]
+        return RandomVariable(op, self)
 
     # ------------------------------ Integrals ------------------------------ #
 

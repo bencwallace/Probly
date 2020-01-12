@@ -1,10 +1,10 @@
 import numpy as np
 
-from probly.lib.utils import RandomArray
-from probly.distr import Normal
+from probly.lib.utils import array
+from probly.distr import Normal, Distribution
 
 
-class Wigner(RandomArray):
+class Wigner(Distribution):
     """
     A Wigner random matrix.
 
@@ -26,22 +26,19 @@ class Wigner(RandomArray):
             self.rv = Normal()
         else:
             self.rv = rv
+        arr = [[self.rv.copy() for _ in range(dim)] for _ in range(dim)]
+        self.arr = array([[arr[i][j] if i <= j else arr[j][i] for i in range(dim)] for j in range(dim)])
 
-        # Upper-diagonal part
-        arr = [[self.rv.copy() if i <= j else 0
-                for j in range(dim)] for i in range(dim)]
+        super().__init__()
 
-        # Lower-diagonal part
-        arr = [[arr[i][j] if i <= j else arr[j][i]
-                for j in range(dim)] for i in range(dim)]
-
-        super().__init__(arr)
+    def _sampler(self, seed):
+        return self.arr(seed)
 
     def __str__(self):
         return 'Wigner({}, {})'.format(self.dim, self.rv)
 
 
-class Wishart(RandomArray):
+class Wishart(Distribution):
     """
     A Wishart random matrix.
 
@@ -70,12 +67,15 @@ class Wishart(RandomArray):
         self.n = n
         self.lambda_ = m / n
         if rv is None:
-            rv = Normal()
-        self.rv = rv
+            self.rv = Normal()
+        else:
+            self.rv = rv
+        rect = np.array([[self.rv.copy() for _ in range(n)] for _ in range(m)])
+        self.arr = array(np.dot(rect.T, rect))
+        super().__init__()
 
-        rect = np.array([[rv.copy() for _ in range(n)] for _ in range(m)])
-        square = np.dot(rect.T, rect)
-        super().__init__(square)
+    def _sampler(self, seed):
+        return self.arr(seed)
 
     def __str__(self):
         return 'Wishart({}, {}, {})'.format(self.m, self.n, self.rv)
