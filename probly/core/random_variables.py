@@ -14,7 +14,6 @@ import scipy.misc
 
 from .._exceptions import ConditionError, ConvergenceWarning
 from .nodes import Node
-from .random_iterators import RandomIterator
 
 
 class RandomVariable(Node, NDArrayOperatorsMixin):
@@ -139,11 +138,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
 class IndependentCopy(RandomVariable):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
-    _current_offset = RandomIterator(1)
-    r = np.random.default_rng(1)
+    _generator = np.random.default_rng(1)
 
     def __init__(self, op=None, *parents):
-        self._offset = self.r.integers(2 ** 32)
+        self._offset = self._generator.integers(2 ** 32)
         super().__init__(op, *parents)
 
     def __call__(self, seed=None):
@@ -173,4 +171,4 @@ class Conditional(RandomVariable):
 
 
 def seed(seed=None):
-    IndependentCopy._current_offset = RandomIterator(seed)
+    IndependentCopy._generator = np.random.default_rng(seed)
