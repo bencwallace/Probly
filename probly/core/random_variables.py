@@ -140,10 +140,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 class IndependentCopy(RandomVariable):
     # Counter for _id. Set start=1 or else first RandomVariable acts as increment
     _current_offset = RandomIterator(1)
+    r = np.random.default_rng(1)
 
     def __init__(self, op=None, *parents):
-        # Add _id and _offset attributes for independence
-        self._offset = next(self._current_offset)
+        self._offset = self.r.integers(2 ** 32)
         super().__init__(op, *parents)
 
     def __call__(self, seed=None):
