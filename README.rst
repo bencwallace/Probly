@@ -8,7 +8,7 @@ by Benjamin Wallace
 Description
 ***********
 
-Probly is a Python package for the simple and intuitive manipulaton of random variables.
+Probly is a Python framework for working with random variables.
 
 Probly shifts the emphasis in computational statistics from **probability distributions**—typically
 implemented as *functions* that can be called on to produce concrete samples—to **random variables**—*objects* that
