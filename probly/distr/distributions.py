@@ -58,3 +58,6 @@ class Distribution(RandomVariable, metaclass=Lift):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
     """
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.make_independent()

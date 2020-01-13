@@ -40,8 +40,11 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
         # obj = RandomVariable(self.op, *self.parents)
         obj = copy.copy(self)
-        obj._offset = self._generator.integers(2 ** 32)
+        obj.make_independent()
         return obj
+
+    def make_independent(self):
+        self._offset = self._generator.integers(self._max_seed)
 
     def given(self, *conditions):
         """
