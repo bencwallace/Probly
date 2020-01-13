@@ -5,6 +5,7 @@ Random variables are defined as nodes in a computational graph that obey arithme
 (in)dependence relations.
 """
 
+import copy
 import functools
 import warnings
 
@@ -19,6 +20,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     """
     A random variable.
     """
+    _generator = np.random.default_rng(0)
+
+    # NumPy max seed
+    _max_seed = 2 ** 32 - 1
 
     def __init__(self, op=None, *parents):
         super().__init__(op, *parents)
@@ -33,7 +38,10 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     def copy(self):
         """Returns an independent, identically distributed random variable."""
 
-        return IndependentCopy(self)
+        # obj = RandomVariable(self.op, *self.parents)
+        obj = copy.copy(self)
+        obj._offset = self._generator.integers(2 ** 32)
+        return obj
 
     def given(self, *conditions):
         """
@@ -45,9 +53,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return Conditional(self, *conditions)
 
     # ------------------------------ Sampling ------------------------------ #
-
-    # NumPy max seed
-    _max_seed = 2 ** 32 - 1
 
     def __call__(self, seed=None):
         """
@@ -70,8 +75,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     def _seed(cls, seed=None):
         if seed is not None:
             return seed
-        np.random.seed(seed)
-        return np.random.randint(cls._max_seed)
+        return cls._generator.integers(cls._max_seed)
 
     def _default_op(self, *args):
         return self._sampler(*args)
@@ -94,7 +98,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         partial = functools.partial(fcn, **kwargs)
 
         return RandomVariable(partial, *inputs)
-
 
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
@@ -140,14 +143,6 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         return (self <= x).mean(*args, **kwargs)
 
 
-class IndependentCopy(RandomVariable):
-    _generator = np.random.default_rng(0)
-
-    def __init__(self, op=None, *parents):
-        super().__init__(op, *parents)
-        self._offset = self._generator.integers(2 ** 32)
-
-
 class Conditional(RandomVariable):
     _max_attempts = 100_000
 
@@ -173,4 +168,4 @@ def seed(seed=None):
     """
     Seeds the current Probly session.
     """
-    IndependentCopy._generator = np.random.default_rng(seed)
+    RandomVariable._generator = np.random.default_rng(seed)

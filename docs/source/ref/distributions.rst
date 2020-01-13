@@ -36,7 +36,6 @@ Continuous random variables
    Exp
    Unif
    Normal
-   LogNormal
    Beta
    PowerLaw
    F
@@ -72,7 +71,6 @@ Random arrays
 .. autoclass:: Exp
 .. autoclass:: Unif
 .. autoclass:: Normal
-.. autoclass:: LogNormal
 .. autoclass:: Beta
 .. autoclass:: PowerLaw
 .. autoclass:: F

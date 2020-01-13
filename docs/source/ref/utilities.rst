@@ -14,10 +14,7 @@ Utilities
 .. autofunction:: lift
 
 .. autofunction:: mean
-.. autofunction:: moment
-.. autofunction:: cmoment
 .. autofunction:: variance
 .. autofunction:: cdf
-.. autofunction:: pdf
 
 .. autofunction:: seed
