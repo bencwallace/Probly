@@ -139,8 +139,8 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         rv = (self - self.mean(*args, **kwargs)) ** 2
         return rv.adjusted_mean(adjustment=1, *args, **kwargs)
 
-    def cdf(self, x, **kwargs):
-        return (self <= x).mean(**kwargs)
+    def cdf(self, x, *args, **kwargs):
+        return (self <= x).mean(*args, **kwargs)
 
 
 class IndependentCopy(RandomVariable):

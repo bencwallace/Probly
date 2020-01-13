@@ -14,7 +14,7 @@ def mean(rv, max_iter=int(1e5), tol=1e-5):
     return rv.mean(max_iter=max_iter, tol=tol)
 
 
-def variance(rv, **kwargs):
+def variance(rv, *args, **kwargs):
     """
     Returns the variance `rv`.
 
@@ -22,10 +22,10 @@ def variance(rv, **kwargs):
 
     :param rv: RandomVariable
     """
-    return rv.variance(**kwargs)
+    return rv.variance(*args, **kwargs)
 
 
-def cdf(rv, x, **kwargs):
+def cdf(rv, x, *args, **kwargs):
     """
     Returns the value of the cumulative distribution function of `rv` evaluated at `x`.
 
@@ -35,4 +35,4 @@ def cdf(rv, x, **kwargs):
     :param x: float
     :return: float
     """
-    return rv.cdf(x, **kwargs)
+    return rv.cdf(x, *args, **kwargs)

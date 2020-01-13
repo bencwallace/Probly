@@ -1,4 +1,6 @@
 import numpy as np
+import scipy.stats as stats
+from math import factorial
 
 from .distributions import Distribution
 
@@ -26,8 +28,22 @@ class RandInt(Distribution):
         np.random.seed(seed)
         return np.random.randint(self.a, self.b + 1)
 
-    def mean(self, **kwargs):
+    def cdf(self, x, *args, **kwargs):
+        if x < self.a:
+            return 0
+        elif x <= self.b:
+            diff = np.ceil(x - self.a)
+            diff = diff + 1 if int(diff) == diff else diff
+            return diff / (self.b - self.a + 1)
+        else:
+            return 1
+
+    def mean(self, *args, **kwargs):
         return (self.a + self.b) / 2
+
+    def variance(self, *args, **kwargs):
+        n = self.b - self.a
+        return (n + 1) * (n - 1) / 2
 
     def __str__(self):
         return 'RandInt({}, {})'.format(self.a, self.b)
@@ -59,8 +75,19 @@ class Multinomial(Distribution):
         np.random.seed(seed)
         return np.random.multinomial(self.n, self.pvals)
 
+    def cdf(self, *args, **kwargs):
+        if sum(args) == self.n:
+            num = factorial(self.n) * np.prod([p ** x for (p, x) in zip(self.pvals, args)])
+            denom = np.prod([factorial(x) for x in args])
+            return num / denom
+        else:
+            return 0
+
     def mean(self, **kwargs):
         return np.array([self.n * pval for pval in self.pvals])
+
+    def variance(self, *args, **kwargs):
+        return np.array([self.n * p * (1 - p) for p in self.pvals])
 
     def __str__(self):
         return 'Multinomial({}, {})'.format(self.n, self.pvals)
@@ -90,8 +117,14 @@ class Bin(Multinomial):
         np.random.seed(seed)
         return np.random.binomial(self.n, self.p)
 
-    def mean(self, **kwargs):
-        return self.n * self.p
+    def cdf(self, x, *args, **kwargs):
+        return super().cdf(x)
+
+    def mean(self, *args, **kwargs):
+        return super().mean()[1]
+
+    def variance(self, *args, **kwargs):
+        return super().variance()[1]
 
     def __str__(self):
         return 'Bin({}, {})'.format(self.n, self.p)
@@ -113,8 +146,14 @@ class Ber(Bin):
     def __init__(self, p=0.5):
         super().__init__(1, p)
 
+    def cdf(self, x, *args, **kwargs):
+        return super().cdf(x)
+
     def mean(self, **kwargs):
-        return self.p
+        return super().mean()
+
+    def variance(self, *args, **kwargs):
+        return super().variance()
 
     def __str__(self):
         return 'Ber({})'.format(self.p)
@@ -147,8 +186,14 @@ class NegBin(Distribution):
         np.random.seed(seed)
         return np.random.negative_binomial(self.n, self.p)
 
+    def cdf(self, x, *args, **kwargs):
+        return stats.nbinom.cdf(x, self.n, self.p)
+
     def mean(self, **kwargs):
         return self.n * (1 - self.p) / self.p
+
+    def variance(self, *args, **kwargs):
+        return self.n * (1 - self.p) / self.p ** 2
 
     def __str__(self):
         return 'NegBin({}, {})'.format(self.n, self.p)
@@ -175,8 +220,14 @@ class Geom(NegBin):
         np.random.seed(seed)
         return np.random.geometric(self.p)
 
+    def cdf(self, x, *args, **kwargs):
+        return 1 - (1 - self.p) ** x
+
     def mean(self, **kwargs):
         return 1 / self.p
+
+    def variance(self, *args, **kwargs):
+        return (1 - self.p) / self.p ** 2
 
     def __str__(self):
         return 'Geom({})'.format(self.p)
@@ -232,6 +283,9 @@ class Pois(Distribution):
         return np.random.poisson(self.rate)
 
     def mean(self, **kwargs):
+        return self.rate
+
+    def variance(self, *args, **kwargs):
         return self.rate
 
     def __str__(self):
