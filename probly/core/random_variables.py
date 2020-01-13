@@ -110,19 +110,20 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     # ------------------------------ Integrals ------------------------------ #
 
-    # All integrals (including probabilities) are defined in terms of the mean
-    def mean(self, max_iter=int(1e5), tol=1e-5):
+    def adjusted_mean(self, max_iter=int(1e5), tol=1e-5, adjustment=0):
         max_small_change = 100
 
         total = 0
         avg = 0
         count = 0
-        for i in range(1, max_iter):
+        for i in range(1, adjustment + 1):
             total += self(i)
-            new_avg = total / i
+        for i in range(adjustment + 1, max_iter):
+            total += self(i)
+
+            new_avg = total / (i - adjustment)
             delta = abs(new_avg - avg)
             avg = new_avg
-
             if delta <= tol:
                 count += 1
                 if count >= max_small_change:
@@ -131,22 +132,15 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         warnings.warn('Failed to converge.', ConvergenceWarning)
         return avg
 
-    def moment(self, p, **kwargs):
-        rv = self ** p
-        return rv.mean(**kwargs)
+    def mean(self, *args, **kwargs):
+        return self.adjusted_mean(*args, **kwargs)
 
-    def cmoment(self, p, **kwargs):
-        return self.moment(p, **kwargs) - (self.mean()) ** p
-
-    def variance(self, **kwargs):
-        return self.cmoment(2, **kwargs)
+    def variance(self, *args, **kwargs):
+        rv = (self - self.mean(*args, **kwargs)) ** 2
+        return rv.adjusted_mean(adjustment=1, *args, **kwargs)
 
     def cdf(self, x, **kwargs):
         return (self <= x).mean(**kwargs)
-
-    def pdf(self, x, dx=1e-5, **kwargs):
-        cdf = functools.partial(self.cdf, **kwargs)
-        return scipy.misc.derivative(cdf, x, dx)
 
 
 class IndependentCopy(RandomVariable):

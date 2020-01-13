@@ -13,7 +13,7 @@ __all__ += ['seed']
 
 __all__ += ['array']
 __all__ += ['const', 'hist', 'lift', 'iid']
-__all__ += ['mean', 'moment', 'cmoment', 'variance', 'cdf', 'pdf']
+__all__ += ['mean', 'variance', 'cdf']
 
 # Discrete random variables
 __all__ == ['Distribution']

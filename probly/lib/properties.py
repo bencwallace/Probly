@@ -14,30 +14,6 @@ def mean(rv, max_iter=int(1e5), tol=1e-5):
     return rv.mean(max_iter=max_iter, tol=tol)
 
 
-def moment(rv, p, **kwargs):
-    """
-    Returns the `p`-th month of `rv`.
-
-    In general computed using `rv.mean` but may be overridden.
-
-    :param rv: RandomVariable
-    :param p: int
-    """
-    return rv.moment(p, **kwargs)
-
-
-def cmoment(rv, p, **kwargs):
-    """
-    Returns the `p`-th central month of `rv`.
-
-    In general computed using `mean` but may be overridden.
-
-    :param rv: RandomVariable
-    :param p: int
-    """
-    return rv.cmoment(p, **kwargs)
-
-
 def variance(rv, **kwargs):
     """
     Returns the variance `rv`.
@@ -60,16 +36,3 @@ def cdf(rv, x, **kwargs):
     :return: float
     """
     return rv.cdf(x, **kwargs)
-
-
-def pdf(rv, x, dx=1e-5, **kwargs):
-    """
-    Returns the value of the probability density function of `rv` evaluated at `x`.
-
-    In general computed using `RandomVariable.mean` but may be overridden.
-
-    :param rv: RandomVariable
-    :param x: float
-    :return: float
-    """
-    return rv.pdf(x, dx, **kwargs)
