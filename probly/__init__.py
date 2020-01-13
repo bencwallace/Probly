@@ -25,7 +25,7 @@ __all__ += ['HyperGeom', 'Pois']
 # Continuous random variables
 __all__ += ['Gamma', 'ChiSquared', 'Exp']
 __all__ += ['Unif']
-__all__ += ['Normal', 'LogNormal']
+__all__ += ['Normal']
 __all__ += ['Beta', 'PowerLaw']
 __all__ += ['F', 'StudentT']
 __all__ += ['Laplace', 'Logistic', 'VonMises']

@@ -9,8 +9,6 @@ import functools
 import warnings
 
 import numpy as np
-import scipy.misc
-
 from numpy.lib.mixins import NDArrayOperatorsMixin
 
 from .._exceptions import ConditionError, ConvergenceWarning
@@ -23,16 +21,14 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
     """
 
     def __init__(self, op=None, *parents):
-        self.shape = ()
+        super().__init__(op, *parents)
+
+        self._offset = 0
+        self.shape_ = ()
 
         # Initialize memo
         self._current_seed = None
         self._current_val = None
-
-        if op is None:
-            super().__init__()
-        else:
-            super().__init__(op, *parents)
 
     def copy(self):
         """Returns an independent, identically distributed random variable."""
@@ -59,6 +55,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
         """
 
         seed = self._seed(seed)
+        seed = (self._seed(seed) + self._offset) % self._max_seed
 
         # Check memo
         if seed == self._current_seed:
@@ -101,7 +98,7 @@ class RandomVariable(Node, NDArrayOperatorsMixin):
 
     def __array__(self, dtype=object):
         # Determines behaviour of np.array
-        return np.asarray(self.parents).reshape(self.shape)
+        return np.asarray(self.parents).reshape(self.shape_)
 
     def __getitem__(self, key):
         def op(array):
@@ -147,21 +144,17 @@ class IndependentCopy(RandomVariable):
     _generator = np.random.default_rng(0)
 
     def __init__(self, op=None, *parents):
-        self._offset = self._generator.integers(2 ** 32)
         super().__init__(op, *parents)
-
-    def __call__(self, seed=None):
-        new_seed = (self._seed(seed) + self._offset) % self._max_seed
-        return super().__call__(new_seed)
+        self._offset = self._generator.integers(2 ** 32)
 
 
 class Conditional(RandomVariable):
     _max_attempts = 100_000
 
     def __init__(self, rv, *conditions):
+        super().__init__()
         self.rv = rv
         self.conditions = conditions
-        super().__init__()
 
     def _sampler(self, seed=None):
         seed = self._seed(seed)

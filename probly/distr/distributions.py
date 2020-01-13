@@ -58,3 +58,4 @@ class Distribution(IndependentCopy, metaclass=Lift):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
     """
+

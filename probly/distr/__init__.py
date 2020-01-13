@@ -9,7 +9,7 @@ from .discrete import HyperGeom, Pois
 # Continuous random variables
 from .continuous import Gamma, ChiSquared, Exp
 from .continuous import Unif
-from .continuous import Normal, LogNormal
+from .continuous import Normal
 from .continuous import Beta, PowerLaw
 from .continuous import F, StudentT
 from .continuous import Laplace, Logistic, VonMises
@@ -27,7 +27,7 @@ __all__ += ['HyperGeom', 'Pois']
 # Continuous random variables
 __all__ += ['Gamma', 'ChiSquared', 'Exp']
 __all__ += ['Unif']
-__all__ += ['Normal', 'LogNormal']
+__all__ += ['Normal']
 __all__ += ['Beta', 'PowerLaw']
 __all__ += ['F', 'StudentT']
 __all__ += ['Laplace', 'Logistic', 'VonMises']

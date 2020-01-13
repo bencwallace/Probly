@@ -1,4 +1,4 @@
-class Node(object):
+class Node:
     """
     A node in a computational graph.
 

@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.stats as stats
 
 from .distributions import Distribution
 
@@ -22,21 +23,27 @@ class Gamma(Distribution):
         Scale parameter.
     """
 
-    def __init__(self, shape=1, scale=None):
-        self.shape = shape
+    def __init__(self, shape, scale):
+        self.shape_ = shape
         self.scale = scale
         self.rate = 1 / scale
         super().__init__()
 
     def _sampler(self, seed):
         np.random.seed(seed)
-        return np.random.gamma(self.shape, self.scale)
+        return np.random.gamma(self.shape_, self.scale)
+
+    def cdf(self, x, *args, **kwargs):
+        return stats.gamma.cdf(x, self.shape_, scale=self.scale)
 
     def mean(self, **kwargs):
-        return self.shape * self.scale
+        return self.shape_ * self.scale
+
+    def variance(self, *args, **kwargs):
+        self.shape_ * self.scale ** 2
 
     def __str__(self):
-        return 'Gamma(shape={}, scale={})'.format(self.shape, self.scale)
+        return 'Gamma(shape={}, scale={})'.format(self.shape_, self.scale)
 
 
 class ChiSquared(Gamma):
@@ -62,8 +69,14 @@ class ChiSquared(Gamma):
         np.random.seed(seed)
         return np.random.chisquare(self.k)
 
+    def cdf(self, x, *args, **kwargs):
+        return super().cdf(x)
+
     def mean(self, **kwargs):
         return self.k
+
+    def variance(self, *args, **kwargs):
+        2 * self.k
 
     def __str__(self):
         return 'ChiSquared({})'.format(self.k)
@@ -90,8 +103,14 @@ class Exp(Gamma):
         np.random.seed(seed)
         return np.random.exponential(self.rate)
 
+    def cdf(self, x, *args, **kwargs):
+        return 1 - np.exp(-self.rate * x)
+
     def mean(self, **kwargs):
         return 1 / self.rate
+
+    def variance(self, *args, **kwargs):
+        return 1 / self.rate ** 2
 
     def __str__(self):
         return 'Exp({})'.format(self.rate)
@@ -108,7 +127,7 @@ class Unif(Distribution):
     a : float, optional
         Left endpoint of the support interval.
     b : float, optional
-        Right endpoint of the selfupport inteDistributional.
+        Right endpoint of the support interval.
     """
 
     def __init__(self, a=0, b=1):
@@ -120,8 +139,19 @@ class Unif(Distribution):
         np.random.seed(seed)
         return np.random.uniform(self.a, self.b)
 
+    def cdf(self, x, *args, **kwargs):
+        if x <= self.a:
+            return 0
+        elif x <= self.b:
+            return (x - self.a) / (self.b - self.a)
+        else:
+            return 1
+
     def mean(self, **kwargs):
         return (self.a + self.b) / 2
+
+    def variance(self, *args, **kwargs):
+        (self.b - self.a) ** 2 / 12
 
     def __str__(self):
         return 'Unif({}, {})'.format(self.a, self.b)
@@ -135,7 +165,7 @@ class Normal(Distribution):
 
     Parameters
     ----------
-    mean : float, optional
+    mu : float, optional
         Mean.
     cov : float, optional
         Covariance matrix (variance if 1-dimensional).
@@ -143,15 +173,15 @@ class Normal(Distribution):
         Dimension of the ambient space.
     """
 
-    def __init__(self, mean=0, cov=1, dim=1):
+    def __init__(self, mu=0, cov=1, dim=1):
         self.dim = dim
-        self._mean = mean
+        self.mu = mu
         self.cov = cov
         self.shape = (dim, dim)
 
         if dim > 1:
-            if mean == 0:
-                self._mean = np.array([0] * dim)
+            if mu == 0:
+                self.mu = np.array([0] * dim)
             if cov == 1:
                 self.cov = np.eye(dim)
 
@@ -160,42 +190,23 @@ class Normal(Distribution):
     def _sampler(self, seed):
         np.random.seed(seed)
         if self.dim == 1:
-            return np.random.normal(self._mean, np.sqrt(self.cov))
+            return np.random.normal(self.mu, np.sqrt(self.cov))
         else:
-            return np.random.multivariate_normal(self._mean,
-                                                 self.cov, self.dim)
+            return np.random.multivariate_normal(self.mu, self.cov, self.dim)
+
+    def cdf(self, x, *args, **kwargs):
+        if self.dim == 1:
+            return stats.norm.cdf(x, self.mu, self.cov)
+        return stats.multivariate_normal.cdf(x, self.mu, self.cov)
 
     def mean(self, **kwargs):
-        return self._mean
+        return self.mu
+
+    def variance(self, *args, **kwargs):
+        return self.cov
 
     def __str__(self):
-        return 'Normal({}, {}, {})'.format(self.mean, self.cov, self.dim)
-
-
-class LogNormal(Distribution):
-    """
-    A log-normal random variable.
-
-    Parameters
-    ----------
-    mean : float, optional
-    sd : float, optional
-    """
-
-    def __init__(self, mean=0, sd=1):
-        self.mean = mean
-        self.sd = sd
-        super().__init__()
-
-    def _sampler(self, seed):
-        np.random.seed(seed)
-        return np.random.lognormal(self.mean, self.sd)
-
-    def mean(self, **kwargs):
-        return np.exp(self.mean + self.sd ** 2 / 2)
-
-    def __str__(self):
-        return 'LogNormal({}, {})'.format(self.mean, self.sd)
+        return 'Normal({}, {}, {})'.format(self.mu, self.cov, self.dim)
 
 
 # --------------------- Beta distribution and power law --------------------- #

@@ -92,5 +92,5 @@ def array(arr):
     def op(*inputs):
         return np.array(inputs).reshape(np.shape(arr))
     rv = RandomVariable(op, *arr.flatten())
-    rv.shape = arr.shape
+    rv.shape_ = arr.shape
     return rv
