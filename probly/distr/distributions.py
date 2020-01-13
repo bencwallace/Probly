@@ -2,6 +2,8 @@
 Random variables following common distributions.
 """
 
+import functools
+
 from ..core.random_variables import RandomVariable
 from ..lib import const
 
@@ -58,3 +60,21 @@ class Distribution(RandomVariable, metaclass=Lift):
     ...         np.random.seed(seed)
     ...         return np.random.uniform(self.a, self.b)
     """
+
+
+def model(*names):
+    def decorator(f):
+        class Model(Distribution):
+            def __init__(self, *params):
+                super().__init__()
+                self.params = params
+                for (name, arg) in zip(names, params):
+                    self.__setattr__(name, arg)
+                functools.update_wrapper(self, f)
+
+            def _sampler(self, seed):
+                return f(*self.params)(seed)
+
+        return Model
+
+    return decorator
