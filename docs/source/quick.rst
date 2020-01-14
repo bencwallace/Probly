@@ -23,7 +23,6 @@ We begin by importing ``probly``.
 >>> import probly as pr
 
 Next, we initialize some pre-packaged random variables.
-A complete list of available distributions is available at the :ref:`api`.
 
 >>> # A Bernoulli random variable with parameter 0.5
 >>> X = pr.Ber()
