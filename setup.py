@@ -1,5 +1,5 @@
 import pathlib
-from setuptools import setup
+from setuptools import find_packages, setup
 
 here = pathlib.Path(__file__).parent
 version = (here / 'version').read_text()
@@ -19,7 +19,7 @@ setup(name='probly',
                    'Intended Audience :: Education',
                    'License :: OSI Approved :: BSD License',
                    'Topic :: Scientific/Engineering :: Mathematics'],
-      packages=['probly'],
+      packages=find_packages(),
       install_requires=['numpy', 'scipy', 'matplotlib'],
       include_package_data=True,
       zip_safe=False)
