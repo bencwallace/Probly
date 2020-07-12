@@ -1,4 +1,4 @@
-from .distributions import Distribution
+from .distributions import Distribution, model
 
 # Discrete random variables
 from .discrete import RandInt
@@ -18,7 +18,7 @@ from .continuous import Laplace, Logistic, VonMises
 from .matrix import Wigner, Wishart
 
 # Discrete random variables
-__all__ = ['Distribution']
+__all__ = ['Distribution', 'model']
 __all__ += ['RandInt']
 __all__ += ['Multinomial', 'Bin', 'Ber']
 __all__ += ['NegBin', 'Geom']

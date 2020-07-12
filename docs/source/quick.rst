@@ -157,3 +157,20 @@ Random variables can themselves be used to parameterize other random variables, 
 >>> B = pr.Ber(U)
 >>> B(seed)
 0
+
+*************
+Custom models
+*************
+Custom models can be constructed by applying the ``pr.model`` decorator, evaluated on a list of parameter names,
+to a function of these parameters whose return value is a sampler (a function from a random seed to a random sample).
+
+>>> @pr.model('a', 'b')
+>>> def SquareOfUniform(a, b):
+>>>     def sampler(seed):
+>>>         np.random.seed()
+>>>         return np.random.uniform(a, b) ** 2
+>>>     return sampler
+
+This makes ``SquareOfUniform`` into a class whose instances are random variable objects that can be manipulated as
+above. To construct classes of random variables with additional functionality (e.g. built-in mean, variance, etc.),
+one can directly subclass ``Distribution`` as in the example at :ref:`custom`.

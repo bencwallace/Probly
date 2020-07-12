@@ -39,7 +39,7 @@ Here are some examples::
     // construct random variables with random parameters
     G = pr.Ber(pr.Unif())
     // define custom models
-    @pr.model
+    @pr.model('a', 'b')
     def SquareOfUniform(a, b):
         def sampler(seed):
             np.random.seed(seed)

@@ -16,7 +16,7 @@ __all__ += ['const', 'hist', 'lift', 'iid']
 __all__ += ['mean', 'variance', 'cdf']
 
 # Discrete random variables
-__all__ == ['Distribution']
+__all__ == ['Distribution', 'model']
 __all__ += ['RandInt']
 __all__ += ['Multinomial', 'Bin', 'Ber']
 __all__ += ['NegBin', 'Geom']

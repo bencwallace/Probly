@@ -2,8 +2,6 @@
 Examples
 ########
 
-.. _clt:
-
 *************************
 The central limit theorem
 *************************
@@ -72,6 +70,7 @@ function. Note that we need only take 1 sample.
 
 .. image:: _static/semicircle_normal_1000.png
 
+.. _custom:
 
 ********************
 Custom distributions
