@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "probly"
+version = "0.1.0"
+description = "A random variable library for Python."
+authors = ["Ben Wallace <bencwallace@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8,<3.12"
+numpy = "<1.20"
+scipy = "^1.9.1"
+matplotlib = "^3.5.3"
+
+[tool.poetry.dev-dependencies]
+ipython = "^8.4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
