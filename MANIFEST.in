@@ -1,6 +1,0 @@
-include MANIFEST
-include README.md
-include LICENSE
-include docs/Makefile
-include docs/source/conf.py
-include docs/source/*.rst
