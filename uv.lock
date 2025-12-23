@@ -64,6 +64,19 @@ wheels = [
 ]
 
 [[package]]
+name = "exceptiongroup"
+version = "1.3.1"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+dependencies = [
+    { name = "typing-extensions", version = "4.13.2", source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "typing-extensions", version = "4.15.0", source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }, marker = "python_full_version >= '3.9'" },
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/exceptiongroup/1.3.1/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/exceptiongroup/1.3.1/exceptiongroup-1.3.1-py3-none-any.whl", hash = "sha256:a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598" },
+]
+
+[[package]]
 name = "executing"
 version = "1.0.0"
 source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
@@ -79,6 +92,15 @@ source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-grou
 sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/fonttools/4.37.1/fonttools-4.37.1.zip", hash = "sha256:4606e1a88ee1f6699d182fea9511bd9a8a915d913eab4584e5226da1180fcce7" }
 wheels = [
     { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/fonttools/4.37.1/fonttools-4.37.1-py3-none-any.whl", hash = "sha256:fff6b752e326c15756c819fe2fe7ceab69f96a1dbcfe8911d0941cdb49905007" },
+]
+
+[[package]]
+name = "iniconfig"
+version = "2.1.0"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/iniconfig/2.1.0/iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/iniconfig/2.1.0/iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760" },
 ]
 
 [[package]]
@@ -302,6 +324,30 @@ wheels = [
 ]
 
 [[package]]
+name = "pluggy"
+version = "1.5.0"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+resolution-markers = [
+    "python_full_version < '3.9'",
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pluggy/1.5.0/pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pluggy/1.5.0/pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669" },
+]
+
+[[package]]
+name = "pluggy"
+version = "1.6.0"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+resolution-markers = [
+    "python_full_version >= '3.9'",
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pluggy/1.6.0/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pluggy/1.6.0/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746" },
+]
+
+[[package]]
 name = "probly"
 version = "0.1.0"
 source = { editable = "." }
@@ -314,6 +360,8 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "ipython" },
+    { name = "pytest", version = "8.3.5", source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "pytest", version = "8.4.2", source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }, marker = "python_full_version >= '3.9'" },
 ]
 
 [package.metadata]
@@ -324,7 +372,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ipython", specifier = ">=8.4.0,<9" }]
+dev = [
+    { name = "ipython", specifier = ">=8.4.0,<9" },
+    { name = "pytest" },
+]
 
 [[package]]
 name = "prompt-toolkit"
@@ -372,6 +423,47 @@ source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-grou
 sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pyparsing/3.0.9/pyparsing-3.0.9.tar.gz", hash = "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb" }
 wheels = [
     { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pyparsing/3.0.9/pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc" },
+]
+
+[[package]]
+name = "pytest"
+version = "8.3.5"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+resolution-markers = [
+    "python_full_version < '3.9'",
+]
+dependencies = [
+    { name = "colorama", marker = "python_full_version < '3.9' and sys_platform == 'win32'" },
+    { name = "exceptiongroup", marker = "python_full_version < '3.9'" },
+    { name = "iniconfig", marker = "python_full_version < '3.9'" },
+    { name = "packaging", marker = "python_full_version < '3.9'" },
+    { name = "pluggy", version = "1.5.0", source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "tomli", marker = "python_full_version < '3.9'" },
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pytest/8.3.5/pytest-8.3.5.tar.gz", hash = "sha256:f4efe70cc14e511565ac476b57c279e12a855b11f48f212af1080ef2263d3845" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pytest/8.3.5/pytest-8.3.5-py3-none-any.whl", hash = "sha256:c69214aa47deac29fad6c2a4f590b9c4a9fdb16a403176fe154b79c0b4d4d820" },
+]
+
+[[package]]
+name = "pytest"
+version = "8.4.2"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+resolution-markers = [
+    "python_full_version >= '3.9'",
+]
+dependencies = [
+    { name = "colorama", marker = "python_full_version >= '3.9' and sys_platform == 'win32'" },
+    { name = "exceptiongroup", marker = "python_full_version >= '3.9'" },
+    { name = "iniconfig", marker = "python_full_version >= '3.9'" },
+    { name = "packaging", marker = "python_full_version >= '3.9'" },
+    { name = "pluggy", version = "1.6.0", source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }, marker = "python_full_version >= '3.9'" },
+    { name = "pygments", marker = "python_full_version >= '3.9'" },
+    { name = "tomli", marker = "python_full_version >= '3.9'" },
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pytest/8.4.2/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/pytest/8.4.2/pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79" },
 ]
 
 [[package]]
@@ -461,12 +553,45 @@ wheels = [
 ]
 
 [[package]]
+name = "tomli"
+version = "2.3.0"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/tomli/2.3.0/tomli-2.3.0.tar.gz", hash = "sha256:64be704a875d2a59753d80ee8a533c3fe183e3f06807ff7dc2232938ccb01549" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/tomli/2.3.0/tomli-2.3.0-py3-none-any.whl", hash = "sha256:e95b1af3c5b07d9e643909b5abbec77cd9f1217e6d0bca72b0234736b9fb1f1b" },
+]
+
+[[package]]
 name = "traitlets"
 version = "5.3.0"
 source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
 sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/traitlets/5.3.0/traitlets-5.3.0.tar.gz", hash = "sha256:0bb9f1f9f017aa8ec187d8b1b2a7a6626a2a1d877116baba52a129bfa124f8e2" }
 wheels = [
     { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/traitlets/5.3.0/traitlets-5.3.0-py3-none-any.whl", hash = "sha256:65fa18961659635933100db8ca120ef6220555286949774b9cfc106f941d1c7a" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.13.2"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+resolution-markers = [
+    "python_full_version < '3.9'",
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/typing-extensions/4.13.2/typing_extensions-4.13.2.tar.gz", hash = "sha256:e6c81219bd689f51865d9e372991c540bda33a0379d5573cddb9a3a23f7caaef" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/typing-extensions/4.13.2/typing_extensions-4.13.2-py3-none-any.whl", hash = "sha256:a439e7c04b49fec3e5d3e2beaa21755cadbbdc391694e28ccdd36ca4a1408f8c" },
+]
+
+[[package]]
+name = "typing-extensions"
+version = "4.15.0"
+source = { registry = "https://nexus.melodis.com/repository/soundhound-pypi-group/simple" }
+resolution-markers = [
+    "python_full_version >= '3.9'",
+]
+sdist = { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/typing-extensions/4.15.0/typing_extensions-4.15.0.tar.gz", hash = "sha256:0cea48d173cc12fa28ecabc3b837ea3cf6f38c6d1136f85cbaaf598984861466" }
+wheels = [
+    { url = "https://nexus.melodis.com/repository/soundhound-pypi-group/packages/typing-extensions/4.15.0/typing_extensions-4.15.0-py3-none-any.whl", hash = "sha256:f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548" },
 ]
 
 [[package]]
