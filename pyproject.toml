@@ -1,19 +1,19 @@
-[tool.poetry]
+[project]
 name = "probly"
 version = "0.1.0"
 description = "A random variable library for Python."
-authors = ["Ben Wallace <bencwallace@gmail.com>"]
+authors = [{ name = "Ben Wallace", email = "bencwallace@gmail.com" }]
+requires-python = ">=3.8,<4,<3.12"
 license = "BSD-3-Clause"
+dependencies = [
+    "numpy<1.20",
+    "scipy>=1.9.1,<2",
+    "matplotlib>=3.5.3,<4",
+]
 
-[tool.poetry.dependencies]
-python = "^3.8,<3.12"
-numpy = "<1.20"
-scipy = "^1.9.1"
-matplotlib = "^3.5.3"
-
-[tool.poetry.dev-dependencies]
-ipython = "^8.4.0"
+[dependency-groups]
+dev = ["ipython>=8.4.0,<9"]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
