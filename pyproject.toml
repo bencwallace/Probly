@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["ipython>=8.4.0,<9"]
+dev = ["ipython>=8.4.0,<9", "pytest"]
 
 [build-system]
 requires = ["hatchling"]
